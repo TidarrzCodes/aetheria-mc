@@ -116,88 +116,91 @@
   <div class="relative z-10 flex flex-col justify-between min-h-screen">
     
     <!-- TOP NAVBAR -->
-    <header class="border-b border-rose-950/80 bg-[#020305]/90 sticky top-0 z-40 backdrop-blur-md">
-      <div class="max-w-6xl mx-auto px-4 py-3.5 flex justify-between items-center">
+    <header class="border-b border-rose-950/80 bg-[#020305]/95 sticky top-0 z-40 backdrop-blur-md">
+      <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
         
         <!-- LOGO BRAND -->
-        <a href="#" class="flex items-center gap-3.5 group">
-          <div class="w-10 h-10 bg-rose-950/80 border border-rose-500/70 rounded-xl flex items-center justify-center text-rose-500 font-bold text-lg shadow-lg shadow-rose-950/80 group-hover:scale-105 transition">
-            <i class="fa-solid fa-moon"></i>
-          </div>
-          <div>
-            <span class="font-epic font-black text-lg text-white tracking-widest">AETHERIA<span class="text-rose-500">: ECLIPSE</span></span>
-            <p class="text-[10px] text-slate-400 font-mono-code tracking-tight">DRAGON'S ECLIPSE NETWORK</p>
+        <a href="#" class="flex items-center gap-3 group w-full sm:w-auto justify-between sm:justify-start">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 bg-rose-950/80 border border-rose-500/70 rounded-xl flex items-center justify-center text-rose-500 font-bold text-base sm:text-lg shadow-lg shadow-rose-950/80 group-hover:scale-105 transition shrink-0">
+              <i class="fa-solid fa-moon"></i>
+            </div>
+            <div>
+              <span class="font-epic font-black text-base sm:text-lg text-white tracking-widest block leading-tight">AETHERIA<span class="text-rose-500">: ECLIPSE</span></span>
+              <p class="text-[9px] sm:text-[10px] text-slate-400 font-mono-code tracking-tight">DRAGON'S ECLIPSE NETWORK</p>
+            </div>
           </div>
         </a>
 
         <!-- SERVER IP COPY WIDGET -->
-        <button onclick="copyIP('aetheria.raditnex.my.id')" class="bg-slate-900/90 hover:bg-slate-800 border border-rose-500/50 text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-2.5 shadow-lg shadow-rose-950/40 active:scale-95">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span class="text-slate-300">SERVER IP: <strong class="text-white font-mono-code">aetheria.raditnex.my.id</strong></span>
-          <i class="fa-regular fa-copy text-rose-400"></i>
+        <button onclick="copyIP('aetheria.raditnex.my.id')" class="w-full sm:w-auto bg-slate-900/90 hover:bg-slate-800 border border-rose-500/50 text-xs px-3.5 py-2 rounded-xl transition flex items-center justify-center sm:justify-start gap-2 shadow-lg shadow-rose-950/40 active:scale-95">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+          <span class="text-slate-300 truncate text-[11px] sm:text-xs">SERVER IP: <strong class="text-white font-mono-code">aetheria.raditnex.my.id</strong></span>
+          <i class="fa-regular fa-copy text-rose-400 shrink-0 ml-1"></i>
         </button>
 
       </div>
     </header>
 
     <!-- HERO SECTION -->
-    <section class="max-w-6xl mx-auto px-4 py-12 md:py-20 w-full text-center">
-      <div class="inline-flex items-center gap-2.5 bg-rose-950/90 border border-rose-500/60 text-rose-300 text-xs font-semibold px-4.5 py-1.5 rounded-full mb-6 glow-rose">
-        <i class="fa-solid fa-moon text-amber-400"></i> AETHERIA: DRAGON'S ECLIPSE • EPIC FIGHT • SURVIVAL 1.20.1
+    <section class="max-w-6xl mx-auto px-4 py-8 md:py-20 w-full text-center">
+      <div class="inline-flex items-center gap-2 bg-rose-950/90 border border-rose-500/60 text-rose-300 text-[10px] sm:text-xs font-semibold px-3 py-1.5 rounded-full mb-5 glow-rose max-w-full">
+        <i class="fa-solid fa-moon text-amber-400 shrink-0"></i> 
+        <span class="truncate">AETHERIA: DRAGON'S ECLIPSE • EPIC FIGHT • SURVIVAL 1.20.1</span>
       </div>
       
-      <h1 class="text-4xl md:text-7xl font-black text-white tracking-tight leading-none uppercase font-epic dragon-title">
-        AETHERIA: <span class="bg-gradient-to-r from-rose-500 via-amber-400 to-rose-600 bg-clip-text text-transparent">DRAGON'S ECLIPSE</span>
+      <h1 class="text-3xl sm:text-5xl md:text-7xl font-black text-white tracking-tight leading-tight sm:leading-none uppercase font-epic dragon-title px-2">
+        AETHERIA: <span class="bg-gradient-to-r from-rose-500 via-amber-400 to-rose-600 bg-clip-text text-transparent block sm:inline">DRAGON'S ECLIPSE</span>
       </h1>
       
-      <p class="mt-5 text-slate-300 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
+      <p class="mt-4 sm:mt-5 text-slate-300 text-xs sm:text-base leading-relaxed max-w-2xl mx-auto px-2">
         Kuasai pertarungan pedang berseni tinggi ala Soulslike dengan sistem combo <strong class="text-rose-400">Epic Fight Mod</strong>, bertarung & terbang menunggangi naga di bawah bayang-bayang Gerhana Naga!
       </p>
 
       <!-- LIVE PLAYER LIST WIDGET -->
-      <div class="mt-10 max-w-2xl mx-auto supreme-card p-6 rounded-2xl text-left border-rose-500/50">
-        <div class="flex flex-wrap justify-between items-center pb-3.5 border-b border-slate-800/80 gap-2">
-          <div class="flex items-center gap-2.5">
-            <span id="server-status-dot" class="w-3 h-3 rounded-full bg-gray-500"></span>
-            <span class="text-xs font-extrabold text-white uppercase font-mono-code tracking-wider">KSATRIA ECLIPSE ONLINE</span>
+      <div class="mt-8 sm:mt-10 max-w-2xl mx-auto supreme-card p-4 sm:p-6 rounded-2xl text-left border-rose-500/50">
+        <div class="flex flex-wrap justify-between items-center pb-3 border-b border-slate-800/80 gap-2">
+          <div class="flex items-center gap-2">
+            <span id="server-status-dot" class="w-2.5 h-2.5 rounded-full bg-gray-500"></span>
+            <span class="text-[11px] sm:text-xs font-extrabold text-white uppercase font-mono-code tracking-wider">KSATRIA ECLIPSE ONLINE</span>
           </div>
-          <div class="text-xs font-mono-code text-slate-400">
+          <div class="text-[11px] sm:text-xs font-mono-code text-slate-400">
             <span id="player-count-text" class="text-rose-400 font-bold">Checking status...</span>
           </div>
         </div>
 
         <!-- PLAYER AVATARS CONTAINER -->
-        <div id="player-list-container" class="mt-4 flex flex-wrap gap-2.5 items-center min-h-[48px]">
+        <div id="player-list-container" class="mt-3 sm:mt-4 flex flex-wrap gap-2 items-center min-h-[40px]">
           <span class="text-xs text-slate-500 italic font-mono-code">Memuat daftar ksatria online...</span>
         </div>
       </div>
     </section>
 
     <!-- GAMEPLAY HIGHLIGHTS -->
-    <section class="max-w-6xl mx-auto px-4 py-6 w-full">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <section class="max-w-6xl mx-auto px-4 py-4 sm:py-6 w-full">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
         
-        <div class="supreme-card p-6 rounded-2xl flex flex-col justify-start">
-          <div class="w-12 h-12 bg-rose-500/10 border border-rose-500/40 text-rose-400 rounded-xl flex items-center justify-center text-xl mb-4 shadow-lg shadow-rose-950/50">
+        <div class="supreme-card p-5 sm:p-6 rounded-2xl flex flex-col justify-start">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-rose-500/10 border border-rose-500/40 text-rose-400 rounded-xl flex items-center justify-center text-lg sm:text-xl mb-3 sm:mb-4 shadow-lg shadow-rose-950/50">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
           </div>
-          <h4 class="text-lg font-bold text-white mb-1.5 font-epic">Combos Epic Fight Mod</h4>
+          <h4 class="text-base sm:text-lg font-bold text-white mb-1.5 font-epic">Combos Epic Fight Mod</h4>
           <p class="text-xs text-slate-400 leading-relaxed">Sistem pertarungan dinamis dengan tebasan Greatsword, Katana, Longsword, Dodge Roll, dan combo serangan udara yang memukau.</p>
         </div>
 
-        <div class="supreme-card p-6 rounded-2xl flex flex-col justify-start">
-          <div class="w-12 h-12 bg-amber-500/10 border border-amber-500/40 text-amber-400 rounded-xl flex items-center justify-center text-xl mb-4 shadow-lg shadow-amber-950/50">
+        <div class="supreme-card p-5 sm:p-6 rounded-2xl flex flex-col justify-start">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-500/10 border border-amber-500/40 text-amber-400 rounded-xl flex items-center justify-center text-lg sm:text-xl mb-3 sm:mb-4 shadow-lg shadow-amber-950/50">
             <i class="fa-solid fa-dragon"></i>
           </div>
-          <h4 class="text-lg font-bold text-white mb-1.5 font-epic">Jinakkan & Tunggangi Naga</h4>
+          <h4 class="text-base sm:text-lg font-bold text-white mb-1.5 font-epic">Jinakkan & Tunggangi Naga</h4>
           <p class="text-xs text-slate-400 leading-relaxed">Berburu telur naga langka, tetaskan di sarang, lalu terbang bertarung di udara bersama naga tempur peliharaanmu.</p>
         </div>
 
-        <div class="supreme-card p-6 rounded-2xl flex flex-col justify-start">
-          <div class="w-12 h-12 bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 rounded-xl flex items-center justify-center text-xl mb-4 shadow-lg shadow-emerald-950/50">
+        <div class="supreme-card p-5 sm:p-6 rounded-2xl flex flex-col justify-start">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 rounded-xl flex items-center justify-center text-lg sm:text-xl mb-3 sm:mb-4 shadow-lg shadow-emerald-950/50">
             <i class="fa-solid fa-coins"></i>
           </div>
-          <h4 class="text-lg font-bold text-white mb-1.5 font-epic">Ekonomi & Pasar Pedang</h4>
+          <h4 class="text-base sm:text-lg font-bold text-white mb-1.5 font-epic">Ekonomi & Pasar Pedang</h4>
           <p class="text-xs text-slate-400 leading-relaxed">Jual beli senjata Epic, material naga, dan item langka via Auction House serta toko fisik player.</p>
         </div>
 
@@ -205,28 +208,26 @@
     </section>
 
     <!-- MEDIA GALLERY SECTION -->
-    <section class="max-w-6xl mx-auto px-4 py-10 w-full">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-8">
+    <section class="max-w-6xl mx-auto px-4 py-8 sm:py-10 w-full">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6 sm:mb-8">
         <div>
-          <h3 class="text-2xl md:text-3xl font-black text-white tracking-tight font-epic flex items-center gap-3">
+          <h3 class="text-xl sm:text-3xl font-black text-white tracking-tight font-epic flex items-center gap-2.5">
             <i class="fa-solid fa-images text-rose-500"></i> Realm Gallery Showcase
           </h3>
           <p class="text-xs text-slate-400 mt-1">Cuplikan aksi pertarungan naga & duel combo pedang in-game Aetheria: Dragon's Eclipse</p>
         </div>
-        <span class="text-xs font-mono-code bg-rose-950/60 border border-rose-500/30 text-rose-300 px-3 py-1 rounded-lg">
+        <span class="text-[11px] sm:text-xs font-mono-code bg-rose-950/60 border border-rose-500/30 text-rose-300 px-3 py-1 rounded-lg">
           <i class="fa-solid fa-camera mr-1"></i> In-Game Screenshots
         </span>
       </div>
 
       <!-- GALLERY GRID -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
         
         <!-- PHOTO 1 -->
         <div onclick="openLightbox('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80', 'Pertarungan Sengit Naga Fire Drake')" class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
           <div class="aspect-video overflow-hidden">
             <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80" alt="Dragon Battle" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-          </div>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 p-4 flex flex-col justify-end">
           </div>
         </div>
 
@@ -235,16 +236,12 @@
           <div class="aspect-video overflow-hidden">
             <img src="https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=800&q=80" alt="Epic Sword Fight" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
           </div>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 p-4 flex flex-col justify-end">
-          </div>
         </div>
 
         <!-- PHOTO 3 -->
         <div onclick="openLightbox('https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1200&q=80', 'Terbang Menjelajahi Sarang Naga')" class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
           <div class="aspect-video overflow-hidden">
             <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80" alt="Dragon Mount Flight" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-          </div>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 p-4 flex flex-col justify-end">
           </div>
         </div>
 
@@ -253,16 +250,12 @@
           <div class="aspect-video overflow-hidden">
             <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80" alt="Guild Stronghold" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
           </div>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 p-4 flex flex-col justify-end">
-          </div>
         </div>
 
         <!-- PHOTO 5 -->
         <div onclick="openLightbox('https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80', 'Pasar Lelang Pedang & Item Rare')" class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
           <div class="aspect-video overflow-hidden">
             <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80" alt="Auction House" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-          </div>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 p-4 flex flex-col justify-end">
           </div>
         </div>
 
@@ -271,30 +264,28 @@
           <div class="aspect-video overflow-hidden">
             <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=800&q=80" alt="World Boss Raid" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
           </div>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 p-4 flex flex-col justify-end">
-          </div>
         </div>
 
       </div>
     </section>
 
     <!-- WEBSTORE CATALOG -->
-    <main id="store" class="max-w-6xl mx-auto px-4 py-12 w-full border-t border-slate-800/80">
+    <main id="store" class="max-w-6xl mx-auto px-4 py-8 sm:py-12 w-full border-t border-slate-800/80">
       
       <!-- CATEGORY SWITCHER -->
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h2 class="text-3xl font-black text-white tracking-tight font-epic flex items-center gap-2">
+          <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight font-epic flex items-center gap-2">
             <i class="fa-solid fa-fire text-rose-500"></i> Eclipse Webstore
           </h2>
           <p class="text-xs text-slate-400 mt-0.5">Dukung operasional server & dapatkan rank serta saldo eksklusif</p>
         </div>
 
-        <div class="flex bg-slate-900/90 p-1.5 rounded-xl border border-slate-800 text-xs font-semibold">
-          <button onclick="switchTab('rank')" id="tab-rank" class="px-5 py-2.5 rounded-lg bg-rose-600 text-white shadow-lg shadow-rose-900/40 transition">
+        <div class="flex w-full sm:w-auto bg-slate-900/90 p-1.5 rounded-xl border border-slate-800 text-xs font-semibold">
+          <button onclick="switchTab('rank')" id="tab-rank" class="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg bg-rose-600 text-white shadow-lg shadow-rose-900/40 transition">
             Rank Membership
           </button>
-          <button onclick="switchTab('money')" id="tab-money" class="px-5 py-2.5 rounded-lg text-slate-400 hover:text-white transition">
+          <button onclick="switchTab('money')" id="tab-money" class="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg text-slate-400 hover:text-white transition">
             Coins / Money
           </button>
         </div>
@@ -304,15 +295,15 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="store-grid">
         
         <!-- ITEM RANK 1: VIP WARRIOR -->
-        <div class="item-card item-rank supreme-card p-6 rounded-2xl flex flex-col justify-between">
+        <div class="item-card item-rank supreme-card p-5 sm:p-6 rounded-2xl flex flex-col justify-between">
           <div>
             <div class="flex justify-between items-center mb-3">
               <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[11px] font-semibold px-2.5 py-1 rounded-md">PERMANENT RANK</span>
               <span class="text-xs font-mono-code text-amber-400 font-bold">[VIP]</span>
             </div>
 
-            <h3 class="text-2xl font-bold text-white font-epic">VIP Warrior</h3>
-            <p class="text-3xl font-extrabold text-amber-400 my-2 font-mono-code">Rp 25.000</p>
+            <h3 class="text-xl sm:text-2xl font-bold text-white font-epic">VIP Warrior</h3>
+            <p class="text-2xl sm:text-3xl font-extrabold text-amber-400 my-2 font-mono-code">Rp 25.000</p>
             <p class="text-xs text-slate-400 mb-6 leading-relaxed">Status VIP untuk kemudahan terbang, kit perlengkapan naga, dan perk pertarungan.</p>
 
             <div class="border-t border-slate-800/80 pt-4 mb-6">
@@ -332,15 +323,15 @@
         </div>
 
         <!-- ITEM RANK 2: MVP DRAGON KNIGHT -->
-        <div class="item-card item-rank supreme-card p-6 rounded-2xl flex flex-col justify-between border-rose-500/60 glow-rose">
+        <div class="item-card item-rank supreme-card p-5 sm:p-6 rounded-2xl flex flex-col justify-between border-rose-500/60 glow-rose">
           <div>
             <div class="flex justify-between items-center mb-3">
               <span class="bg-rose-500/10 text-rose-400 border border-rose-500/30 text-[11px] font-semibold px-2.5 py-1 rounded-md">PERMANENT RANK</span>
               <span class="text-xs font-mono-code text-cyan-400 font-bold">[MVP]</span>
             </div>
 
-            <h3 class="text-2xl font-bold text-white font-epic">MVP Dragon Knight</h3>
-            <p class="text-3xl font-extrabold text-amber-400 my-2 font-mono-code">Rp 50.000</p>
+            <h3 class="text-xl sm:text-2xl font-bold text-white font-epic">MVP Dragon Knight</h3>
+            <p class="text-2xl sm:text-3xl font-extrabold text-amber-400 my-2 font-mono-code">Rp 50.000</p>
             <p class="text-xs text-slate-400 mb-6 leading-relaxed">Status ksatria naga tertinggi dengan hak istimewa penuh dan batas maksimal.</p>
 
             <div class="border-t border-slate-800/80 pt-4 mb-6">
@@ -360,7 +351,7 @@
         </div>
 
         <!-- ITEM RANK 3: DRAGONIAN -->
-        <div class="item-card item-rank supreme-card p-6 rounded-2xl flex flex-col justify-between border-amber-500/80 glow-gold relative overflow-hidden">
+        <div class="item-card item-rank supreme-card p-5 sm:p-6 rounded-2xl flex flex-col justify-between border-amber-500/80 glow-gold relative overflow-hidden">
           <div class="absolute -right-10 -top-10 w-28 h-28 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
           <div>
             <div class="flex justify-between items-center mb-3">
@@ -368,8 +359,8 @@
               <span class="text-xs font-mono-code text-amber-300 font-extrabold tracking-wider">[DRAGONIAN]</span>
             </div>
 
-            <h3 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-rose-300 to-amber-400 font-epic">Dragonians</h3>
-            <p class="text-3xl font-extrabold text-amber-300 my-2 font-mono-code">Rp 100.000</p>
+            <h3 class="text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-rose-300 to-amber-400 font-epic">Dragonians</h3>
+            <p class="text-2xl sm:text-3xl font-extrabold text-amber-300 my-2 font-mono-code">Rp 100.000</p>
             <p class="text-xs text-slate-400 mb-6 leading-relaxed">Kasta tertinggi penguasa legenda naga. Akses tanpa batas ke seluruh komando & efek visual eksklusif.</p>
 
             <div class="border-t border-slate-800/80 pt-4 mb-6">
@@ -392,15 +383,15 @@
         <!-- ================= MONEY / COINS CATALOG ================= -->
 
         <!-- ITEM MONEY 1: 10K COINS -->
-        <div class="item-card item-money supreme-card p-6 rounded-2xl flex-col justify-between hidden">
+        <div class="item-card item-money supreme-card p-5 sm:p-6 rounded-2xl flex-col justify-between hidden">
           <div>
             <div class="flex justify-between items-center mb-3">
               <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[11px] font-semibold px-2.5 py-1 rounded-md">STARTER PACK</span>
               <span class="text-xs font-mono-code text-emerald-400 font-bold"><i class="fa-solid fa-coins"></i></span>
             </div>
 
-            <h3 class="text-2xl font-bold text-white font-epic">10.000 Coins</h3>
-            <p class="text-3xl font-extrabold text-emerald-400 my-2 font-mono-code">Rp 10.000</p>
+            <h3 class="text-xl sm:text-2xl font-bold text-white font-epic">10.000 Coins</h3>
+            <p class="text-2xl sm:text-3xl font-extrabold text-emerald-400 my-2 font-mono-code">Rp 10.000</p>
             <p class="text-xs text-slate-400 mb-6 leading-relaxed">Saldo tunai game instan untuk beli pedang Epic, makanan naga & item toko.</p>
 
             <div class="border-t border-slate-800/80 pt-4 mb-6">
@@ -419,15 +410,15 @@
         </div>
 
         <!-- ITEM MONEY 2: 25K COINS -->
-        <div class="item-card item-money supreme-card p-6 rounded-2xl flex-col justify-between hidden">
+        <div class="item-card item-money supreme-card p-5 sm:p-6 rounded-2xl flex-col justify-between hidden">
           <div>
             <div class="flex justify-between items-center mb-3">
               <span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 text-[11px] font-semibold px-2.5 py-1 rounded-md">ADVENTURER PACK</span>
               <span class="text-xs font-mono-code text-cyan-400 font-bold">DISCOUNT</span>
             </div>
 
-            <h3 class="text-2xl font-bold text-white font-epic">25.000 Coins</h3>
-            <p class="text-3xl font-extrabold text-emerald-400 my-2 font-mono-code">Rp 22.000</p>
+            <h3 class="text-xl sm:text-2xl font-bold text-white font-epic">25.000 Coins</h3>
+            <p class="text-2xl sm:text-3xl font-extrabold text-emerald-400 my-2 font-mono-code">Rp 22.000</p>
             <p class="text-xs text-slate-400 mb-6 leading-relaxed">Paket saldo petualang sedang untuk modal beli perlengkapan naga pertamamu.</p>
 
             <div class="border-t border-slate-800/80 pt-4 mb-6">
@@ -446,15 +437,15 @@
         </div>
 
         <!-- ITEM MONEY 3: 50K COINS -->
-        <div class="item-card item-money supreme-card p-6 rounded-2xl flex-col justify-between hidden">
+        <div class="item-card item-money supreme-card p-5 sm:p-6 rounded-2xl flex-col justify-between hidden">
           <div>
             <div class="flex justify-between items-center mb-3">
               <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[11px] font-semibold px-2.5 py-1 rounded-md">GUILD MASTER PACK</span>
               <span class="text-xs font-mono-code text-amber-400 font-bold">BEST VALUE</span>
             </div>
 
-            <h3 class="text-2xl font-bold text-white font-epic">50.000 Coins</h3>
-            <p class="text-3xl font-extrabold text-emerald-400 my-2 font-mono-code">Rp 40.000</p>
+            <h3 class="text-xl sm:text-2xl font-bold text-white font-epic">50.000 Coins</h3>
+            <p class="text-2xl sm:text-3xl font-extrabold text-emerald-400 my-2 font-mono-code">Rp 40.000</p>
             <p class="text-xs text-slate-400 mb-6 leading-relaxed">Paket saldo hemat untuk klaim lahan luas dan membuat Guild Ksatria.</p>
 
             <div class="border-t border-slate-800/80 pt-4 mb-6">
@@ -473,7 +464,7 @@
         </div>
 
         <!-- ITEM MONEY 4: 100K COINS -->
-        <div class="item-card item-money supreme-card p-6 rounded-2xl flex-col justify-between border-emerald-500/70 glow-emerald relative overflow-hidden hidden">
+        <div class="item-card item-money supreme-card p-5 sm:p-6 rounded-2xl flex-col justify-between border-emerald-500/70 glow-emerald relative overflow-hidden hidden">
           <div class="absolute -right-10 -top-10 w-28 h-28 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
           <div>
             <div class="flex justify-between items-center mb-3">
@@ -481,8 +472,8 @@
               <span class="text-xs font-mono-code text-amber-300 font-extrabold tracking-wider">ULTIMATE SULTAN</span>
             </div>
 
-            <h3 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-400 font-epic">100.000 Coins</h3>
-            <p class="text-3xl font-extrabold text-emerald-300 my-2 font-mono-code">Rp 75.000</p>
+            <h3 class="text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-400 font-epic">100.000 Coins</h3>
+            <p class="text-2xl sm:text-3xl font-extrabold text-emerald-300 my-2 font-mono-code">Rp 75.000</p>
             <p class="text-xs text-slate-400 mb-6 leading-relaxed">Gudang koin melimpah untuk menjadi raja ekonomi server & menguasai pasar pedang Epic!</p>
 
             <div class="border-t border-slate-800/80 pt-4 mb-6">
@@ -516,34 +507,34 @@
 
     <!-- MODAL CHECKOUT -->
     <div id="checkoutModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-      <div class="supreme-card w-full max-w-md p-6 rounded-2xl relative shadow-2xl border-rose-500/60 max-h-[90vh] overflow-y-auto">
+      <div class="supreme-card w-full max-w-md p-5 sm:p-6 rounded-2xl relative shadow-2xl border-rose-500/60 max-h-[90vh] overflow-y-auto">
         
         <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-sm w-8 h-8 flex items-center justify-center rounded-lg bg-slate-900 border border-slate-800">
           <i class="fa-solid fa-xmark"></i>
         </button>
 
-        <h3 class="text-lg font-bold text-white mb-4 border-b border-slate-800/80 pb-3 font-epic flex items-center gap-2">
+        <h3 class="text-base sm:text-lg font-bold text-white mb-4 border-b border-slate-800/80 pb-3 font-epic flex items-center gap-2">
           <i class="fa-solid fa-shield-halved text-rose-500"></i> Konfirmasi Pembayaran GoPay
         </h3>
 
         <!-- SUMMARY -->
-        <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800/80 mb-4 text-xs flex justify-between items-center">
+        <div class="bg-slate-950/80 p-3 sm:p-3.5 rounded-xl border border-slate-800/80 mb-4 text-xs flex justify-between items-center">
           <div>
-            <p class="text-slate-400 text-[11px]">Item Dipilih:</p>
+            <p class="text-slate-400 text-[10px] sm:text-[11px]">Item Dipilih:</p>
             <p id="modal-item-name" class="font-bold text-white mt-0.5 font-epic"></p>
           </div>
           <div class="text-right">
-            <p class="text-slate-400 text-[11px]">Harga:</p>
+            <p class="text-slate-400 text-[10px] sm:text-[11px]">Harga:</p>
             <p id="modal-item-price" class="font-bold text-emerald-400 mt-0.5 font-mono-code"></p>
           </div>
         </div>
 
         <!-- GOPAY INFO -->
-        <div class="bg-blue-950/30 border border-blue-500/30 p-3.5 rounded-xl mb-4 text-xs flex justify-between items-center">
+        <div class="bg-blue-950/30 border border-blue-500/30 p-3 sm:p-3.5 rounded-xl mb-4 text-xs flex justify-between items-center">
           <div>
-            <p class="text-slate-400 text-[10px] tracking-wider font-semibold">TRANSFER MANUAL GOPAY:</p>
-            <p class="font-mono-code font-bold text-white text-sm mt-0.5">0812-3456-7890</p>
-            <p class="text-[10px] text-slate-400">a.n. Owner Server</p>
+            <p class="text-slate-400 text-[9px] sm:text-[10px] tracking-wider font-semibold">TRANSFER MANUAL GOPAY:</p>
+            <p class="font-mono-code font-bold text-white text-xs sm:text-sm mt-0.5">0812-3456-7890</p>
+            <p class="text-[9px] sm:text-[10px] text-slate-400">a.n. Owner Server</p>
           </div>
           <button onclick="copyGopay('081234567890')" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs px-3 py-1.5 rounded-lg transition shadow-md shadow-blue-950">
             Copy
@@ -719,33 +710,33 @@
         const data = await response.json();
 
         if (data.online) {
-          dot.className = "w-3 h-3 rounded-full bg-emerald-400 animate-pulse";
+          dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
           const onlineCount = data.players ? data.players.online : 0;
           const maxCount = data.players ? data.players.max : 0;
           countText.innerText = `${onlineCount} / ${maxCount} Warriors Online`;
 
           if (data.players && data.players.list && data.players.list.length > 0) {
             container.innerHTML = data.players.list.map(name => `
-              <div class="flex items-center gap-2 bg-slate-900/90 border border-slate-800 hover:border-rose-500/50 px-3 py-1.5 rounded-xl transition">
-                <img src="https://mc-heads.net/avatar/${name}/24" alt="${name}" class="w-6 h-6 rounded">
-                <span class="text-xs font-mono-code text-slate-200 font-semibold">${name}</span>
+              <div class="flex items-center gap-2 bg-slate-900/90 border border-slate-800 hover:border-rose-500/50 px-2.5 py-1 rounded-xl transition">
+                <img src="https://mc-heads.net/avatar/${name}/24" alt="${name}" class="w-5 h-5 rounded">
+                <span class="text-[11px] font-mono-code text-slate-200 font-semibold">${name}</span>
               </div>
             `).join('');
           } else {
             container.innerHTML = `
-              <div class="text-xs text-slate-400 font-mono-code flex items-center gap-2 py-1">
+              <div class="text-[11px] sm:text-xs text-slate-400 font-mono-code flex items-center gap-2 py-1">
                 <i class="fa-solid fa-shield-halved text-slate-500"></i> Belum ada player/ksatria yang online saat ini.
               </div>
             `;
           }
         } else {
-          dot.className = "w-3 h-3 rounded-full bg-red-500";
+          dot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
           countText.innerText = "Server Offline";
           container.innerHTML = `<span class="text-xs text-red-400 font-mono-code">Server sedang offline / Maintenance.</span>`;
         }
       } catch (err) {
         console.error("Gagal mengambil status server:", err);
-        dot.className = "w-3 h-3 rounded-full bg-amber-500";
+        dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
         countText.innerText = "Status Tidak Tersedia";
         container.innerHTML = `<span class="text-xs text-amber-400 font-mono-code">Gagal memuat list player online.</span>`;
       }
@@ -759,8 +750,8 @@
       const moneys = document.querySelectorAll('.item-money');
 
       if (type === 'rank') {
-        tabRank.className = "px-5 py-2.5 rounded-lg bg-rose-600 text-white shadow-lg shadow-rose-900/40 transition";
-        tabMoney.className = "px-5 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
+        tabRank.className = "flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg bg-rose-600 text-white shadow-lg shadow-rose-900/40 transition";
+        tabMoney.className = "flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
         ranks.forEach(el => {
           el.classList.remove('hidden');
           el.classList.add('flex');
@@ -770,8 +761,8 @@
           el.classList.remove('flex');
         });
       } else {
-        tabMoney.className = "px-5 py-2.5 rounded-lg bg-emerald-600 text-white shadow-lg shadow-emerald-900/40 transition";
-        tabRank.className = "px-5 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
+        tabMoney.className = "flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg bg-emerald-600 text-white shadow-lg shadow-emerald-900/40 transition";
+        tabRank.className = "flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
         moneys.forEach(el => {
           el.classList.remove('hidden');
           el.classList.add('flex');
@@ -804,7 +795,6 @@
       document.getElementById('modal-item-price').innerText = price;
       document.getElementById('checkoutModal').classList.remove('hidden');
       
-      // Re-trigger canvas resize for correct signature drawing after display unhide
       setTimeout(() => {
         const canvas = document.getElementById('signaturePad');
         const ratio = Math.max(window.devicePixelRatio || 1, 1);
