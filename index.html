@@ -125,7 +125,6 @@
         <!-- LOGO BRAND -->
         <a href="#" class="flex items-center gap-3 group w-full sm:w-auto justify-between sm:justify-start">
           <div class="flex items-center gap-3">
-            <!-- LOGO PNG CONTAINER (Border & BG dihapus agar transparan & pas) -->
             <div class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center group-hover:scale-105 transition shrink-0">
               <img src="aetheria.png" alt="Aetheria Logo" class="w-full h-full object-contain">
             </div>
@@ -226,42 +225,42 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
         
         <!-- PHOTO 1 -->
-        <div onclick="openLightbox('img1.png', 'Pertarungan Sengit Naga Fire Drake')" class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
+        <div onclick="openLightbox('./albums/img1.png', 'Pertarungan Sengit Naga Fire Drake')" class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
           <div class="aspect-video overflow-hidden">
             <img src="./albums/img1.png" alt="Dragon Battle" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
           </div>
         </div>
 
         <!-- PHOTO 2 -->
-        <div onclick="openLightbox('img2.png', 'Duel Combo Pedang Epic Fight')" class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
+        <div onclick="openLightbox('./albums/img2.png', 'Duel Combo Pedang Epic Fight')" class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
           <div class="aspect-video overflow-hidden">
             <img src="./albums/img2.png" alt="Epic Sword Fight" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
           </div>
         </div>
 
         <!-- PHOTO 3 -->
-        <div onclick="openLightbox('img3.png', 'Terbang Menjelajahi Sarang Naga')" class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
+        <div onclick="openLightbox('./albums/img3.png', 'Terbang Menjelajahi Sarang Naga')" class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
           <div class="aspect-video overflow-hidden">
             <img src="./albums/img3.png" alt="Dragon Mount Flight" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
           </div>
         </div>
 
         <!-- PHOTO 4 -->
-        <div onclick="openLightbox('img4.png', 'Kastil Pertahanan Guild Ksatria')" class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
+        <div onclick="openLightbox('./albums/img4.png', 'Kastil Pertahanan Guild Ksatria')" class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
           <div class="aspect-video overflow-hidden">
             <img src="./albums/img4.png" alt="Guild Stronghold" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
           </div>
         </div>
 
         <!-- PHOTO 5 -->
-        <div onclick="openLightbox('img5.png', 'Pasar Lelang Pedang & Item Rare')" class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
+        <div onclick="openLightbox('./albums/img5.png', 'Pasar Lelang Pedang & Item Rare')" class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
           <div class="aspect-video overflow-hidden">
-            <img src="./albums/galeri5.png" alt="Auction House" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+            <img src="./albums/img5.png" alt="Auction House" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
           </div>
         </div>
 
         <!-- PHOTO 6 -->
-        <div onclick="openLightbox('img6.png', 'Raid Boss Dragon World Event')" class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
+        <div onclick="openLightbox('./albums/img6.png', 'Raid Boss Dragon World Event')" class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
           <div class="aspect-video overflow-hidden">
             <img src="./albums/img6.png" alt="World Boss Raid" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
           </div>
@@ -305,7 +304,7 @@
 
             <h3 class="text-xl sm:text-2xl font-bold text-white font-epic">VIP Warrior</h3>
             <p class="text-2xl sm:text-3xl font-extrabold text-amber-400 my-2 font-mono-code">Rp 25.000</p>
-            <p class="text-xs text-slate-400 mb-6 leading-relaxed"></p> <!-- deskripsi rank -->
+            <p class="text-xs text-slate-400 mb-6 leading-relaxed"></p>
 
             <div class="border-t border-slate-800/80 pt-4 mb-6">
               <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">KEUNTUNGAN RANK:</p>
@@ -331,7 +330,7 @@
 
             <h3 class="text-xl sm:text-2xl font-bold text-white font-epic">MVP Dragon Knight</h3>
             <p class="text-2xl sm:text-3xl font-extrabold text-amber-400 my-2 font-mono-code">Rp 50.000</p>
-            <p class="text-xs text-slate-400 mb-6 leading-relaxed"></p> <!-- deskripsi rank -->
+            <p class="text-xs text-slate-400 mb-6 leading-relaxed"></p>
 
             <div class="border-t border-slate-800/80 pt-4 mb-6">
               <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">KEUNTUNGAN RANK:</p>
@@ -692,7 +691,7 @@
       document.getElementById('lightboxModal').classList.add('hidden');
     }
 
-    // FETCH LIVE ONLINE PLAYERS
+    // FETCH LIVE ONLINE PLAYERS (PERBAIKAN BUG OBJECT OBJECT)
     async function fetchOnlinePlayers() {
       const dot = document.getElementById('server-status-dot');
       const countText = document.getElementById('player-count-text');
@@ -709,12 +708,15 @@
           countText.innerText = `${onlineCount} / ${maxCount} Warriors Online`;
 
           if (data.players && data.players.list && data.players.list.length > 0) {
-            container.innerHTML = data.players.list.map(name => `
-              <div class="flex items-center gap-2 bg-slate-900/90 border border-slate-800 hover:border-rose-500/50 px-2.5 py-1 rounded-xl transition">
-                <img src="https://mc-heads.net/avatar/${name}/24" alt="${name}" class="w-5 h-5 rounded">
-                <span class="text-[11px] font-mono-code text-slate-200 font-semibold">${name}</span>
-              </div>
-            `).join('');
+            container.innerHTML = data.players.list.map(player => {
+              const playerName = typeof player === 'object' ? player.name : player;
+              return `
+                <div class="flex items-center gap-2 bg-slate-900/90 border border-slate-800 hover:border-rose-500/50 px-2.5 py-1 rounded-xl transition">
+                  <img src="https://mc-heads.net/avatar/${playerName}/24" alt="${playerName}" class="w-5 h-5 rounded">
+                  <span class="text-[11px] font-mono-code text-slate-200 font-semibold">${playerName}</span>
+                </div>
+              `;
+            }).join('');
           } else {
             container.innerHTML = `
               <div class="text-[11px] sm:text-xs text-slate-400 font-mono-code flex items-center gap-2 py-1">
