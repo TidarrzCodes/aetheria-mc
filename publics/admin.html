@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aetheria Admin — Payment & Player Manager</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- EXTERNAL CSS (Satu tingkat di subfolder style) -->
+  <link rel="stylesheet" href="./style/admin.css">
+</head>
+
+<body class="min-h-screen antialiased flex flex-col justify-between">
+
+  <!-- AUTHENTICATION OVERLAY -->
+  <div id="loginOverlay"
+    class="fixed inset-0 bg-[#09090b]/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-[#121215] border border-zinc-800 p-6 rounded-xl shadow-2xl">
+      <div class="flex items-center gap-3 mb-5 border-b border-zinc-800 pb-4">
+        <div
+          class="w-8 h-8 bg-zinc-800 border border-zinc-700 rounded-lg flex items-center justify-center text-zinc-300">
+          <i class="fa-solid fa-lock text-xs"></i>
+        </div>
+        <div>
+          <h2 class="text-sm font-semibold text-white">Aetheria Admin</h2>
+          <p class="text-[11px] text-zinc-400 font-mono">Restricted Access</p>
+        </div>
+      </div>
+
+      <form onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-[11px] font-medium text-zinc-400 mb-1.5 uppercase font-mono">Password</label>
+          <input type="password" id="passwordInput" required placeholder="••••••••••••"
+            class="w-full bg-[#09090b] border border-zinc-800 focus:border-rose-500 focus:outline-none px-3.5 py-2.5 rounded-lg text-white font-mono text-sm transition">
+        </div>
+
+        <p id="loginError" class="text-xs text-rose-500 font-mono hidden flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-exclamation"></i> Password tidak valid.
+        </p>
+
+        <button type="submit"
+          class="w-full bg-rose-600 hover:bg-rose-500 text-white font-medium py-2.5 rounded-lg transition text-xs font-mono uppercase tracking-wide">
+          Authenticate
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN DASHBOARD CONTENT -->
+  <div id="dashboardContent" class="hidden min-h-screen flex flex-col">
+    <header class="border-b border-zinc-800 bg-[#09090b]/80 sticky top-0 z-40 backdrop-blur-md">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-6">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+            <h1 class="text-xs font-bold text-white tracking-wide uppercase font-mono">AETHERIA <span
+                class="text-zinc-600">/</span> ADMIN</h1>
+          </div>
+          <nav class="flex items-center gap-1 bg-[#121215] p-1 rounded-lg border border-zinc-800 text-xs font-mono">
+            <button onclick="switchMainTab('orders')" id="main-tab-orders"
+              class="px-3 py-1.5 rounded-md bg-zinc-800 text-white font-medium transition flex items-center gap-2">
+              <i class="fa-solid fa-receipt text-[11px]"></i> Webstore Orders
+            </button>
+            <button onclick="switchMainTab('players')" id="main-tab-players"
+              class="px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition flex items-center gap-2">
+              <i class="fa-solid fa-users text-[11px]"></i> Online Players
+              <span id="nav-player-badge"
+                class="bg-zinc-800 text-emerald-400 text-[10px] px-1.5 py-0.2 rounded font-bold">0</span>
+            </button>
+          </nav>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="syncCurrentTab()"
+            class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-2">
+            <i class="fa-solid fa-arrows-rotate text-[10px]" id="refresh-icon"></i> Sync Data
+          </button>
+          <button onclick="handleLogout()"
+            class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-rose-400 px-3 py-1.5 rounded-lg text-xs font-mono transition">
+            <i class="fa-solid fa-power-off text-[10px]"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full flex-1">
+      <section id="view-orders" class="space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-[#121215] border border-zinc-800/80 p-4 rounded-xl">
+            <p class="text-[11px] font-mono text-zinc-500 uppercase">Total Transactions</p>
+            <p id="stat-total" class="text-2xl font-bold font-mono text-white mt-1">0</p>
+          </div>
+          <div class="bg-[#121215] border border-zinc-800/80 p-4 rounded-xl">
+            <p class="text-[11px] font-mono text-amber-500/80 uppercase">Pending Review</p>
+            <p id="stat-pending" class="text-2xl font-bold font-mono text-amber-400 mt-1">0</p>
+          </div>
+          <div class="bg-[#121215] border border-zinc-800/80 p-4 rounded-xl">
+            <p class="text-[11px] font-mono text-emerald-500/80 uppercase">Approved Orders</p>
+            <p id="stat-approved" class="text-2xl font-bold font-mono text-emerald-400 mt-1">0</p>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <div class="flex gap-1 bg-[#121215] p-1 rounded-lg border border-zinc-800 text-xs font-mono">
+            <button onclick="filterStatus('ALL')" id="tab-ALL"
+              class="px-3 py-1.5 rounded-md bg-zinc-800 text-white font-medium transition">Semua</button>
+            <button onclick="filterStatus('PENDING')" id="tab-PENDING"
+              class="px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition">Pending</button>
+            <button onclick="filterStatus('APPROVED')" id="tab-APPROVED"
+              class="px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition">Approved</button>
+            <button onclick="filterStatus('REJECTED')" id="tab-REJECTED"
+              class="px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition">Rejected</button>
+          </div>
+          <span class="text-xs text-zinc-500 font-mono hidden sm:inline" id="row-count">0 record(s)</span>
+        </div>
+
+        <div class="bg-[#121215] border border-zinc-800/80 rounded-xl overflow-hidden shadow-xl">
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-[#18181b] text-zinc-400 font-mono text-[11px] uppercase border-b border-zinc-800">
+                <tr>
+                  <th class="p-3.5">ID / Time</th>
+                  <th class="p-3.5">User Minecraft</th>
+                  <th class="p-3.5">Item & Category</th>
+                  <th class="p-3.5">Amount</th>
+                  <th class="p-3.5 text-center">Assets</th>
+                  <th class="p-3.5 text-center">Status</th>
+                  <th class="p-3.5 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="order-list" class="divide-y divide-zinc-800/60 font-sans text-zinc-300">
+                <tr>
+                  <td colspan="7" class="text-center p-8 text-zinc-500 font-mono">Loading dataset from Worker...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-players" class="hidden space-y-6">
+        <div
+          class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-[#121215] border border-zinc-800/80 rounded-xl gap-4">
+          <div class="flex items-center gap-3">
+            <span id="player-tab-dot" class="w-3 h-3 rounded-full bg-zinc-600"></span>
+            <div>
+              <h2 class="text-sm font-semibold text-white font-mono">SERVER REALM STATUS</h2>
+              <p id="player-tab-count" class="text-xs text-zinc-400 font-mono">Checking online players...</p>
+            </div>
+          </div>
+          <div class="text-xs font-mono text-zinc-400">
+            IP: <strong class="text-white">aetheria.raditnex.my.id</strong>
+          </div>
+        </div>
+
+        <div class="bg-[#121215] border border-zinc-800/80 rounded-xl overflow-hidden shadow-xl">
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-[#18181b] text-zinc-400 font-mono text-[11px] uppercase border-b border-zinc-800">
+                <tr>
+                  <th class="p-3.5">Avatar</th>
+                  <th class="p-3.5">Username</th>
+                  <th class="p-3.5">Rank Group</th>
+                  <th class="p-3.5 text-right">Status</th>
+                </tr>
+              </thead>
+              <tbody id="player-table-list" class="divide-y divide-zinc-800/60 font-sans text-zinc-300">
+                <tr>
+                  <td colspan="4" class="text-center p-8 text-zinc-500 font-mono">Fetching online players from server...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-zinc-800/60 py-4 text-center text-xs text-zinc-600 font-mono">
+      Aetheria Infrastructure &bull; Automated Payment Gateway
+    </footer>
+  </div>
+
+  <div id="imageModal"
+    class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4"
+    onclick="closeImageModal()">
+    <div class="max-w-2xl w-full text-center">
+      <img id="modalImg" src=""
+        class="max-h-[80vh] mx-auto rounded-lg border border-zinc-700 shadow-2xl object-contain">
+      <p class="mt-3 text-xs text-zinc-400 font-mono">Tekan tombol Esc atau klik di mana saja untuk menutup</p>
+    </div>
+  </div>
+
+  <!-- EXTERNAL JS SCRIPT (Satu tingkat di subfolder javascript) -->
+  <script src="./javascript/admin.js" defer></script>
+</body>
+
+</html>

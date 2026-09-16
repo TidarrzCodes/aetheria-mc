@@ -1,0 +1,109 @@
+body {
+  background-color: #020305;
+  color: #e2e8f0;
+  font-family: 'Space Grotesk', sans-serif;
+  overflow-x: hidden;
+}
+
+.font-epic {
+  font-family: 'Cinzel Decorative', serif;
+}
+
+.font-mono-code {
+  font-family: 'Fira Code', monospace;
+}
+
+/* Fullscreen Particle Canvas */
+#emberCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* AAA Game Supreme Glass Cards */
+.supreme-card {
+  background: linear-gradient(135deg, rgba(18, 12, 24, 0.95), rgba(5, 6, 10, 0.98));
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  backdrop-filter: blur(14px);
+  transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.supreme-card:hover {
+  border-color: rgba(244, 63, 94, 0.9);
+  box-shadow: 0 0 35px -5px rgba(244, 63, 94, 0.45);
+  transform: translateY(-4px);
+}
+
+/* Animated Fire Aura Glowing Text */
+@keyframes dragonGlow {
+  0%, 100% {
+    text-shadow: 0 0 25px rgba(244, 63, 94, 0.8), 0 0 50px rgba(245, 158, 11, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 45px rgba(244, 63, 94, 1), 0 0 75px rgba(245, 158, 11, 0.8), 0 0 100px rgba(225, 29, 72, 0.6);
+  }
+}
+
+.dragon-title {
+  animation: dragonGlow 2.8s infinite ease-in-out;
+}
+
+.glow-rose {
+  box-shadow: 0 0 25px rgba(244, 63, 94, 0.35);
+}
+
+.glow-gold {
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+}
+
+.glow-emerald {
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.35);
+}
+
+.glow-violet {
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.35);
+}
+
+.input-box {
+  background-color: #070910;
+  border: 1px solid #1e2638;
+  transition: all 0.2s ease-in-out;
+}
+
+.input-box:focus {
+  border-color: #f43f5e;
+  box-shadow: 0 0 12px rgba(244, 63, 94, 0.3);
+  outline: none;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  height: 4px;
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #090d16;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #f43f5e;
+  border-radius: 4px;
+}
+
+input[type="file"]::file-selector-button {
+  background-color: #1e2638;
+  color: #e2e8f0;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.5rem;
+  margin-right: 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background-color: #f43f5e;
+  color: #ffffff;
+}
