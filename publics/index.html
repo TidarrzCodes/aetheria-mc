@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aetheria: Dragon's Eclipse — Official Action RPG & Survival Realm</title>
 
-  <!-- FAVICON (Keluar 1 folder ke library) -->
-  <link rel="icon" type="image/png" href="../library/aetheria.png">
+  <!-- FAVICON (Path internal folder library) -->
+  <link rel="icon" type="image/png" href="./library/aetheria.png">
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -22,7 +22,7 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- EXTERNAL CSS (Satu folder dengan publics/style) -->
+  <!-- EXTERNAL CSS -->
   <link rel="stylesheet" href="./style/index.css">
 </head>
 
@@ -46,7 +46,7 @@
           <div class="flex items-center gap-3">
             <div
               class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center group-hover:scale-105 transition shrink-0">
-              <img src="../library/aetheria.png" alt="Aetheria Logo" class="w-full h-full object-contain">
+              <img src="./library/aetheria.png" alt="Aetheria Logo" class="w-full h-full object-contain">
             </div>
             <div>
               <span
@@ -258,26 +258,26 @@
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
-        <div onclick="openLightbox('../albums/img1.png', 'Pertarungan Sengit Naga Fire Drake')"
+        <div onclick="openLightbox('./albums/img1.png', 'Pertarungan Sengit Naga Fire Drake')"
           class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
           <div class="aspect-video overflow-hidden">
-            <img src="../albums/img1.png" alt="Dragon Battle"
+            <img src="./albums/img1.png" alt="Dragon Battle"
               class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
           </div>
         </div>
 
-        <div onclick="openLightbox('../albums/img2.png', 'Duel Combo Pedang Epic Fight')"
+        <div onclick="openLightbox('./albums/img2.png', 'Duel Combo Pedang Epic Fight')"
           class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
           <div class="aspect-video overflow-hidden">
-            <img src="../albums/img2.png" alt="Epic Sword Fight"
+            <img src="./albums/img2.png" alt="Epic Sword Fight"
               class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
           </div>
         </div>
 
-        <div onclick="openLightbox('../albums/img3.png', 'Terbang Menjelajahi Sarang Naga')"
+        <div onclick="openLightbox('./albums/img3.png', 'Terbang Menjelajahi Sarang Naga')"
           class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
           <div class="aspect-video overflow-hidden">
-            <img src="../albums/img3.png" alt="Dragon Mount Flight"
+            <img src="./albums/img3.png" alt="Dragon Mount Flight"
               class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
           </div>
         </div>
@@ -731,7 +731,7 @@
 
   </div>
 
-  <!-- EXTERNAL JS SCRIPT (Satu folder dengan publics/javascript) -->
+  <!-- EXTERNAL JS SCRIPT -->
   <script src="./javascript/index.js" defer></script>
 </body>
 
