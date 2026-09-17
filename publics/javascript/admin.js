@@ -1,5 +1,3 @@
-const ADMIN_PASSWORD = "adminaetheria";
-// SECURE PROXY ENDPOINT VIA CLOUDFLARE WORKER
 const WORKER_PROXY_URL = "https://aetheria-checkout.raditnur216531.workers.dev/";
 const SERVER_DOMAIN = "aetheria.raditnex.my.id";
 
@@ -7,7 +5,73 @@ let ordersData = [];
 let currentFilter = 'ALL';
 let currentMainTab = 'orders';
 
-// HELPER SANITASI XSS (ANTI-SCRIPT INJECTION)
+// ==========================================
+// UTILS: COOKIE HELPER
+// ==========================================
+function setCookie(name, value, days) {
+  let expires = "";
+  if (days) {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    expires = "; expires=" + date.toUTCString();
+  }
+  document.cookie = name + "=" + (value || "") + expires + "; path=/; SameSite=Strict";
+}
+
+function getCookie(name) {
+  const nameEQ = name + "=";
+  const ca = document.cookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+  }
+  return null;
+}
+
+function eraseCookie(name) {
+  document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+}
+
+// ==========================================
+// TOAST NOTIFICATION SYSTEM (POJOK KANAN ATAS)
+// ==========================================
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  const isSuccess = type === 'success';
+  const isError = type === 'error';
+
+  const bgColor = isSuccess ? 'bg-zinc-900 border-emerald-500/50 text-emerald-400' :
+                  isError ? 'bg-zinc-900 border-rose-500/50 text-rose-400' :
+                  'bg-zinc-900 border-amber-500/50 text-amber-400';
+
+  const icon = isSuccess ? 'fa-circle-check' : isError ? 'fa-circle-xmark' : 'fa-circle-info';
+
+  toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl border ${bgColor} shadow-2xl font-mono text-xs transition-all duration-300 opacity-0 transform translate-y-[-10px] min-w-[260px] max-w-sm`;
+  
+  toast.innerHTML = `
+    <i class="fa-solid ${icon} text-base shrink-0"></i>
+    <span class="flex-1 font-medium text-white leading-snug">${message}</span>
+    <button onclick="this.parentElement.remove()" class="text-zinc-500 hover:text-white transition ml-1 text-xs">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  `;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.remove('opacity-0', 'translate-y-[-10px]');
+  }, 10);
+
+  setTimeout(() => {
+    toast.classList.add('opacity-0', 'translate-y-[-10px]');
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
 function escapeHTML(str) {
   if (!str) return '';
   return String(str)
@@ -18,8 +82,15 @@ function escapeHTML(str) {
     .replace(/'/g, '&#039;');
 }
 
+// ==========================================
+// INITIALIZATION & COOKIE VERIFICATION
+// ==========================================
 window.addEventListener('DOMContentLoaded', () => {
-  if (sessionStorage.getItem('aetheria_admin_auth') === 'true') {
+  // Cek otentikasi dari Cookie atau Session Storage (dikirim dari login in-game)
+  const adminCookie = getCookie('aetheria_admin_token');
+  const sessionAuth = sessionStorage.getItem('aetheria_admin_auth');
+
+  if (adminCookie || sessionAuth === 'true') {
     unlockDashboard();
   }
 });
@@ -28,17 +99,58 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeImageModal();
 });
 
-function handleLogin(e) {
+// LOGIN FORM HANDLER (VERIFIKASI IN-GAME PASSWORD VIA WORKER)
+async function handleLogin(e) {
   e.preventDefault();
-  const pwd = document.getElementById('passwordInput').value;
+  const username = document.getElementById('loginUsername') ? document.getElementById('loginUsername').value.trim() : 'Admin';
+  const password = document.getElementById('passwordInput').value;
   const errorMsg = document.getElementById('loginError');
+  const submitBtn = e.target.querySelector('button[type="submit"]');
 
-  if (pwd === ADMIN_PASSWORD) {
-    sessionStorage.setItem('aetheria_admin_auth', 'true');
-    errorMsg.classList.add('hidden');
-    unlockDashboard();
-  } else {
+  if (!password) return;
+
+  errorMsg.classList.add('hidden');
+  submitBtn.innerText = "VERIFYING...";
+  submitBtn.disabled = true;
+
+  try {
+    const res = await fetch(`${WORKER_PROXY_URL}?action=player_login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.result === 'success') {
+      const rankUpper = (data.rank || '').toUpperCase();
+
+      // Pastikan akun memiliki rank Admin/Owner
+      if (rankUpper.includes('ADMIN') || rankUpper.includes('OWNER')) {
+        // Simpan token ke Cookie (Aktif selama 1 hari) & SessionStorage
+        const authPayload = JSON.stringify({ username: data.username, rank: data.rank, token: Date.now() });
+        setCookie('aetheria_admin_token', btoa(authPayload), 1);
+        sessionStorage.setItem('aetheria_admin_auth', 'true');
+
+        showToast(`Selamat datang Admin ${data.username}!`, "success");
+        unlockDashboard();
+      } else {
+        errorMsg.innerText = "❌ Akun kamu tidak memiliki akses Admin!";
+        errorMsg.classList.remove('hidden');
+        showToast("Akses Ditolak: Bukan akun Admin!", "error");
+      }
+    } else {
+      errorMsg.innerText = "❌ " + (data.message || "Password in-game salah!");
+      errorMsg.classList.remove('hidden');
+      showToast("Gagal memverifikasi akun!", "error");
+    }
+  } catch (err) {
+    console.error('Login Auth Error:', err);
+    errorMsg.innerText = "❌ Gagal terhubung ke server verifikasi.";
     errorMsg.classList.remove('hidden');
+  } finally {
+    submitBtn.innerText = "AUTHENTICATE";
+    submitBtn.disabled = false;
   }
 }
 
@@ -51,11 +163,11 @@ function unlockDashboard() {
 }
 
 function handleLogout() {
+  eraseCookie('aetheria_admin_token');
   sessionStorage.removeItem('aetheria_admin_auth');
   location.reload();
 }
 
-// MAIN TAB SWITCHER (ORDERS VS PLAYERS)
 function switchMainTab(tabName) {
   currentMainTab = tabName;
   const viewOrders = document.getElementById('view-orders');
@@ -82,9 +194,63 @@ function syncCurrentTab() {
   } else {
     fetchOnlinePlayers();
   }
+  showToast("Data berhasil disinkronkan", "info");
 }
 
-// RANK BADGE FORMATTER
+// MODERASI PLAYER: KICK, BAN, INVSEE, & CUSTOM COMMAND
+async function kickPlayer(username) {
+  const reason = prompt(`Masukkan alasan kick untuk ${username}:`, "Dikeluarkan oleh Admin");
+  if (reason === null) return;
+
+  const command = `kick ${username} ${reason}`;
+  await executeAdminCommand(command, `Player ${username} berhasil dikick!`);
+  fetchOnlinePlayers();
+}
+
+async function banPlayer(username) {
+  const reason = prompt(`Masukkan alasan BAN permanen untuk ${username}:`, "Melanggar aturan server");
+  if (reason === null) return;
+
+  const command = `ban ${username} ${reason}`;
+  await executeAdminCommand(command, `Player ${username} berhasil dibanned!`);
+  fetchOnlinePlayers();
+}
+
+async function invseePlayer(username) {
+  const command = `invsee ${username}`;
+  await executeAdminCommand(command, `Command "/invsee ${username}" dikirim ke konsol.`);
+}
+
+async function sendConsoleCommand(e) {
+  e.preventDefault();
+  const input = document.getElementById('consoleCommandInput');
+  const command = input.value.trim();
+  if (!command) return;
+
+  await executeAdminCommand(command, `Command "${command}" dieksekusi!`);
+  input.value = '';
+}
+
+async function executeAdminCommand(command, successMessage) {
+  try {
+    const res = await fetch(`${WORKER_PROXY_URL}?action=admin_command`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ command })
+    });
+
+    const json = await res.json();
+    if (res.ok && json.result === 'success') {
+      showToast(successMessage, "success");
+    } else {
+      showToast("Gagal: " + (json.message || "Error tidak diketahui"), "error");
+    }
+  } catch (err) {
+    console.error(err);
+    showToast("Kesalahan koneksi ke Worker.", "error");
+  }
+}
+
 function renderRankBadge(rankName) {
   const rank = (rankName || 'MEMBER').toUpperCase();
   if (rank.includes('DRAGONIAN') || rank.includes('OWNER') || rank.includes('ADMIN')) {
@@ -99,7 +265,6 @@ function renderRankBadge(rankName) {
   return `<span class="bg-zinc-800 text-zinc-400 border border-zinc-700 px-2 py-0.5 rounded text-[10px] font-mono font-semibold">MEMBER</span>`;
 }
 
-// FETCH ONLINE PLAYERS FROM SERVER API
 async function fetchOnlinePlayers() {
   const dot = document.getElementById('player-tab-dot');
   const countText = document.getElementById('player-tab-count');
@@ -121,21 +286,31 @@ async function fetchOnlinePlayers() {
         tableBody.innerHTML = data.players.list.map(p => {
           const name = typeof p === 'object' ? p.name : p;
           const rank = typeof p === 'object' && p.group ? p.group : 'Member';
+          const safeName = escapeHTML(name);
+
           return `
             <tr class="hover:bg-zinc-900/40 transition">
               <td class="p-3.5 w-12">
-                <img src="https://mc-heads.net/avatar/${escapeHTML(name)}/28" alt="${escapeHTML(name)}" class="w-7 h-7 rounded border border-zinc-700">
+                <img src="https://mc-heads.net/avatar/${safeName}/28" alt="${safeName}" class="w-7 h-7 rounded border border-zinc-700">
               </td>
               <td class="p-3.5 font-semibold text-white font-mono">
-                ${escapeHTML(name)}
+                ${safeName}
               </td>
               <td class="p-3.5">
                 ${renderRankBadge(rank)}
               </td>
               <td class="p-3.5 text-right font-mono">
-                <span class="inline-flex items-center gap-1.5 text-emerald-400 text-xs">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Active
-                </span>
+                <div class="inline-flex items-center gap-1.5">
+                  <button onclick="invseePlayer('${safeName}')" class="bg-blue-950/80 hover:bg-blue-900 border border-blue-600/50 text-blue-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
+                    <i class="fa-solid fa-box-open text-[10px]"></i> Invsee
+                  </button>
+                  <button onclick="kickPlayer('${safeName}')" class="bg-amber-950/80 hover:bg-amber-900 border border-amber-600/50 text-amber-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
+                    <i class="fa-solid fa-user-minus text-[10px]"></i> Kick
+                  </button>
+                  <button onclick="banPlayer('${safeName}')" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
+                    <i class="fa-solid fa-gavel text-[10px]"></i> Ban
+                  </button>
+                </div>
               </td>
             </tr>
           `;
@@ -157,7 +332,6 @@ async function fetchOnlinePlayers() {
   }
 }
 
-// FETCH ORDERS FROM CLOUDFLARE WORKER PROXY
 async function fetchOrders() {
   const container = document.getElementById('order-list');
   const icon = document.getElementById('refresh-icon');
@@ -168,7 +342,7 @@ async function fetchOrders() {
     const json = await res.json();
 
     if (json.result === 'success') {
-      ordersData = json.data.reverse();
+      ordersData = (json.data || []).reverse();
       renderOrders();
     } else {
       container.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-rose-400 font-mono">Gagal membaca data dari Proxy.</td></tr>`;
@@ -241,10 +415,10 @@ function renderOrders() {
       <td class="p-3.5 text-right font-mono">
         ${ord.status === 'PENDING' ? `
           <div class="inline-flex gap-1">
-            <button onclick="updateStatus('${escapeHTML(ord.id)}', 'APPROVED')" class="bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-600/50 text-emerald-300 px-2.5 py-1 rounded text-xs transition">
+            <button onclick="updateStatus('${escapeHTML(ord.id)}', 'APPROVED', '${escapeHTML(ord.username)}', '${escapeHTML(ord.itemName)}')" class="bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-600/50 text-emerald-300 px-2.5 py-1 rounded text-xs transition">
               Approve
             </button>
-            <button onclick="updateStatus('${escapeHTML(ord.id)}', 'REJECTED')" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 px-2.5 py-1 rounded text-xs transition">
+            <button onclick="updateStatus('${escapeHTML(ord.id)}', 'REJECTED', '${escapeHTML(ord.username)}', '${escapeHTML(ord.itemName)}')" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 px-2.5 py-1 rounded text-xs transition">
               Reject
             </button>
           </div>
@@ -260,21 +434,36 @@ function getStatusBadge(status) {
   return `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded text-[10px] font-medium">PENDING</span>`;
 }
 
-// UPDATE STATUS VIA CLOUDFLARE WORKER PROXY
-async function updateStatus(id, newStatus) {
-  if (!confirm(`Ubah status ${id} -> ${newStatus}?`)) return;
+async function updateStatus(id, newStatus, username, itemName) {
+  const confirmMsg = newStatus === 'APPROVED' 
+    ? `Setujui pesanan ${id} untuk ${username} (${itemName}) & kirim rank/coins ke server?`
+    : `Tolak pesanan ${id}?`;
+
+  if (!confirm(confirmMsg)) return;
 
   try {
-    const res = await fetch(`${WORKER_PROXY_URL}?action=updateStatus&id=${id}&status=${newStatus}`);
+    const res = await fetch(`${WORKER_PROXY_URL}?action=update_status`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: id,
+        status: newStatus,
+        username: username,
+        itemName: itemName
+      })
+    });
+
     const json = await res.json();
 
-    if (json.result === 'success') {
+    if (res.ok && json.result === 'success') {
+      showToast(`Status berhasil diperbarui ke ${newStatus}!`, "success");
       fetchOrders();
     } else {
-      alert("Gagal memperbarui database.");
+      showToast("Gagal memperbarui database: " + (json.message || "Error tidak diketahui"), "error");
     }
   } catch (err) {
-    alert("Kesalahan koneksi.");
+    console.error(err);
+    showToast("Kesalahan koneksi saat memperbarui status.", "error");
   }
 }
 

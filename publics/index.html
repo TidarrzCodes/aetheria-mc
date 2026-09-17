@@ -58,14 +58,24 @@
           </div>
         </a>
 
-        <!-- SERVER IP COPY WIDGET -->
-        <button onclick="copyIP('aetheria.raditnex.my.id')"
-          class="w-full sm:w-auto bg-slate-900/90 hover:bg-slate-800 border border-rose-500/50 text-xs px-3.5 py-2 rounded-xl transition flex items-center justify-center sm:justify-start gap-2 shadow-lg shadow-rose-950/40 active:scale-95">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-          <span class="text-slate-300 truncate text-[11px] sm:text-xs">SERVER IP: <strong
-              class="text-white font-mono-code">aetheria.raditnex.my.id</strong></span>
-          <i class="fa-regular fa-copy text-rose-400 shrink-0 ml-1"></i>
-        </button>
+        <!-- RIGHT WIDGETS (IP COPY & PLAYER LOGIN) -->
+        <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+          <!-- SERVER IP COPY WIDGET -->
+          <button onclick="copyIP('aetheria.raditnex.my.id')"
+            class="w-full sm:w-auto bg-slate-900/90 hover:bg-slate-800 border border-rose-500/50 text-xs px-3.5 py-2 rounded-xl transition flex items-center justify-center sm:justify-start gap-2 shadow-lg shadow-rose-950/40 active:scale-95">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+            <span class="text-slate-300 truncate text-[11px] sm:text-xs">SERVER IP: <strong
+                class="text-white font-mono-code">aetheria.raditnex.my.id</strong></span>
+            <i class="fa-regular fa-copy text-rose-400 shrink-0 ml-1"></i>
+          </button>
+
+          <!-- TOMBOL LOGIN / PLAYER AREA -->
+          <a href="./players.html"
+            class="w-full sm:w-auto bg-rose-600 hover:bg-rose-500 text-white text-xs px-3.5 py-2 rounded-xl transition flex items-center justify-center gap-2 font-mono-code font-bold shadow-lg shadow-rose-950/40 shrink-0">
+            <i class="fa-solid fa-user-shield"></i>
+            <span>Login</span>
+          </a>
+        </div>
 
       </div>
     </header>
@@ -726,7 +736,7 @@
 
     <!-- FOOTER -->
     <footer class="border-t border-slate-800/60 py-6 text-center text-xs text-slate-500">
-      <p>&copy; 2026 Aetheria: Dragon's Eclipse. Not affiliated with Mojang AB.</p>
+      <p>&copy; 2026 Aetheria: Dragon's Eclipse. &bull; Not affiliated with Mojang AB. &bull; Powered by RaditNex Infrastructure</p>
     </footer>
 
   </div>

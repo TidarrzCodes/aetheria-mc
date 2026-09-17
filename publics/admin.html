@@ -29,11 +29,14 @@
     }
   </script>
 
-  <!-- EXTERNAL CSS (Satu tingkat di subfolder style) -->
+  <!-- EXTERNAL CSS -->
   <link rel="stylesheet" href="./style/admin.css">
 </head>
 
-<body class="min-h-screen antialiased flex flex-col justify-between">
+<body class="min-h-screen antialiased flex flex-col justify-between relative">
+
+  <!-- TOAST NOTIFICATION CONTAINER (POJOK KANAN ATAS) -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2.5 pointer-events-none"></div>
 
   <!-- AUTHENTICATION OVERLAY -->
   <div id="loginOverlay"
@@ -77,7 +80,7 @@
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-rose-500"></span>
             <h1 class="text-xs font-bold text-white tracking-wide uppercase font-mono">AETHERIA <span
-                class="text-zinc-600">/</span> ADMIN</h1>
+                class="text-zinc-600">/</span> ADMIN CONTROL</h1>
           </div>
           <nav class="flex items-center gap-1 bg-[#121215] p-1 rounded-lg border border-zinc-800 text-xs font-mono">
             <button onclick="switchMainTab('orders')" id="main-tab-orders"
@@ -106,6 +109,7 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full flex-1">
+      <!-- VIEW ORDERS SECTION -->
       <section id="view-orders" class="space-y-6">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div class="bg-[#121215] border border-zinc-800/80 p-4 rounded-xl">
@@ -160,13 +164,29 @@
         </div>
       </section>
 
+      <!-- VIEW PLAYERS SECTION -->
       <section id="view-players" class="hidden space-y-6">
+        
+        <!-- QUICK CONSOLE COMMAND EXECUTION WIDGET -->
+        <div class="bg-[#121215] border border-zinc-800/80 p-4 rounded-xl shadow-xl space-y-2">
+          <label class="block text-xs font-mono text-zinc-400 uppercase">
+            <i class="fa-solid fa-terminal text-rose-500 mr-1"></i> Quick Console Command
+          </label>
+          <form onsubmit="sendConsoleCommand(event)" class="flex gap-2">
+            <input type="text" id="consoleCommandInput"
+              class="flex-1 bg-[#09090b] border border-zinc-800 focus:border-rose-500 focus:outline-none px-3.5 py-2 rounded-lg text-white font-mono text-xs transition">
+            <button type="submit" class="bg-rose-600 hover:bg-rose-500 text-white font-mono text-xs font-bold px-4 py-2 rounded-lg transition uppercase tracking-wider">
+              Kirim
+            </button>
+          </form>
+        </div>
+
         <div
           class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-[#121215] border border-zinc-800/80 rounded-xl gap-4">
           <div class="flex items-center gap-3">
             <span id="player-tab-dot" class="w-3 h-3 rounded-full bg-zinc-600"></span>
             <div>
-              <h2 class="text-sm font-semibold text-white font-mono">SERVER REALM STATUS</h2>
+              <h2 class="text-sm font-semibold text-white font-mono">SERVER STATUS</h2>
               <p id="player-tab-count" class="text-xs text-zinc-400 font-mono">Checking online players...</p>
             </div>
           </div>
@@ -183,7 +203,7 @@
                   <th class="p-3.5">Avatar</th>
                   <th class="p-3.5">Username</th>
                   <th class="p-3.5">Rank Group</th>
-                  <th class="p-3.5 text-right">Status</th>
+                  <th class="p-3.5 text-right">Aksi Moderasi</th>
                 </tr>
               </thead>
               <tbody id="player-table-list" class="divide-y divide-zinc-800/60 font-sans text-zinc-300">
@@ -199,7 +219,7 @@
     </main>
 
     <footer class="border-t border-zinc-800/60 py-4 text-center text-xs text-zinc-600 font-mono">
-      Aetheria Infrastructure &bull; Automated Payment Gateway
+      Aetheria Infrastructure &bull; Moderation & Auto Payment Gateway
     </footer>
   </div>
 
@@ -213,7 +233,7 @@
     </div>
   </div>
 
-  <!-- EXTERNAL JS SCRIPT (Satu tingkat di subfolder javascript) -->
+  <!-- EXTERNAL JS SCRIPT -->
   <script src="./javascript/admin.js" defer></script>
 </body>
 
