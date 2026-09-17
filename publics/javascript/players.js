@@ -170,10 +170,10 @@ function renderRankBadge(rankName) {
 function renderRankBenefits(rankName) {
   const rank = (rankName || 'MEMBER').toUpperCase();
 
-  if (rank.includes('DRAGONIAN')) {
+  if (rank.includes('DRAGONIAN') || rank.includes('OWNER') || rank.includes('ADMIN')) {
     return `
       <div class="p-4 bg-amber-950/30 border border-amber-500/30 rounded-xl space-y-2">
-        <p class="text-amber-300 font-bold"><i class="fa-solid fa-crown mr-1"></i> RANK DRAGONIAN (ULTIMATE)</p>
+        <p class="text-amber-300 font-bold"><i class="fa-solid fa-crown mr-1"></i> RANK OWNER / DRAGONIAN (ULTIMATE)</p>
         <ul class="space-y-1.5 text-slate-300">
           <li>✨ Prefix Tag Rainbow/Emas <strong class="text-amber-300">[DRAGONIAN]</strong></li>
           <li>🏡 8x Slot Wilayah Sethome Maximum</li>
