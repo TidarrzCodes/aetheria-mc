@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aetheria: Dragon's Eclipse — Official Action RPG & Survival Realm</title>
 
-  <!-- FAVICON (Naik 1 folder ke library) -->
-  <link rel="icon" type="image/png" href="./library/aetheria.png">
+  <!-- FAVICON (Keluar 1 folder ke library) -->
+  <link rel="icon" type="image/png" href="../library/aetheria.png">
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -22,7 +22,7 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- EXTERNAL CSS -->
+  <!-- EXTERNAL CSS (Satu folder dengan publics/style) -->
   <link rel="stylesheet" href="./style/index.css">
 </head>
 
@@ -46,7 +46,7 @@
           <div class="flex items-center gap-3">
             <div
               class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center group-hover:scale-105 transition shrink-0">
-              <img src="./library/aetheria.png" alt="Aetheria Logo" class="w-full h-full object-contain">
+              <img src="../library/aetheria.png" alt="Aetheria Logo" class="w-full h-full object-contain">
             </div>
             <div>
               <span
@@ -89,7 +89,7 @@
           Fight Mod</strong>, bertarung & terbang menunggangi naga di bawah bayang-bayang Gerhana Naga!
       </p>
 
-      <!-- CALL TO ACTION BUTTONS (DITUKAR & DISCORD TOMBOL 1) -->
+      <!-- CALL TO ACTION BUTTONS -->
       <div class="mt-6 flex flex-wrap justify-center items-center gap-3">
         <!-- TOMBOL 1: JOIN DISCORD COMMUNITY -->
         <a href="https://discord.gg/" target="_blank"
@@ -97,7 +97,7 @@
           <i class="fa-brands fa-discord text-base"></i> Join Komunitas Discord
         </a>
 
-        <!-- TOMBOL 2: DOWNLOAD MODPACK (DESAIN GRADIENT DARI TOMBOL 1 DULU) -->
+        <!-- TOMBOL 2: DOWNLOAD MODPACK -->
         <a href="https://drive.google.com/drive/folders/1RoBEnPzmepIOVjlnwSfXcIKkJ5Zau6ri?usp=drive_link"
           target="_blank"
           class="bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-xl transition shadow-lg shadow-rose-950/50 flex items-center gap-2.5 font-epic">
@@ -159,7 +159,7 @@
         <!-- STEP 2 -->
         <div class="supreme-card p-5 rounded-2xl flex flex-col justify-between relative overflow-hidden">
           <span
-            class="absolute -right-2 -bottom-4 text-6xl font-black font-mono-code text-slate-800/40 pointer-events-none">01</span>
+            class="absolute -right-2 -bottom-4 text-6xl font-black font-mono-code text-slate-800/40 pointer-events-none">02</span>
           <div>
             <div
               class="w-8 h-8 bg-amber-500/20 text-amber-400 rounded-lg flex items-center justify-center font-bold text-sm mb-3 font-mono-code border border-amber-500/40">
@@ -258,26 +258,26 @@
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
-        <div onclick="openLightbox('./albums/img1.png', 'Pertarungan Sengit Naga Fire Drake')"
+        <div onclick="openLightbox('../albums/img1.png', 'Pertarungan Sengit Naga Fire Drake')"
           class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
           <div class="aspect-video overflow-hidden">
-            <img src="./albums/img1.png" alt="Dragon Battle"
+            <img src="../albums/img1.png" alt="Dragon Battle"
               class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
           </div>
         </div>
 
-        <div onclick="openLightbox('./albums/img2.png', 'Duel Combo Pedang Epic Fight')"
+        <div onclick="openLightbox('../albums/img2.png', 'Duel Combo Pedang Epic Fight')"
           class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
           <div class="aspect-video overflow-hidden">
-            <img src="./albums/img2.png" alt="Epic Sword Fight"
+            <img src="../albums/img2.png" alt="Epic Sword Fight"
               class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
           </div>
         </div>
 
-        <div onclick="openLightbox('./albums/img3.png', 'Terbang Menjelajahi Sarang Naga')"
+        <div onclick="openLightbox('../albums/img3.png', 'Terbang Menjelajahi Sarang Naga')"
           class="group supreme-card rounded-2xl overflow-hidden cursor-pointer relative">
           <div class="aspect-video overflow-hidden">
-            <img src="./albums/img3.png" alt="Dragon Mount Flight"
+            <img src="../albums/img3.png" alt="Dragon Mount Flight"
               class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
           </div>
         </div>
@@ -731,7 +731,7 @@
 
   </div>
 
-  <!-- EXTERNAL JS SCRIPT -->
+  <!-- EXTERNAL JS SCRIPT (Satu folder dengan publics/javascript) -->
   <script src="./javascript/index.js" defer></script>
 </body>
 

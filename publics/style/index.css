@@ -3,6 +3,7 @@ body {
   color: #e2e8f0;
   font-family: 'Space Grotesk', sans-serif;
   overflow-x: hidden;
+  width: 100%;
 }
 
 .font-epic {
@@ -13,13 +14,13 @@ body {
   font-family: 'Fira Code', monospace;
 }
 
-/* Fullscreen Particle Canvas */
+/* Fullscreen Particle Canvas (Disesuaikan agar tidak memicu horizontal scrollbar di HP) */
 #emberCanvas {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   z-index: 1;
 }
@@ -29,43 +30,48 @@ body {
   background: linear-gradient(135deg, rgba(18, 12, 24, 0.95), rgba(5, 6, 10, 0.98));
   border: 1px solid rgba(244, 63, 94, 0.3);
   backdrop-filter: blur(14px);
-  transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+  -webkit-backdrop-filter: blur(14px);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.supreme-card:hover {
-  border-color: rgba(244, 63, 94, 0.9);
-  box-shadow: 0 0 35px -5px rgba(244, 63, 94, 0.45);
-  transform: translateY(-4px);
+/* Efek Hover Hanya Aktif di Perangkat Non-Touchscreen */
+@media (hover: hover) {
+  .supreme-card:hover {
+    border-color: rgba(244, 63, 94, 0.9);
+    box-shadow: 0 0 35px -5px rgba(244, 63, 94, 0.45);
+    transform: translateY(-4px);
+  }
 }
 
-/* Animated Fire Aura Glowing Text */
+/* Animated Fire Aura Glowing Text (Glow disesuaikan untuk layar HP) */
 @keyframes dragonGlow {
   0%, 100% {
-    text-shadow: 0 0 25px rgba(244, 63, 94, 0.8), 0 0 50px rgba(245, 158, 11, 0.5);
+    text-shadow: 0 0 15px rgba(244, 63, 94, 0.7), 0 0 30px rgba(245, 158, 11, 0.4);
   }
   50% {
-    text-shadow: 0 0 45px rgba(244, 63, 94, 1), 0 0 75px rgba(245, 158, 11, 0.8), 0 0 100px rgba(225, 29, 72, 0.6);
+    text-shadow: 0 0 25px rgba(244, 63, 94, 0.9), 0 0 45px rgba(245, 158, 11, 0.7);
   }
 }
 
 .dragon-title {
   animation: dragonGlow 2.8s infinite ease-in-out;
+  word-break: break-word;
 }
 
 .glow-rose {
-  box-shadow: 0 0 25px rgba(244, 63, 94, 0.35);
+  box-shadow: 0 0 20px rgba(244, 63, 94, 0.35);
 }
 
 .glow-gold {
-  box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
 }
 
 .glow-emerald {
-  box-shadow: 0 0 30px rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
 }
 
 .glow-violet {
-  box-shadow: 0 0 30px rgba(168, 85, 247, 0.35);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.35);
 }
 
 .input-box {
@@ -92,18 +98,34 @@ body {
   border-radius: 4px;
 }
 
+/* Input File Button Responsif di HP */
 input[type="file"]::file-selector-button {
   background-color: #1e2638;
   color: #e2e8f0;
   border: none;
   padding: 0.4rem 0.8rem;
   border-radius: 0.5rem;
-  margin-right: 0.75rem;
+  margin-right: 0.5rem;
   cursor: pointer;
   transition: background 0.2s;
+  max-width: 100%;
 }
 
 input[type="file"]::file-selector-button:hover {
   background-color: #f43f5e;
   color: #ffffff;
+}
+
+/* Optimasi tambahan khusus layar HP (dibawah 640px) */
+@media (max-width: 639px) {
+  input[type="file"]::file-selector-button {
+    display: block;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    margin-right: 0;
+  }
+  
+  .glow-rose, .glow-gold, .glow-emerald, .glow-violet {
+    box-shadow: 0 0 12px rgba(244, 63, 94, 0.25);
+  }
 }
