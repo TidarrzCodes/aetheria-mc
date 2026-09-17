@@ -18,16 +18,17 @@ function escapeHTML(str) {
     .replace(/'/g, '&#039;');
 }
 
-// CHECK USER LOCAL SESSION (JIKA SUDAH LOGIN SEBELUMNYA)
+// CHECK USER LOCAL SESSION
 function checkPlayerSession() {
   const savedUser = localStorage.getItem('aetheria_player_user');
   if (savedUser) {
     try {
       const playerData = JSON.parse(savedUser);
-
-      // CEK JIKA USER ADALAH ADMIN/OWNER
       const rankUpper = (playerData.rank || '').toUpperCase();
+
+      // JIKA RANK DARI LUCKPERMS ADALAH ADMIN/OWNER, REDIRECT KE ADMIN.HTML
       if (rankUpper.includes('ADMIN') || rankUpper.includes('OWNER')) {
+        sessionStorage.setItem('aetheria_admin_auth', 'true');
         window.location.href = './admin.html';
         return;
       }
@@ -68,8 +69,9 @@ async function handlePlayerLogin(e) {
         rank: data.rank || 'Member' 
       };
 
-      // CEK LOGIKA ADMIN: JIKA RANK ADMIN ATAU OWNER, REDIRECT KE ADMIN.HTML
-      const rankUpper = (playerData.rank || '').toUpperCase();
+      const rankUpper = playerData.rank.toUpperCase();
+
+      // JIKA LUCKPERMS MERESPONS RANK ADMIN / OWNER, OTOMATIS REDIRECT
       if (rankUpper.includes('ADMIN') || rankUpper.includes('OWNER')) {
         sessionStorage.setItem('aetheria_admin_auth', 'true');
         window.location.href = './admin.html';
@@ -118,7 +120,6 @@ async function showDashboardProfile(playerData) {
         if (typeof match === 'object' && match.group) {
           currentRank = match.group;
 
-          // JIKA RE-SYNC DI SERVER DETEKSI RANK DAH JADI ADMIN
           const rankUpper = currentRank.toUpperCase();
           if (rankUpper.includes('ADMIN') || rankUpper.includes('OWNER')) {
             sessionStorage.setItem('aetheria_admin_auth', 'true');
