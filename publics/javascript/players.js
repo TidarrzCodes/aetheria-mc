@@ -18,18 +18,27 @@ function escapeHTML(str) {
     .replace(/'/g, '&#039;');
 }
 
+// CHECK AND REDIRECT ADMIN / STAFF (OWNER, ADMIN, HELPER)
+function checkAndRedirectAdmin(rank) {
+  const rankUpper = (rank || '').toUpperCase();
+  const staffRanks = ['OWNER', 'ADMIN', 'HELPER'];
+  const isStaff = staffRanks.some(r => rankUpper.includes(r));
+
+  if (isStaff) {
+    sessionStorage.setItem('aetheria_admin_auth', 'true');
+    window.location.href = './admin.html';
+    return true;
+  }
+  return false;
+}
+
 // CHECK USER LOCAL SESSION
 function checkPlayerSession() {
   const savedUser = localStorage.getItem('aetheria_player_user');
   if (savedUser) {
     try {
       const playerData = JSON.parse(savedUser);
-      const rankUpper = (playerData.rank || '').toUpperCase();
-
-      // JIKA RANK DARI LUCKPERMS ADALAH ADMIN/OWNER, REDIRECT KE ADMIN.HTML
-      if (rankUpper.includes('ADMIN') || rankUpper.includes('OWNER')) {
-        sessionStorage.setItem('aetheria_admin_auth', 'true');
-        window.location.href = './admin.html';
+      if (checkAndRedirectAdmin(playerData.rank)) {
         return;
       }
 
@@ -61,27 +70,25 @@ async function handlePlayerLogin(e) {
       body: JSON.stringify({ username, password })
     });
 
-    const data = await res.json();
+    const contentType = res.headers.get('content-type') || '';
+    const isJson = contentType.includes('application/json');
+    const data = isJson ? await res.json() : null;
 
-    if (res.ok && data.result === 'success') {
-      const playerData = { 
-        username: data.username || username, 
-        rank: data.rank || 'Member' 
+    if (res.ok && data && data.result === 'success') {
+      const playerData = {
+        username: data.username || username,
+        rank: data.rank || 'Member'
       };
 
-      const rankUpper = playerData.rank.toUpperCase();
-
-      // JIKA LUCKPERMS MERESPONS RANK ADMIN / OWNER, OTOMATIS REDIRECT
-      if (rankUpper.includes('ADMIN') || rankUpper.includes('OWNER')) {
-        sessionStorage.setItem('aetheria_admin_auth', 'true');
-        window.location.href = './admin.html';
+      if (checkAndRedirectAdmin(playerData.rank)) {
         return;
       }
 
       localStorage.setItem('aetheria_player_user', JSON.stringify(playerData));
       showDashboardProfile(playerData);
     } else {
-      errorMsg.innerText = "❌ " + (data.message || "Username / Password in-game salah!");
+      const message = (data && data.message) || `Server error (${res.status}): Gagal memproses permintaan login.`;
+      errorMsg.innerText = "❌ " + message;
       errorMsg.classList.remove('hidden');
     }
   } catch (err) {
@@ -107,9 +114,12 @@ async function showDashboardProfile(playerData) {
 
   try {
     const res = await fetch(`https://api.mcsrvstat.us/3/${SERVER_DOMAIN}`);
+    if (!res.ok) {
+      throw new Error(`MCSrvStat API error: ${res.status}`);
+    }
     const data = await res.json();
 
-    if (data.online && data.players && data.players.list) {
+    if (data && data.online && data.players && data.players.list) {
       const match = data.players.list.find(p => {
         const name = typeof p === 'object' ? p.name : p;
         return name.toLowerCase() === playerData.username.toLowerCase();
@@ -120,10 +130,7 @@ async function showDashboardProfile(playerData) {
         if (typeof match === 'object' && match.group) {
           currentRank = match.group;
 
-          const rankUpper = currentRank.toUpperCase();
-          if (rankUpper.includes('ADMIN') || rankUpper.includes('OWNER')) {
-            sessionStorage.setItem('aetheria_admin_auth', 'true');
-            window.location.href = './admin.html';
+          if (checkAndRedirectAdmin(currentRank)) {
             return;
           }
         }
@@ -153,8 +160,17 @@ function handlePlayerLogout() {
 
 // RENDER RANK BADGE
 function renderRankBadge(rankName) {
-  const rank = (rankName || 'MEMBER').toUpperCase();
-  if (rank.includes('DRAGONIAN') || rank.includes('OWNER') || rank.includes('ADMIN')) {
+  const rank = (rankName || 'PLAYER').toUpperCase();
+  if (rank.includes('OWNER')) {
+    return `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/50 px-3 py-1 rounded-md text-xs font-mono font-bold tracking-wide">[OWNER]</span>`;
+  }
+  if (rank.includes('ADMIN')) {
+    return `<span class="bg-rose-500/20 text-rose-300 border border-rose-500/40 px-3 py-1 rounded-md text-xs font-mono font-bold tracking-wide">[ADMIN]</span>`;
+  }
+  if (rank.includes('HELPER')) {
+    return `<span class="bg-blue-500/20 text-blue-400 border border-blue-500/50 px-3 py-1 rounded-md text-xs font-mono font-bold tracking-wide">[HELPER]</span>`;
+  }
+  if (rank.includes('DRAGONIAN')) {
     return `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1 rounded-md text-xs font-mono font-bold tracking-wide">[DRAGONIAN]</span>`;
   }
   if (rank.includes('MVP')) {
@@ -163,7 +179,7 @@ function renderRankBadge(rankName) {
   if (rank.includes('VIP')) {
     return `<span class="bg-amber-400/10 text-amber-300 border border-amber-400/30 px-3 py-1 rounded-md text-xs font-mono font-bold tracking-wide">[VIP]</span>`;
   }
-  return `<span class="bg-zinc-800 text-zinc-400 border border-zinc-700 px-3 py-1 rounded-md text-xs font-mono font-semibold">MEMBER</span>`;
+  return `<span class="bg-zinc-800 text-zinc-400 border border-zinc-700 px-3 py-1 rounded-md text-xs font-mono font-semibold">[PLAYER]</span>`;
 }
 
 // RENDER BENEFIT LIST
@@ -226,6 +242,9 @@ async function fetchOnlinePlayers() {
 
   try {
     const response = await fetch(`https://api.mcsrvstat.us/3/${SERVER_DOMAIN}`);
+    if (!response.ok) {
+      throw new Error(`MCSrvStat API error: ${response.status}`);
+    }
     const data = await response.json();
 
     if (data.online) {

@@ -1,0 +1,7 @@
+# Ignore Cloudflare Worker file containing API credentials/keys
+worker.js
+
+# OS & IDE junk
+.DS_Store
+.vscode/
+*.log

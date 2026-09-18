@@ -124,20 +124,22 @@ async function handleLogin(e) {
 
     if (res.ok && data.result === 'success') {
       const rankUpper = (data.rank || '').toUpperCase();
+      const staffRanks = ['OWNER', 'ADMIN', 'HELPER'];
+      const isStaff = staffRanks.some(r => rankUpper.includes(r));
 
-      // Pastikan akun memiliki rank Admin/Owner
-      if (rankUpper.includes('ADMIN') || rankUpper.includes('OWNER')) {
+      // Pastikan akun memiliki rank Admin/Staff
+      if (isStaff) {
         // Simpan token ke Cookie (Aktif selama 1 hari) & SessionStorage
         const authPayload = JSON.stringify({ username: data.username, rank: data.rank, token: Date.now() });
         setCookie('aetheria_admin_token', btoa(authPayload), 1);
         sessionStorage.setItem('aetheria_admin_auth', 'true');
 
-        showToast(`Selamat datang Admin ${data.username}!`, "success");
+        showToast(`Selamat datang ${data.username} (${data.rank || 'Staff'})!`, "success");
         unlockDashboard();
       } else {
-        errorMsg.innerText = "❌ Akun kamu tidak memiliki akses Admin!";
+        errorMsg.innerText = "❌ Akun kamu tidak memiliki akses Staff/Admin!";
         errorMsg.classList.remove('hidden');
-        showToast("Akses Ditolak: Bukan akun Admin!", "error");
+        showToast("Akses Ditolak: Bukan akun Staff/Admin!", "error");
       }
     } else {
       errorMsg.innerText = "❌ " + (data.message || "Password in-game salah!");
@@ -252,8 +254,17 @@ async function executeAdminCommand(command, successMessage) {
 }
 
 function renderRankBadge(rankName) {
-  const rank = (rankName || 'MEMBER').toUpperCase();
-  if (rank.includes('DRAGONIAN') || rank.includes('OWNER') || rank.includes('ADMIN')) {
+  const rank = (rankName || 'PLAYER').toUpperCase();
+  if (rank.includes('OWNER')) {
+    return `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wide">OWNER</span>`;
+  }
+  if (rank.includes('ADMIN')) {
+    return `<span class="bg-rose-500/10 text-rose-300 border border-rose-500/30 px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wide">ADMIN</span>`;
+  }
+  if (rank.includes('HELPER')) {
+    return `<span class="bg-blue-500/10 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wide">HELPER</span>`;
+  }
+  if (rank.includes('DRAGONIAN')) {
     return `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wide">DRAGONIAN</span>`;
   }
   if (rank.includes('MVP')) {
@@ -262,7 +273,7 @@ function renderRankBadge(rankName) {
   if (rank.includes('VIP')) {
     return `<span class="bg-amber-400/10 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wide">VIP</span>`;
   }
-  return `<span class="bg-zinc-800 text-zinc-400 border border-zinc-700 px-2 py-0.5 rounded text-[10px] font-mono font-semibold">MEMBER</span>`;
+  return `<span class="bg-zinc-800 text-zinc-400 border border-zinc-700 px-2 py-0.5 rounded text-[10px] font-mono font-semibold">PLAYER</span>`;
 }
 
 async function fetchOnlinePlayers() {
