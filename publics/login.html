@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aetheria — Login Player / Staff</title>
+
+  <link rel="icon" type="image/png" href="./library/aetheria.png">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Fira+Code:wght@500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- EXTERNAL CSS -->
+  <link rel="stylesheet" href="./style/login.css">
+</head>
+
+<body class="min-h-screen bg-[#020305] text-slate-200 antialiased flex flex-col justify-between selection:bg-rose-600 selection:text-white relative">
+
+  <!-- DYNAMIC EMBERS CANVAS -->
+  <canvas id="emberCanvas"></canvas>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2.5 pointer-events-none"></div>
+
+  <div class="relative z-10 flex flex-col min-h-screen justify-between">
+
+    <!-- NAVBAR -->
+    <header class="border-b border-rose-950/80 bg-[#020305]/95 sticky top-0 z-40 backdrop-blur-md">
+      <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+        <a href="./index.html" class="flex items-center gap-3">
+          <img src="./library/aetheria.png" alt="Aetheria Logo" class="w-9 h-9 object-contain">
+          <div>
+            <span class="font-black text-base text-white tracking-widest block leading-tight font-epic">AETHERIA<span class="text-rose-500">: ECLIPSE</span></span>
+            <p class="text-[9px] text-slate-400 font-mono-code tracking-tight">AUTH PORTAL GATEWAY</p>
+          </div>
+        </a>
+
+        <div class="flex items-center gap-2">
+          <a href="./index.html" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-bold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 font-mono-code">
+            <i class="fa-solid fa-house"></i> Home
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN LOGIN CONTAINER -->
+    <main class="max-w-md w-full mx-auto px-4 py-12 flex-1 flex flex-col justify-center">
+
+      <section class="supreme-card p-6 sm:p-8 rounded-2xl border-rose-500/50 glow-rose relative overflow-hidden shadow-2xl">
+        <div class="space-y-6">
+
+          <!-- CARD HEADER -->
+          <div class="text-center space-y-2">
+            <div class="w-14 h-14 bg-rose-500/10 border border-rose-500/40 rounded-2xl flex items-center justify-center mx-auto text-rose-400 text-2xl shadow-lg shadow-rose-950/50">
+              <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <h1 class="text-2xl font-black text-white font-epic tracking-wide">LOGIN AETHERIA</h1>
+            <p class="text-xs text-slate-400 font-mono-code">Gunakan Username & Password yang sama dengan di dalam Server Minecraft (<code class="text-rose-400 bg-slate-950 px-1 py-0.5 rounded">/login</code>)</p>
+          </div>
+
+          <!-- LOGIN FORM -->
+          <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-4 font-mono-code text-xs">
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1.5 flex items-center gap-1.5">
+                <i class="fa-solid fa-user text-rose-400"></i> Username Minecraft
+              </label>
+              <input type="text" id="loginUsername" required placeholder="Contoh: Steve" class="w-full input-box px-3.5 py-3 rounded-xl text-white bg-slate-950/80 border border-slate-800 focus:border-rose-500 focus:outline-none transition">
+            </div>
+
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1.5 flex items-center gap-1.5">
+                <i class="fa-solid fa-key text-rose-400"></i> Password In-Game (/login)
+              </label>
+              <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full input-box px-3.5 py-3 rounded-xl text-white bg-slate-950/80 border border-slate-800 focus:border-rose-500 focus:outline-none transition">
+            </div>
+
+            <!-- ERROR ALERT MESSAGE -->
+            <div id="loginError" class="hidden p-3 bg-rose-950/60 border border-rose-500/60 text-rose-300 rounded-xl text-xs font-semibold leading-relaxed flex items-center gap-2">
+              <i class="fa-solid fa-triangle-exclamation text-rose-400 shrink-0"></i>
+              <span id="loginErrorText">Username atau password in-game salah!</span>
+            </div>
+
+            <button type="submit" id="btnLogin" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3.5 rounded-xl transition uppercase tracking-wider font-epic shadow-lg shadow-rose-950/60 flex items-center justify-center gap-2 text-xs">
+              <i class="fa-solid fa-right-to-bracket"></i> Masuk Sekarang
+            </button>
+          </form>
+
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800/60 py-4 text-center text-xs text-slate-500 font-mono-code">
+      &copy; 2026 Aetheria: Dragon's Eclipse. &bull; Not affiliated with Mojang AB. &bull; Powered by RaditNex Infrastructure
+    </footer>
+
+  </div>
+
+  <script src="./javascript/login.js" defer></script>
+</body>
+
+</html>

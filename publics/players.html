@@ -17,12 +17,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- EXTERNAL CSS -->
-  <link rel="stylesheet" href="./style/index.css">
-  <link rel="stylesheet" href="./style/admin.css">
+  <link rel="stylesheet" href="./style/players.css">
 </head>
 
 <body class="min-h-screen bg-[#020305] text-slate-200 antialiased flex flex-col justify-between selection:bg-rose-600 selection:text-white relative">
 
+  <!-- EMBERS CANVAS -->
   <canvas id="emberCanvas"></canvas>
 
   <div class="relative z-10 flex flex-col min-h-screen">
@@ -34,14 +34,17 @@
           <img src="./library/aetheria.png" alt="Aetheria Logo" class="w-9 h-9 object-contain">
           <div>
             <span class="font-black text-base text-white tracking-widest block leading-tight font-epic">AETHERIA<span class="text-rose-500">: PLAYER HUD</span></span>
-            <p class="text-[9px] text-slate-400 font-mono tracking-tight">PLAYER PROFILE & REALM HUB</p>
+            <p class="text-[9px] text-slate-400 font-mono-code tracking-tight">PLAYER PROFILE & REALM HUB</p>
           </div>
         </a>
 
-        <div class="flex items-center gap-2">
-          <a href="./index.html#store" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 font-mono">
+        <div class="flex items-center gap-2 font-mono-code">
+          <a href="./index.html#store" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
             <i class="fa-solid fa-cart-shopping"></i> Webstore
           </a>
+          <button onclick="handlePlayerLogout()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-bold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </button>
         </div>
       </div>
     </header>
@@ -49,89 +52,67 @@
     <!-- MAIN DASHBOARD HUB -->
     <main class="max-w-6xl mx-auto px-4 py-8 w-full flex-1 space-y-8">
 
-      <!-- LOGIN PLAYER CARD -->
-      <section id="loginSection" class="supreme-card p-6 rounded-2xl border-rose-500/40 relative overflow-hidden">
-        <div class="max-w-md mx-auto space-y-4">
-          <div class="text-center">
-            <h2 class="text-2xl font-black text-white font-epic tracking-wide">LOGIN PLAYER AETHERIA</h2>
-            <p class="text-xs text-slate-400 font-mono mt-1">Gunakan Username & Password yang sama dengan di dalam Server Minecraft (/login)</p>
-          </div>
-          
-          <form onsubmit="handlePlayerLogin(event)" class="space-y-3 font-mono text-xs">
-            <div>
-              <label class="block text-slate-300 font-semibold mb-1">Username Minecraft</label>
-              <input type="text" id="loginUsername" required placeholder="Contoh: Steve" class="w-full input-box px-3.5 py-2.5 rounded-xl text-white bg-slate-950/80 border border-slate-800 focus:border-rose-500 focus:outline-none">
-            </div>
-
-            <div>
-              <label class="block text-slate-300 font-semibold mb-1">Password In-Game (/login)</label>
-              <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full input-box px-3.5 py-2.5 rounded-xl text-white bg-slate-950/80 border border-slate-800 focus:border-rose-500 focus:outline-none">
-            </div>
-
-            <p id="playerLoginError" class="text-rose-500 hidden text-[11px] font-semibold">❌ Username atau password in-game salah!</p>
-
-            <button type="submit" id="btnLogin" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 rounded-xl transition uppercase tracking-wider font-mono">
-              Masuk ke Dashboard
-            </button>
-          </form>
-        </div>
-      </section>
-
-      <!-- PLAYER PROFILE CARD (MUNCUL SETELAH LOGIN) -->
-      <section id="playerProfileCard" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- PLAYER PROFILE CARD -->
+      <section id="playerProfileCard" class="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         <!-- AVATAR & BASIC INFO -->
-        <div class="supreme-card p-6 rounded-2xl flex flex-col items-center text-center justify-between border-rose-500/50">
+        <div class="supreme-card p-6 rounded-2xl flex flex-col items-center text-center justify-between border-rose-500/50 shadow-xl">
           <div class="space-y-3 w-full">
             <div class="relative w-28 h-28 mx-auto">
               <img id="playerSkinHead" src="https://mc-heads.net/avatar/Steve/100" alt="Avatar" class="w-full h-full rounded-2xl border-2 border-rose-500/60 shadow-xl bg-slate-900 object-contain p-1">
             </div>
             <div>
-              <h3 id="playerDisplayUsername" class="text-xl font-bold text-white font-mono">Steve</h3>
+              <h3 id="playerDisplayUsername" class="text-xl font-bold text-white font-mono-code">Steve</h3>
               <div id="playerDisplayRank" class="mt-1">
-                <span class="bg-zinc-800 text-zinc-400 border border-zinc-700 px-2.5 py-0.5 rounded text-[11px] font-mono font-semibold">MEMBER</span>
+                <span class="bg-zinc-800 text-zinc-400 border border-zinc-700 px-2.5 py-0.5 rounded text-[11px] font-mono-code font-semibold">MEMBER</span>
               </div>
             </div>
           </div>
 
-          <div class="w-full pt-4 border-t border-slate-800/80 text-xs font-mono text-slate-400 space-y-2 mt-4">
+          <div class="w-full pt-4 border-t border-slate-800/80 text-xs font-mono-code text-slate-400 space-y-2 mt-4">
             <div class="flex justify-between"><span>Status In-Game:</span> <strong id="playerOnlineState" class="text-slate-500">Offline</strong></div>
             <div class="flex justify-between"><span>Realm Server:</span> <strong class="text-rose-400">1.20.1 Forge</strong></div>
             
-            <button onclick="handlePlayerLogout()" class="w-full mt-3 bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/30 text-rose-300 py-2 rounded-xl transition text-xs font-mono">
+            <div id="staffAccessContainer" class="hidden">
+              <a href="./admin.html" class="w-full mt-2 bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 py-2 rounded-xl transition text-xs font-mono-code flex items-center justify-center gap-1.5 font-bold">
+                <i class="fa-solid fa-user-shield"></i> Ke Dashboard Staff
+              </a>
+            </div>
+
+            <button onclick="handlePlayerLogout()" class="w-full mt-2 bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/30 text-rose-300 py-2 rounded-xl transition text-xs font-mono-code">
               <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout Akun
             </button>
           </div>
         </div>
 
         <!-- RANK BENEFITS & STATS -->
-        <div class="md:col-span-2 supreme-card p-6 rounded-2xl space-y-4">
-          <h4 class="text-sm font-bold text-white font-mono uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-3">
+        <div class="md:col-span-2 supreme-card p-6 rounded-2xl space-y-4 shadow-xl">
+          <h4 class="text-sm font-bold text-white font-mono-code uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-3">
             <i class="fa-solid fa-shield-halved text-rose-500"></i> Benefit & Keuntungan Rank Kamu
           </h4>
 
-          <div id="rankBenefitList" class="space-y-3 text-xs font-mono">
-            <p class="text-slate-400 italic">Login untuk melihat keuntungan rank kamu...</p>
+          <div id="rankBenefitList" class="space-y-3 text-xs font-mono-code">
+            <p class="text-slate-400 italic">Memuat keuntungan rank...</p>
           </div>
         </div>
       </section>
 
       <!-- REALM ONLINE PLAYERS TAB -->
-      <section class="supreme-card p-6 rounded-2xl border-slate-800 space-y-4">
+      <section class="supreme-card p-6 rounded-2xl border-slate-800 space-y-4 shadow-xl">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-slate-800">
           <div>
-            <h3 class="text-lg font-bold text-white font-mono flex items-center gap-2">
+            <h3 class="text-lg font-bold text-white font-mono-code flex items-center gap-2">
               <span id="player-tab-dot" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span> KSATRIA ONLINE IN-GAME
             </h3>
-            <p id="player-tab-count" class="text-xs text-slate-400 font-mono mt-0.5">Memuat data server...</p>
+            <p id="player-tab-count" class="text-xs text-slate-400 font-mono-code mt-0.5">Memuat data server...</p>
           </div>
-          <button onclick="fetchOnlinePlayers()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs px-3 py-1.5 rounded-xl font-mono text-slate-300 transition flex items-center gap-1.5">
+          <button onclick="fetchOnlinePlayers()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs px-3 py-1.5 rounded-xl font-mono-code text-slate-300 transition flex items-center gap-1.5">
             <i class="fa-solid fa-arrows-rotate text-[10px]"></i> Refresh Status
           </button>
         </div>
 
         <div class="overflow-x-auto custom-scrollbar">
-          <table class="w-full text-left text-xs font-mono">
+          <table class="w-full text-left text-xs font-mono-code">
             <thead class="bg-slate-950 text-slate-400 uppercase text-[11px]">
               <tr>
                 <th class="p-3">Avatar</th>
@@ -152,7 +133,7 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="border-t border-slate-800/60 py-4 text-center text-xs text-slate-500 font-mono">
+    <footer class="border-t border-slate-800/60 py-4 text-center text-xs text-slate-500 font-mono-code">
       &copy; 2026 Aetheria: Dragon's Eclipse. &bull; Not affiliated with Mojang AB. &bull; Powered by RaditNex Infrastructure
     </footer>
 

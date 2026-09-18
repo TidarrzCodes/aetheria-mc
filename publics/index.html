@@ -33,7 +33,7 @@
   <canvas id="emberCanvas"></canvas>
 
   <!-- CUSTOM HUD TOAST NOTIFICATION CONTAINER -->
-  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
+  <div id="toast-container" class="fixed top-20 right-5 z-[60] flex flex-col gap-3 pointer-events-none"></div>
 
   <div class="relative z-10 flex flex-col justify-between min-h-screen">
 
@@ -70,10 +70,10 @@
           </button>
 
           <!-- TOMBOL LOGIN / PLAYER AREA -->
-          <a href="./players.html"
+          <a href="./login.html" id="navAuthBtn"
             class="w-full sm:w-auto bg-rose-600 hover:bg-rose-500 text-white text-xs px-3.5 py-2 rounded-xl transition flex items-center justify-center gap-2 font-mono-code font-bold shadow-lg shadow-rose-950/40 shrink-0">
             <i class="fa-solid fa-user-shield"></i>
-            <span>Login</span>
+            <span id="navAuthBtnText">Login</span>
           </a>
         </div>
 
@@ -690,11 +690,11 @@
             <div>
               <p class="text-slate-400 text-[9px] sm:text-[10px] tracking-wider font-semibold flex items-center gap-1">
                 TRANSFER KE <b class="text-blue-400">GOPAY</b>:</p>
-              <p class="font-mono-code font-bold text-white text-xs sm:text-sm mt-0.5">081234567890</p>
-              <p class="text-[9px] sm:text-[10px] text-slate-400">a.n. Owner Server</p>
+              <p class="font-mono-code font-bold text-white text-xs sm:text-sm mt-0.5">0858-8022-6237</p>
+              <p class="text-[9px] sm:text-[10px] text-slate-400">a.n. Operator Server</p>
             </div>
           </div>
-          <button onclick="copyGopay('081234567890')"
+          <button onclick="copyGopay('085880226237')"
             class="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs px-3 py-1.5 rounded-lg transition shadow-md shadow-blue-950 shrink-0">
             Copy
           </button>
@@ -738,6 +738,73 @@
     <footer class="border-t border-slate-800/60 py-6 text-center text-xs text-slate-500">
       <p>&copy; 2026 Aetheria: Dragon's Eclipse. &bull; Not affiliated with Mojang AB. &bull; Powered by RaditNex Infrastructure</p>
     </footer>
+
+  </div>
+
+  <!-- FLOATING LIVE WEB CHAT WIDGET & POPUP (DI KANAN BAWAH) -->
+  <div id="webChatWidget" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; pointer-events: auto;" class="flex flex-col items-end font-mono-code">
+
+    <!-- CHAT POPUP WINDOW CONTAINER (DEFAULT HIDDEN) -->
+    <div id="webChatPopup" class="hidden mb-3 w-[90vw] max-w-sm supreme-card p-4 rounded-2xl border-cyan-500/60 shadow-2xl space-y-3 backdrop-blur-xl animate-fade-in text-left pointer-events-auto">
+      <div class="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+          <h4 class="text-xs font-bold text-white font-epic tracking-wide">LIVE CHAT IN-GAME</h4>
+        </div>
+        <button type="button" onclick="toggleWebChatPopup()" class="text-slate-400 hover:text-white text-xs w-6 h-6 flex items-center justify-center rounded-lg bg-slate-900 border border-slate-800 transition cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- STEP 1: IDENTITY REGISTRATION (EMAIL & USERNAME) -->
+      <div id="webChatAuthContainer" class="space-y-3 text-xs">
+        <p class="text-slate-300 text-[11px] leading-relaxed">Masukkan Username & Email kamu untuk mulai live chat ke server Minecraft:</p>
+        <form onsubmit="initWebChatUser(event)" class="space-y-2.5">
+          <div>
+            <label class="block text-slate-400 mb-1 text-[10px]">Username Minecraft *</label>
+            <input type="text" id="webChatUsername" required placeholder="Steve" class="w-full input-box px-3 py-2 rounded-xl text-white text-xs bg-slate-950">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1 text-[10px]">Email *</label>
+            <input type="email" id="webChatEmail" required placeholder="steve@email.com" class="w-full input-box px-3 py-2 rounded-xl text-white text-xs bg-slate-950">
+          </div>
+          <button type="submit" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-2.5 rounded-xl transition text-xs flex items-center justify-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-comments"></i> Masuk Chat
+          </button>
+        </form>
+      </div>
+
+      <!-- STEP 2: LIVE CHAT MESSENGER -->
+      <div id="webChatBoxContainer" class="hidden space-y-2.5 text-xs">
+        <div class="flex justify-between items-center text-[10px] bg-slate-950/80 px-2.5 py-1.5 rounded-lg border border-slate-800">
+          <span class="text-slate-300 truncate">Pengirim: <strong id="activeChatUser" class="text-cyan-400"></strong></span>
+          <button type="button" onclick="resetWebChatUser()" class="text-rose-400 hover:text-rose-300 text-[9px] underline shrink-0 ml-1 cursor-pointer">
+            Ganti
+          </button>
+        </div>
+
+        <!-- CHAT LOG HISTORY -->
+        <div id="webChatLog" class="bg-slate-950/90 border border-slate-800 rounded-xl p-2.5 h-44 overflow-y-auto custom-scrollbar space-y-1.5 text-xs">
+          <div class="text-slate-500 italic text-[10px]">Pesan yang kamu kirim akan langsung muncul di chat pemain Minecraft in-game.</div>
+        </div>
+
+        <!-- CHAT INPUT FORM -->
+        <form onsubmit="handleSendWebChat(event)" class="flex gap-1.5">
+          <input type="text" id="webChatMessage" required placeholder="Tulis pesan..." class="flex-1 input-box px-3 py-2 rounded-xl text-white text-xs bg-slate-950 focus:border-cyan-500">
+          <button type="submit" id="btnSendWebChat" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-3.5 py-2 rounded-xl transition text-xs shrink-0 cursor-pointer flex items-center justify-center">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- FLOATING TOGGLE BUTTON (LOGO CHAT) -->
+    <button type="button" id="webChatToggleBtn" onclick="toggleWebChatPopup()"
+      class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white flex items-center justify-center shadow-2xl shadow-cyan-950/80 border border-cyan-400/50 transition-all duration-300 hover:scale-110 active:scale-95 group cursor-pointer relative pointer-events-auto">
+      <i class="fa-solid fa-comments text-xl group-hover:rotate-12 transition transform pointer-events-none"></i>
+      <span class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-rose-500 rounded-full animate-ping pointer-events-none"></span>
+      <span class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-rose-500 rounded-full border-2 border-slate-950 pointer-events-none"></span>
+    </button>
 
   </div>
 

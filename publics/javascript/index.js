@@ -213,19 +213,57 @@ function switchTab(type) {
   }
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  const canvas = document.getElementById('signaturePad');
-  function resizeCanvas() {
-    const ratio = Math.max(window.devicePixelRatio || 1, 1);
-    canvas.width = canvas.offsetWidth * ratio;
-    canvas.height = canvas.offsetHeight * ratio;
-    canvas.getContext("2d").scale(ratio, ratio);
+function getCookie(name) {
+  const nameEQ = name + "=";
+  const ca = document.cookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
   }
-  resizeCanvas();
-  signaturePad = new SignaturePad(canvas, { penColor: "rgb(244, 63, 94)" });
+  return null;
+}
 
-  fetchOnlinePlayers();
-  setInterval(fetchOnlinePlayers, 30000);
+function checkAuthNavState() {
+  const btn = document.getElementById('navAuthBtn');
+  const btnText = document.getElementById('navAuthBtnText');
+  if (!btn || !btnText) return;
+
+  const adminCookie = getCookie('aetheria_admin_token');
+  const sessionAuth = sessionStorage.getItem('aetheria_admin_auth');
+  const playerUser = localStorage.getItem('aetheria_player_user');
+
+  if (adminCookie || sessionAuth === 'true') {
+    btn.href = './admin.html';
+    btnText.innerText = 'Dashboard Staff';
+  } else if (playerUser) {
+    btn.href = './players.html';
+    btnText.innerText = 'Dashboard Player';
+  } else {
+    btn.href = './login.html';
+    btnText.innerText = 'Login';
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  try { checkAuthNavState(); } catch (e) { console.error(e); }
+  try { checkWebChatIdentity(); } catch (e) { console.error(e); }
+
+  try {
+    const canvas = document.getElementById('signaturePad');
+    if (canvas && typeof SignaturePad !== 'undefined') {
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      canvas.width = canvas.offsetWidth * ratio;
+      canvas.height = canvas.offsetHeight * ratio;
+      if (canvas.getContext) canvas.getContext("2d").scale(ratio, ratio);
+      signaturePad = new SignaturePad(canvas, { penColor: "rgb(244, 63, 94)" });
+    }
+  } catch (e) { console.error(e); }
+
+  try {
+    fetchOnlinePlayers();
+    setInterval(fetchOnlinePlayers, 30000);
+  } catch (e) { console.error(e); }
 });
 
 function openModal(name, price, category) {
@@ -305,7 +343,7 @@ async function handleFormSubmit(e) {
     formData.append("file1", proofFile, `bukti_${username}.png`);
     formData.append("file2", signatureBlob, `ttd_${username}.png`);
 
-    const response = await fetch(WORKER_PROXY_URL, {
+    const response = await fetch(`${WORKER_PROXY_URL}?action=submit_checkout`, {
       method: "POST",
       body: formData
     });
@@ -328,3 +366,137 @@ async function handleFormSubmit(e) {
     submitBtn.innerText = "Kirim Bukti Pembayaran";
   }
 }
+
+// =========================================================================
+// LIVE WEB CHAT TO IN-GAME MINECRAFT SERVER FUNCTIONS
+// =========================================================================
+function checkWebChatIdentity() {
+  const authContainer = document.getElementById('webChatAuthContainer');
+  const boxContainer = document.getElementById('webChatBoxContainer');
+  const userEl = document.getElementById('activeChatUser');
+  const emailEl = document.getElementById('activeChatEmail');
+
+  if (!authContainer || !boxContainer) return;
+
+  const savedIdentity = localStorage.getItem('aetheria_webchat_identity');
+  if (savedIdentity) {
+    try {
+      const { username, email } = JSON.parse(savedIdentity);
+      if (username && email) {
+        if (userEl) userEl.innerText = username;
+        if (emailEl) emailEl.innerText = `(${email})`;
+        authContainer.classList.add('hidden');
+        boxContainer.classList.remove('hidden');
+        return;
+      }
+    } catch (e) {
+      localStorage.removeItem('aetheria_webchat_identity');
+    }
+  }
+
+  authContainer.classList.remove('hidden');
+  boxContainer.classList.add('hidden');
+}
+
+function initWebChatUser(e) {
+  e.preventDefault();
+  const username = document.getElementById('webChatUsername').value.trim();
+  const email = document.getElementById('webChatEmail').value.trim();
+
+  if (!username || !email) return;
+
+  localStorage.setItem('aetheria_webchat_identity', JSON.stringify({ username, email }));
+  checkWebChatIdentity();
+  showToast(`Identity tersimpan! Kamu siap live chat ke server sebagai ${username}.`, 'success');
+}
+
+function resetWebChatUser() {
+  localStorage.removeItem('aetheria_webchat_identity');
+  checkWebChatIdentity();
+  showToast('Silakan masukkan nama user dan email kembali.', 'info');
+}
+
+async function handleSendWebChat(e) {
+  e.preventDefault();
+
+  const savedIdentity = localStorage.getItem('aetheria_webchat_identity');
+  if (!savedIdentity) {
+    resetWebChatUser();
+    return;
+  }
+
+  let username = "", email = "";
+  try {
+    const parsed = JSON.parse(savedIdentity);
+    username = parsed.username;
+    email = parsed.email;
+  } catch (err) {
+    resetWebChatUser();
+    return;
+  }
+
+  const msgInput = document.getElementById('webChatMessage');
+  const btnSend = document.getElementById('btnSendWebChat');
+  const message = msgInput.value.trim();
+
+  if (!message) return;
+
+  btnSend.disabled = true;
+  btnSend.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
+
+  try {
+    const res = await fetch(`${WORKER_PROXY_URL}?action=send_chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, email, message })
+    });
+
+    const data = await res.json().catch(() => null);
+
+    if (res.ok && data && data.result === 'success') {
+      const chatLog = document.getElementById('webChatLog');
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      const msgDiv = document.createElement('div');
+      msgDiv.className = "flex items-start gap-2 text-xs py-0.5 border-b border-slate-900/60";
+      msgDiv.innerHTML = `
+        <span class="text-slate-500 font-mono-code text-[10px] shrink-0">[${timeStr}]</span>
+        <span class="text-cyan-400 font-bold shrink-0">[WebChat] ${escapeHTML(username)}:</span>
+        <span class="text-slate-200 font-mono-code">${escapeHTML(message)}</span>
+      `;
+
+      chatLog.appendChild(msgDiv);
+      chatLog.scrollTop = chatLog.scrollHeight;
+
+      msgInput.value = '';
+      showToast('Pesan terkirim & muncul di chat in-game Minecraft server!', 'success');
+    } else {
+      const errorMsg = (data && data.message) || `Response server (${res.status}): Gagal mengirim pesan ke server.`;
+      showToast(errorMsg, 'error');
+    }
+  } catch (err) {
+    console.error('WebChat Fetch Error:', err);
+    showToast(`Kesalahan koneksi saat mengirim live chat: ${err.message || 'Network Error'}`, 'error');
+  } finally {
+    btnSend.disabled = false;
+    btnSend.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Kirim`;
+  }
+}
+
+function toggleWebChatPopup() {
+  const popup = document.getElementById('webChatPopup');
+  if (!popup) return;
+  const isHidden = popup.classList.contains('hidden') || popup.style.display === 'none';
+  if (isHidden) {
+    popup.classList.remove('hidden');
+    popup.style.display = 'block';
+    playUiSound(550, 'sine');
+    checkWebChatIdentity();
+  } else {
+    popup.classList.add('hidden');
+    popup.style.display = 'none';
+    playUiSound(350, 'sine');
+  }
+}
+
+window.toggleWebChatPopup = toggleWebChatPopup;

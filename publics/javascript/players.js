@@ -1,4 +1,3 @@
-const WORKER_PROXY_URL = "https://aetheria-checkout.raditnur216531.workers.dev/";
 const SERVER_DOMAIN = "aetheria.raditnex.my.id";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -6,6 +5,49 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchOnlinePlayers();
   setInterval(fetchOnlinePlayers, 30000);
 });
+
+// EMBERS PARTICLE ENGINE
+(function initEmbers() {
+  const canvas = document.getElementById('emberCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let width = canvas.width = window.innerWidth;
+  let height = canvas.height = window.innerHeight;
+
+  window.addEventListener('resize', () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  });
+
+  const embers = Array.from({ length: 50 }, () => ({
+    x: Math.random() * width,
+    y: Math.random() * height,
+    r: Math.random() * 2 + 0.5,
+    dx: (Math.random() - 0.5) * 0.5,
+    dy: -Math.random() * 1.2 - 0.3,
+    alpha: Math.random() * 0.8 + 0.2
+  }));
+
+  function draw() {
+    ctx.clearRect(0, 0, width, height);
+    embers.forEach(e => {
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(244, 63, 94, ${e.alpha})`;
+      ctx.fill();
+
+      e.x += e.dx;
+      e.y += e.dy;
+
+      if (e.y < 0) {
+        e.y = height + 10;
+        e.x = Math.random() * width;
+      }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
 
 // SANITASI INPUT XSS
 function escapeHTML(str) {
@@ -18,93 +60,32 @@ function escapeHTML(str) {
     .replace(/'/g, '&#039;');
 }
 
-// CHECK AND REDIRECT ADMIN / STAFF (OWNER, ADMIN, HELPER)
-function checkAndRedirectAdmin(rank) {
-  const rankUpper = (rank || '').toUpperCase();
-  const staffRanks = ['OWNER', 'ADMIN', 'HELPER'];
-  const isStaff = staffRanks.some(r => rankUpper.includes(r));
-
-  if (isStaff) {
-    sessionStorage.setItem('aetheria_admin_auth', 'true');
-    window.location.href = './admin.html';
-    return true;
-  }
-  return false;
-}
-
-// CHECK USER LOCAL SESSION
+// CHECK USER LOCAL SESSION & REDIRECT IF UNAUTHENTICATED
 function checkPlayerSession() {
   const savedUser = localStorage.getItem('aetheria_player_user');
-  if (savedUser) {
-    try {
-      const playerData = JSON.parse(savedUser);
-      if (checkAndRedirectAdmin(playerData.rank)) {
-        return;
-      }
-
-      showDashboardProfile(playerData);
-    } catch (err) {
-      localStorage.removeItem('aetheria_player_user');
-    }
+  if (!savedUser) {
+    window.location.href = './login.html';
+    return;
   }
-}
-
-// HANDLE LOGIN PLAYER IN-GAME
-async function handlePlayerLogin(e) {
-  e.preventDefault();
-  const username = document.getElementById('loginUsername').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  const errorMsg = document.getElementById('playerLoginError');
-  const btn = document.getElementById('btnLogin');
-
-  if (!username || !password) return;
-
-  errorMsg.classList.add('hidden');
-  btn.innerText = "Memverifikasi...";
-  btn.disabled = true;
 
   try {
-    const res = await fetch(`${WORKER_PROXY_URL}?action=player_login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
-
-    const contentType = res.headers.get('content-type') || '';
-    const isJson = contentType.includes('application/json');
-    const data = isJson ? await res.json() : null;
-
-    if (res.ok && data && data.result === 'success') {
-      const playerData = {
-        username: data.username || username,
-        rank: data.rank || 'Member'
-      };
-
-      if (checkAndRedirectAdmin(playerData.rank)) {
-        return;
-      }
-
-      localStorage.setItem('aetheria_player_user', JSON.stringify(playerData));
-      showDashboardProfile(playerData);
-    } else {
-      const message = (data && data.message) || `Server error (${res.status}): Gagal memproses permintaan login.`;
-      errorMsg.innerText = "❌ " + message;
-      errorMsg.classList.remove('hidden');
-    }
+    const playerData = JSON.parse(savedUser);
+    showDashboardProfile(playerData);
   } catch (err) {
-    console.error('Login Error:', err);
-    errorMsg.innerText = "❌ Gagal terhubung ke server verifikasi AuthMe.";
-    errorMsg.classList.remove('hidden');
-  } finally {
-    btn.innerText = "Masuk ke Dashboard";
-    btn.disabled = false;
+    localStorage.removeItem('aetheria_player_user');
+    window.location.href = './login.html';
   }
 }
 
 // TAMPILKAN PROFILE CARD KETIKA SESI AKTIF
 async function showDashboardProfile(playerData) {
-  document.getElementById('loginSection').classList.add('hidden');
-  document.getElementById('playerProfileCard').classList.remove('hidden');
+  const staffContainer = document.getElementById('staffAccessContainer');
+  const rankUpper = (playerData.rank || '').toUpperCase();
+  const isStaff = ['OWNER', 'ADMIN', 'HELPER'].some(r => rankUpper.includes(r));
+
+  if (isStaff && staffContainer) {
+    staffContainer.classList.remove('hidden');
+  }
 
   document.getElementById('playerSkinHead').src = `https://mc-heads.net/avatar/${escapeHTML(playerData.username)}/100`;
   document.getElementById('playerDisplayUsername').innerText = playerData.username;
@@ -114,24 +95,18 @@ async function showDashboardProfile(playerData) {
 
   try {
     const res = await fetch(`https://api.mcsrvstat.us/3/${SERVER_DOMAIN}`);
-    if (!res.ok) {
-      throw new Error(`MCSrvStat API error: ${res.status}`);
-    }
-    const data = await res.json();
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.online && data.players && data.players.list) {
+        const match = data.players.list.find(p => {
+          const name = typeof p === 'object' ? p.name : p;
+          return name.toLowerCase() === playerData.username.toLowerCase();
+        });
 
-    if (data && data.online && data.players && data.players.list) {
-      const match = data.players.list.find(p => {
-        const name = typeof p === 'object' ? p.name : p;
-        return name.toLowerCase() === playerData.username.toLowerCase();
-      });
-
-      if (match) {
-        isOnline = true;
-        if (typeof match === 'object' && match.group) {
-          currentRank = match.group;
-
-          if (checkAndRedirectAdmin(currentRank)) {
-            return;
+        if (match) {
+          isOnline = true;
+          if (typeof match === 'object' && match.group) {
+            currentRank = match.group;
           }
         }
       }
@@ -155,31 +130,31 @@ async function showDashboardProfile(playerData) {
 // LOGOUT PLAYER
 function handlePlayerLogout() {
   localStorage.removeItem('aetheria_player_user');
-  location.reload();
+  window.location.href = './login.html';
 }
 
 // RENDER RANK BADGE
 function renderRankBadge(rankName) {
   const rank = (rankName || 'PLAYER').toUpperCase();
   if (rank.includes('OWNER')) {
-    return `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/50 px-3 py-1 rounded-md text-xs font-mono font-bold tracking-wide">[OWNER]</span>`;
+    return `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/50 px-3 py-1 rounded-md text-xs font-mono-code font-bold tracking-wide">[OWNER]</span>`;
   }
   if (rank.includes('ADMIN')) {
-    return `<span class="bg-rose-500/20 text-rose-300 border border-rose-500/40 px-3 py-1 rounded-md text-xs font-mono font-bold tracking-wide">[ADMIN]</span>`;
+    return `<span class="bg-rose-500/20 text-rose-300 border border-rose-500/40 px-3 py-1 rounded-md text-xs font-mono-code font-bold tracking-wide">[ADMIN]</span>`;
   }
   if (rank.includes('HELPER')) {
-    return `<span class="bg-blue-500/20 text-blue-400 border border-blue-500/50 px-3 py-1 rounded-md text-xs font-mono font-bold tracking-wide">[HELPER]</span>`;
+    return `<span class="bg-blue-500/20 text-blue-400 border border-blue-500/50 px-3 py-1 rounded-md text-xs font-mono-code font-bold tracking-wide">[HELPER]</span>`;
   }
   if (rank.includes('DRAGONIAN')) {
-    return `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1 rounded-md text-xs font-mono font-bold tracking-wide">[DRAGONIAN]</span>`;
+    return `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1 rounded-md text-xs font-mono-code font-bold tracking-wide">[DRAGONIAN]</span>`;
   }
   if (rank.includes('MVP')) {
-    return `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-1 rounded-md text-xs font-mono font-bold tracking-wide">[MVP]</span>`;
+    return `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-1 rounded-md text-xs font-mono-code font-bold tracking-wide">[MVP]</span>`;
   }
   if (rank.includes('VIP')) {
-    return `<span class="bg-amber-400/10 text-amber-300 border border-amber-400/30 px-3 py-1 rounded-md text-xs font-mono font-bold tracking-wide">[VIP]</span>`;
+    return `<span class="bg-amber-400/10 text-amber-300 border border-amber-400/30 px-3 py-1 rounded-md text-xs font-mono-code font-bold tracking-wide">[VIP]</span>`;
   }
-  return `<span class="bg-zinc-800 text-zinc-400 border border-zinc-700 px-3 py-1 rounded-md text-xs font-mono font-semibold">[PLAYER]</span>`;
+  return `<span class="bg-zinc-800 text-zinc-400 border border-zinc-700 px-3 py-1 rounded-md text-xs font-mono-code font-semibold">[PLAYER]</span>`;
 }
 
 // RENDER BENEFIT LIST

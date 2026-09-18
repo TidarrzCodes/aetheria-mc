@@ -86,12 +86,14 @@ function escapeHTML(str) {
 // INITIALIZATION & COOKIE VERIFICATION
 // ==========================================
 window.addEventListener('DOMContentLoaded', () => {
-  // Cek otentikasi dari Cookie atau Session Storage (dikirim dari login in-game)
+  // Cek otentikasi dari Cookie atau Session Storage
   const adminCookie = getCookie('aetheria_admin_token');
   const sessionAuth = sessionStorage.getItem('aetheria_admin_auth');
 
   if (adminCookie || sessionAuth === 'true') {
     unlockDashboard();
+  } else {
+    window.location.href = './login.html';
   }
 });
 
@@ -99,66 +101,9 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeImageModal();
 });
 
-// LOGIN FORM HANDLER (VERIFIKASI IN-GAME PASSWORD VIA WORKER)
-async function handleLogin(e) {
-  e.preventDefault();
-  const username = document.getElementById('loginUsername') ? document.getElementById('loginUsername').value.trim() : 'Admin';
-  const password = document.getElementById('passwordInput').value;
-  const errorMsg = document.getElementById('loginError');
-  const submitBtn = e.target.querySelector('button[type="submit"]');
-
-  if (!password) return;
-
-  errorMsg.classList.add('hidden');
-  submitBtn.innerText = "VERIFYING...";
-  submitBtn.disabled = true;
-
-  try {
-    const res = await fetch(`${WORKER_PROXY_URL}?action=player_login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
-
-    const data = await res.json();
-
-    if (res.ok && data.result === 'success') {
-      const rankUpper = (data.rank || '').toUpperCase();
-      const staffRanks = ['OWNER', 'ADMIN', 'HELPER'];
-      const isStaff = staffRanks.some(r => rankUpper.includes(r));
-
-      // Pastikan akun memiliki rank Admin/Staff
-      if (isStaff) {
-        // Simpan token ke Cookie (Aktif selama 1 hari) & SessionStorage
-        const authPayload = JSON.stringify({ username: data.username, rank: data.rank, token: Date.now() });
-        setCookie('aetheria_admin_token', btoa(authPayload), 1);
-        sessionStorage.setItem('aetheria_admin_auth', 'true');
-
-        showToast(`Selamat datang ${data.username} (${data.rank || 'Staff'})!`, "success");
-        unlockDashboard();
-      } else {
-        errorMsg.innerText = "❌ Akun kamu tidak memiliki akses Staff/Admin!";
-        errorMsg.classList.remove('hidden');
-        showToast("Akses Ditolak: Bukan akun Staff/Admin!", "error");
-      }
-    } else {
-      errorMsg.innerText = "❌ " + (data.message || "Password in-game salah!");
-      errorMsg.classList.remove('hidden');
-      showToast("Gagal memverifikasi akun!", "error");
-    }
-  } catch (err) {
-    console.error('Login Auth Error:', err);
-    errorMsg.innerText = "❌ Gagal terhubung ke server verifikasi.";
-    errorMsg.classList.remove('hidden');
-  } finally {
-    submitBtn.innerText = "AUTHENTICATE";
-    submitBtn.disabled = false;
-  }
-}
-
 function unlockDashboard() {
-  document.getElementById('loginOverlay').classList.add('hidden');
-  document.getElementById('dashboardContent').classList.remove('hidden');
+  const dash = document.getElementById('dashboardContent');
+  if (dash) dash.classList.remove('hidden');
   fetchOrders();
   fetchOnlinePlayers();
   setInterval(fetchOnlinePlayers, 30000);
@@ -167,7 +112,7 @@ function unlockDashboard() {
 function handleLogout() {
   eraseCookie('aetheria_admin_token');
   sessionStorage.removeItem('aetheria_admin_auth');
-  location.reload();
+  window.location.href = './login.html';
 }
 
 function switchMainTab(tabName) {
