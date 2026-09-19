@@ -101,8 +101,43 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     closeImageModal();
     closeInvseeModal();
+    closeEditPlayerModal();
+    closeEditClanModal();
   }
 });
+
+let autoReloadElapsed = 0;
+let autoReloadTimer = null;
+const AUTO_REFRESH_INTERVAL = 3000;
+
+function startAutoReloadAnimation() {
+  if (autoReloadTimer) clearInterval(autoReloadTimer);
+  autoReloadElapsed = 0;
+
+  const bar = document.getElementById('autoReloadBar');
+  const spinner = document.getElementById('autoReloadSpinner');
+
+  autoReloadTimer = setInterval(() => {
+    autoReloadElapsed += 100;
+    const percent = Math.min((autoReloadElapsed / AUTO_REFRESH_INTERVAL) * 100, 100);
+
+    if (bar) {
+      bar.style.width = `${percent}%`;
+    }
+
+    if (autoReloadElapsed >= AUTO_REFRESH_INTERVAL) {
+      autoReloadElapsed = 0;
+      if (bar) bar.style.width = '0%';
+
+      if (spinner) {
+        spinner.classList.add('fa-spin');
+        setTimeout(() => spinner.classList.remove('fa-spin'), 1000);
+      }
+
+      syncCurrentTab();
+    }
+  }, 100);
+}
 
 function unlockDashboard() {
   const dash = document.getElementById('dashboardContent');
@@ -112,26 +147,67 @@ function unlockDashboard() {
   renderStaffProfileBadge();
 
   syncCurrentTab();
-  setInterval(syncCurrentTab, 8000); // Optimized 8-second refresh to save Cloudflare Worker quota
+  startAutoReloadAnimation();
 }
 
-function renderStaffProfileBadge() {
-  const badgeEl = document.getElementById('staffProfileBadge');
-  const userEl = document.getElementById('staffUsername');
-  const rankEl = document.getElementById('staffRankBadge');
-  const avatarEl = document.getElementById('staffAvatarHead');
+async function renderStaffProfileBadge() {
+  const badgeContainer = document.getElementById('staffProfileBadge');
+  if (!badgeContainer) return;
 
-  if (!badgeEl) return;
-
-  const savedUser = localStorage.getItem('aetheria_player_user') || sessionStorage.getItem('aetheria_admin_username') || 'Admin';
+  const savedUser = sessionStorage.getItem('aetheria_admin_username') || localStorage.getItem('aetheria_player_user') || 'Admin';
   const savedRank = sessionStorage.getItem('aetheria_admin_rank') || 'Staff';
 
-  if (userEl) userEl.innerText = savedUser;
-  if (rankEl) rankEl.innerText = savedRank.toUpperCase();
-  if (avatarEl) avatarEl.src = `https://mc-heads.net/avatar/${encodeURIComponent(savedUser)}/24`;
+  try {
+    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
+    const res = await fetch(`${WORKER_PROXY_URL}?action=staff_heartbeat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Token': adminToken
+      },
+      body: JSON.stringify({ username: savedUser, rank: savedRank })
+    });
 
-  badgeEl.classList.remove('hidden');
-  badgeEl.classList.add('flex');
+    const json = await res.json().catch(() => null);
+    if (res.ok && json && json.result === 'success' && Array.isArray(json.activeStaff)) {
+      renderActiveStaffList(json.activeStaff);
+      return;
+    }
+  } catch (e) { }
+
+  // Fallback if worker heartbeat offline
+  renderActiveStaffList([{ username: savedUser, rank: savedRank }]);
+}
+
+function renderActiveStaffList(staffList) {
+  const badgeContainer = document.getElementById('staffProfileBadge');
+  if (!badgeContainer) return;
+
+  if (!Array.isArray(staffList) || staffList.length === 0) {
+    badgeContainer.classList.add('hidden');
+    return;
+  }
+
+  const avatarsHtml = staffList.map(item => {
+    const user = escapeHTML(item.username);
+    const rank = escapeHTML((item.rank || 'Staff').toUpperCase());
+    return `
+      <div class="relative group flex items-center gap-1.5 bg-[#09090b] px-2 py-1 rounded-lg border border-zinc-800/80" title="${user} (${rank})">
+        <div class="relative shrink-0">
+          <img src="https://mc-heads.net/avatar/${encodeURIComponent(item.username)}/24" alt="${user}" class="w-5 h-5 rounded-full border border-rose-500/60 object-cover shadow-sm">
+          <span class="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-500 border border-[#09090b] animate-pulse"></span>
+        </div>
+        <div class="hidden sm:flex flex-col leading-none">
+          <span class="text-white font-bold text-[10px] font-mono">${user}</span>
+          <span class="text-[8px] text-rose-400 font-mono tracking-tight">${rank}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  badgeContainer.innerHTML = avatarsHtml;
+  badgeContainer.classList.remove('hidden');
+  badgeContainer.classList.add('flex');
 }
 
 function handleLogout() {
@@ -143,6 +219,10 @@ function handleLogout() {
 
 function switchMainTab(tabName) {
   currentMainTab = tabName;
+  autoReloadElapsed = 0;
+  const bar = document.getElementById('autoReloadBar');
+  if (bar) bar.style.width = '0%';
+
   const viewOrders = document.getElementById('view-orders');
   const viewPlayers = document.getElementById('view-players');
   const viewEtc = document.getElementById('view-etc');
@@ -171,6 +251,7 @@ function switchMainTab(tabName) {
     if (viewEtc) viewEtc.classList.remove('hidden');
     if (btnEtc) btnEtc.className = "px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition flex items-center gap-1.5 text-xs";
     fetchWebChatLogs();
+    fetchEtcClanList();
   }
 }
 
@@ -182,6 +263,7 @@ function syncCurrentTab() {
     fetchRealtimeConsoleLogs();
   } else if (currentMainTab === 'etc') {
     fetchWebChatLogs();
+    fetchEtcClanList();
   }
 }
 
@@ -258,6 +340,454 @@ function closeInvseeModal() {
   const modal = document.getElementById('invseeModal');
   if (modal) modal.classList.add('hidden');
 }
+
+// ==========================================
+// MODERASI PLAYER: UNIFIED EDIT PLAYER (LUCKPERMS, BALANCE, & SIMPLECLANS)
+// ==========================================
+let currentTargetPlayer = '';
+
+function openEditPlayerModal(username) {
+  if (!username) return;
+  currentTargetPlayer = username;
+
+  const modal = document.getElementById('editPlayerModal');
+  const userEl = document.getElementById('editPlayerUsername');
+  const headEl = document.getElementById('editPlayerHead');
+
+  if (userEl) userEl.innerText = username;
+  if (headEl) headEl.src = `https://mc-heads.net/avatar/${encodeURIComponent(username)}/28`;
+
+  switchEditPlayerTab('lp');
+
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeEditPlayerModal() {
+  const modal = document.getElementById('editPlayerModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function switchEditPlayerTab(tabName) {
+  const tabLp = document.getElementById('editPlayerTab-lp');
+  const tabEco = document.getElementById('editPlayerTab-eco');
+  const tabClan = document.getElementById('editPlayerTab-clan');
+
+  const btnLp = document.getElementById('editPlayerBtnTab-lp');
+  const btnEco = document.getElementById('editPlayerBtnTab-eco');
+  const btnClan = document.getElementById('editPlayerBtnTab-clan');
+
+  if (tabLp) tabLp.classList.add('hidden');
+  if (tabEco) tabEco.classList.add('hidden');
+  if (tabClan) tabClan.classList.add('hidden');
+
+  const inactiveBtnClass = "px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white transition text-[11px] font-mono flex items-center gap-1";
+  const activeBtnClass = "px-2.5 py-1 rounded-lg bg-zinc-800 text-white font-medium transition text-[11px] font-mono flex items-center gap-1";
+
+  if (btnLp) btnLp.className = inactiveBtnClass;
+  if (btnEco) btnEco.className = inactiveBtnClass;
+  if (btnClan) btnClan.className = inactiveBtnClass;
+
+  if (tabName === 'lp') {
+    if (tabLp) tabLp.classList.remove('hidden');
+    if (btnLp) btnLp.className = activeBtnClass;
+  } else if (tabName === 'eco') {
+    if (tabEco) tabEco.classList.remove('hidden');
+    if (btnEco) btnEco.className = activeBtnClass;
+  } else if (tabName === 'clan') {
+    if (tabClan) tabClan.classList.remove('hidden');
+    if (btnClan) btnClan.className = activeBtnClass;
+    fetchAvailableClans();
+  }
+}
+
+// LUCKPERMS HANDLERS
+async function submitLpSetGroup() {
+  if (!currentTargetPlayer) return;
+  const select = document.getElementById('lpGroupSelect');
+  const group = select ? select.value : 'default';
+
+  const command = `lp user ${currentTargetPlayer} parent set ${group}`;
+  await executeAdminCommand(command, `Rank ${currentTargetPlayer} diubah menjadi ${group.toUpperCase()}!`);
+  closeEditPlayerModal();
+  fetchOnlinePlayers();
+}
+
+async function submitLpAddPermission() {
+  if (!currentTargetPlayer) return;
+  const input = document.getElementById('lpPermissionInput');
+  const perm = input ? input.value.trim() : '';
+
+  if (!perm) {
+    showToast("Masukkan nama permission node!", "warning");
+    return;
+  }
+
+  const command = `lp user ${currentTargetPlayer} permission set ${perm} true`;
+  await executeAdminCommand(command, `Permission "${perm}" ditambahkan ke ${currentTargetPlayer}!`);
+  if (input) input.value = '';
+}
+
+async function submitLpUnsetPermission() {
+  if (!currentTargetPlayer) return;
+  const input = document.getElementById('lpUnsetPermissionInput');
+  const perm = input ? input.value.trim() : '';
+
+  if (!perm) {
+    showToast("Masukkan nama permission node!", "warning");
+    return;
+  }
+
+  const command = `lp user ${currentTargetPlayer} permission unset ${perm}`;
+  await executeAdminCommand(command, `Permission "${perm}" dihapus dari ${currentTargetPlayer}!`);
+  if (input) input.value = '';
+}
+
+async function submitLpCheckInfo() {
+  if (!currentTargetPlayer) return;
+  const command = `lp user ${currentTargetPlayer} info`;
+  await executeAdminCommand(command, `Info LuckPerms ${currentTargetPlayer} telah diminta.`);
+}
+
+async function submitLpClearParent() {
+  if (!currentTargetPlayer) return;
+  if (!confirm(`Hapus semua parent rank dari ${currentTargetPlayer}?`)) return;
+
+  const command = `lp user ${currentTargetPlayer} parent clear`;
+  await executeAdminCommand(command, `Parent ranks ${currentTargetPlayer} telah dibersihkan.`);
+  closeEditPlayerModal();
+  fetchOnlinePlayers();
+}
+
+// ECONOMY BALANCE HANDLERS
+async function submitEcoSetBalance() {
+  if (!currentTargetPlayer) return;
+  const input = document.getElementById('ecoAmountInput');
+  const amount = input ? input.value.trim() : '';
+
+  if (!amount || isNaN(amount) || Number(amount) < 0) {
+    showToast("Masukkan nominal saldo yang valid!", "warning");
+    return;
+  }
+
+  const command = `eco set ${currentTargetPlayer} ${amount}`;
+  await executeAdminCommand(command, `Balance ${currentTargetPlayer} di-set ke $${Number(amount).toLocaleString()}!`);
+  if (input) input.value = '';
+}
+
+async function submitEcoGiveMoney() {
+  if (!currentTargetPlayer) return;
+  const input = document.getElementById('ecoAmountInput');
+  const amount = input ? input.value.trim() : '';
+
+  if (!amount || isNaN(amount) || Number(amount) <= 0) {
+    showToast("Masukkan nominal saldo yang valid!", "warning");
+    return;
+  }
+
+  const command = `eco give ${currentTargetPlayer} ${amount}`;
+  await executeAdminCommand(command, `Menambahkan $${Number(amount).toLocaleString()} ke ${currentTargetPlayer}!`);
+  if (input) input.value = '';
+}
+
+async function submitEcoTakeMoney() {
+  if (!currentTargetPlayer) return;
+  const input = document.getElementById('ecoAmountInput');
+  const amount = input ? input.value.trim() : '';
+
+  if (!amount || isNaN(amount) || Number(amount) <= 0) {
+    showToast("Masukkan nominal saldo yang valid!", "warning");
+    return;
+  }
+
+  const command = `eco take ${currentTargetPlayer} ${amount}`;
+  await executeAdminCommand(command, `Mengurangi $${Number(amount).toLocaleString()} dari ${currentTargetPlayer}!`);
+  if (input) input.value = '';
+}
+
+async function submitEcoResetBalance() {
+  if (!currentTargetPlayer) return;
+  if (!confirm(`Reset saldo ${currentTargetPlayer} menjadi 0?`)) return;
+
+  const command = `eco reset ${currentTargetPlayer}`;
+  await executeAdminCommand(command, `Balance ${currentTargetPlayer} telah di-reset ke 0.`);
+}
+
+// SIMPLECLANS HANDLERS
+let cachedClans = [];
+
+const CONSOLE_LOG_RESERVED_WORDS = [
+  'SERVER', 'THERE', 'OUT', 'OFFLINE', 'ONLINE', 'ISSUED', 'TYPE', 'FOR', 
+  'THREAD', 'INFO', 'WARN', 'ERROR', 'COMMAND', 'CONSOLE', 'CLANS', 'LIST', 
+  'NAME', 'TOTAL', 'PAGE', 'PLAYERS', 'PLAYER', 'SUCCESS', 'FAILED', 'UNKNOWN', 
+  'USAGE', 'DAA', 'AETHERIA', 'HELP', 'VERSION', 'MAXIMUM', 'LP', 'LUCKPERMS', 'ESSENTIALS', 'VAULT'
+];
+
+async function fetchAvailableClans() {
+  const select = document.getElementById('clanSelect');
+  if (!select) return;
+
+  try {
+    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
+    const res = await fetch(`${WORKER_PROXY_URL}?action=admin_command`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Token': adminToken
+      },
+      body: JSON.stringify({ command: 'clan list' })
+    });
+
+    const json = await res.json().catch(() => null);
+    if (res.ok && json && json.result === 'success' && json.output) {
+      const outputLines = json.output.split('\n');
+      outputLines.forEach(rawLine => {
+        const cleanLine = rawLine
+          .replace(/\[\d{2}:\d{2}:\d{2}[^\]]*\]/g, '')
+          .replace(/\[(INFO|WARN|ERROR|Console|Server thread\/[A-Z]+)[^\]]*\]/gi, '')
+          .trim();
+
+        const lower = cleanLine.toLowerCase();
+        if (!cleanLine || 
+            lower.includes('issued server command') || 
+            lower.includes('server thread') || 
+            lower.includes('there are') || 
+            lower.includes('total clans') ||
+            lower.includes('clan list') ||
+            lower.includes('players online')) {
+          return;
+        }
+
+        const match = cleanLine.match(/(?:^\s*[*•\-]?\s*\[([A-Z0-9]{2,6})\])/i) ||
+                      cleanLine.match(/(?:^\s*[*•\-]\s*([A-Z0-9]{2,6})\s*-)/i);
+
+        if (match && match[1]) {
+          const tag = match[1].toUpperCase();
+          if (!CONSOLE_LOG_RESERVED_WORDS.includes(tag) && !cachedClans.includes(tag)) {
+            cachedClans.push(tag);
+          }
+        }
+      });
+    }
+  } catch (e) {
+  } finally {
+    renderClanSelectorOptions();
+  }
+}
+
+function renderClanSelectorOptions() {
+  const select = document.getElementById('clanSelect');
+  if (!select) return;
+
+  const currentVal = select.value;
+  let html = `<option value="">-- Pilih Clan yang Tersedia --</option>`;
+
+  cachedClans.forEach(tag => {
+    html += `<option value="${escapeHTML(tag)}">[${escapeHTML(tag)}] Clan ${escapeHTML(tag)}</option>`;
+  });
+
+  html += `<option value="custom">-- Tulis Custom Tag --</option>`;
+  select.innerHTML = html;
+
+  if (currentVal && Array.from(select.options).some(o => o.value === currentVal)) {
+    select.value = currentVal;
+  }
+}
+
+function handleClanSelectChange() {
+  const select = document.getElementById('clanSelect');
+  const input = document.getElementById('clanTagInput');
+  if (!select || !input) return;
+
+  if (select.value === 'custom') {
+    input.classList.remove('hidden');
+    input.focus();
+  } else {
+    input.classList.add('hidden');
+    input.value = select.value;
+  }
+}
+
+async function submitClanSetGroup(mode = 'force') {
+  if (!currentTargetPlayer) return;
+
+  if (mode === 'leave') {
+    if (!confirm(`Keluarkan ${currentTargetPlayer} dari clan mereka saat ini?`)) return;
+    const command = `clan kick ${currentTargetPlayer}`;
+    await executeAdminCommand(command, `Player ${currentTargetPlayer} telah dikeluarkan dari clan.`);
+    return;
+  }
+
+  const select = document.getElementById('clanSelect');
+  const input = document.getElementById('clanTagInput');
+
+  let tag = '';
+  if (select && select.value && select.value !== 'custom') {
+    tag = select.value.trim().toUpperCase();
+  } else if (input) {
+    tag = input.value.trim().toUpperCase();
+  }
+
+  if (!tag) {
+    showToast("Pilih atau masukkan TAG clan!", "warning");
+    return;
+  }
+
+  const command = `clan forcejoin ${currentTargetPlayer} ${tag}`;
+  await executeAdminCommand(command, `Player ${currentTargetPlayer} berhasil dimasukkan ke Clan [${tag}]!`);
+  if (input) input.value = '';
+}
+
+async function submitCreateClan() {
+  const tagInput = document.getElementById('createClanTagInput');
+  const nameInput = document.getElementById('createClanNameInput');
+
+  const tag = tagInput ? tagInput.value.trim().toUpperCase() : '';
+  const name = nameInput ? nameInput.value.trim() : '';
+
+  if (!tag || !name) {
+    showToast("Masukkan TAG dan Nama Clan!", "warning");
+    return;
+  }
+
+  const command = `clan create ${tag} ${name}`;
+  await executeAdminCommand(command, `Clan Baru [${tag}] "${name}" berhasil dibuat!`);
+
+  if (!cachedClans.includes(tag)) {
+    cachedClans.push(tag);
+    renderClanSelectorOptions();
+  }
+
+  if (tagInput) tagInput.value = '';
+  if (nameInput) nameInput.value = '';
+
+  fetchEtcClanList();
+}
+
+async function fetchEtcClanList() {
+  const tableBody = document.getElementById('etc-clan-table-list');
+  const countBadge = document.getElementById('etc-clan-count');
+  if (!tableBody) return;
+
+  try {
+    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
+    const res = await fetch(`${WORKER_PROXY_URL}?action=admin_command`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Token': adminToken
+      },
+      body: JSON.stringify({ command: 'clan list' })
+    });
+
+    const json = await res.json().catch(() => null);
+    if (res.ok && json && json.result === 'success' && json.output) {
+      const outputLines = json.output.split('\n');
+      const parsedClans = [];
+
+      outputLines.forEach(rawLine => {
+        const cleanLine = rawLine
+          .replace(/\[\d{2}:\d{2}:\d{2}[^\]]*\]/g, '')
+          .replace(/\[(INFO|WARN|ERROR|Console|Server thread\/[A-Z]+)[^\]]*\]/gi, '')
+          .trim();
+
+        const lower = cleanLine.toLowerCase();
+        if (!cleanLine || 
+            lower.includes('issued server command') || 
+            lower.includes('server thread') || 
+            lower.includes('there are') || 
+            lower.includes('total clans') ||
+            lower.includes('clan list') ||
+            lower.includes('players online')) {
+          return;
+        }
+
+        const match = cleanLine.match(/(?:^\s*[*•\-]?\s*\[([A-Z0-9]{2,6})\])/i) ||
+                      cleanLine.match(/(?:^\s*[*•\-]\s*([A-Z0-9]{2,6})\s*-)/i);
+
+        if (match && match[1]) {
+          const tag = match[1].toUpperCase();
+          if (!CONSOLE_LOG_RESERVED_WORDS.includes(tag) && !parsedClans.some(c => c.tag === tag)) {
+            let cleanName = cleanLine.replace(/[*\[\]]/g, '').trim();
+            parsedClans.push({ tag, name: cleanName });
+            if (!cachedClans.includes(tag)) cachedClans.push(tag);
+          }
+        }
+      });
+
+      if (countBadge) countBadge.innerText = `${parsedClans.length} Clan`;
+
+      if (parsedClans.length > 0) {
+        tableBody.innerHTML = parsedClans.map(clan => `
+          <tr class="hover:bg-zinc-900/50 transition">
+            <td class="p-2.5 font-bold text-emerald-400 font-mono">
+              [${escapeHTML(clan.tag)}]
+            </td>
+            <td class="p-2.5 text-zinc-200">
+              ${escapeHTML(clan.name)}
+            </td>
+            <td class="p-2.5 text-right">
+              <button onclick="disbandClan('${escapeHTML(clan.tag)}')" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 px-2 py-1 rounded text-[11px] transition font-bold flex items-center gap-1 ml-auto">
+                <i class="fa-solid fa-trash-can text-[10px]"></i> Hapus
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      } else if (cachedClans.length > 0) {
+        if (countBadge) countBadge.innerText = `${cachedClans.length} Clan`;
+        tableBody.innerHTML = cachedClans.map(tag => `
+          <tr class="hover:bg-zinc-900/50 transition">
+            <td class="p-2.5 font-bold text-emerald-400 font-mono">[${escapeHTML(tag)}]</td>
+            <td class="p-2.5 text-zinc-300">Clan ${escapeHTML(tag)}</td>
+            <td class="p-2.5 text-right">
+              <button onclick="disbandClan('${escapeHTML(tag)}')" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 px-2 py-1 rounded text-[11px] transition font-bold flex items-center gap-1 ml-auto">
+                <i class="fa-solid fa-trash-can text-[10px]"></i> Hapus
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      } else {
+        tableBody.innerHTML = `<tr><td colspan="3" class="text-center p-6 text-zinc-500 font-mono">Belum ada clan yang terdaftar di server.</td></tr>`;
+      }
+      renderClanSelectorOptions();
+    } else {
+      tableBody.innerHTML = `<tr><td colspan="3" class="text-center p-6 text-rose-400 font-mono">Gagal mengambil data clan dari server.</td></tr>`;
+    }
+  } catch (err) {
+    tableBody.innerHTML = `<tr><td colspan="3" class="text-center p-6 text-rose-500 font-mono">Kesalahan koneksi saat menghubungi server.</td></tr>`;
+  }
+}
+
+async function disbandClan(tag) {
+  if (!tag) return;
+  if (!confirm(`Apakah Anda YAKIN ingin menghapus/disband Clan [${tag}] secara permanen dari server?`)) return;
+
+  const command = `clan disband ${tag}`;
+  await executeAdminCommand(command, `Clan [${tag}] berhasil dibubarkan/dihapus!`);
+
+  cachedClans = cachedClans.filter(c => c !== tag);
+  fetchEtcClanList();
+}
+
+window.openEditPlayerModal = openEditPlayerModal;
+window.closeEditPlayerModal = closeEditPlayerModal;
+window.switchEditPlayerTab = switchEditPlayerTab;
+window.submitLpSetGroup = submitLpSetGroup;
+window.submitLpAddPermission = submitLpAddPermission;
+window.submitLpUnsetPermission = submitLpUnsetPermission;
+window.submitLpCheckInfo = submitLpCheckInfo;
+window.submitLpClearParent = submitLpClearParent;
+
+window.submitEcoSetBalance = submitEcoSetBalance;
+window.submitEcoGiveMoney = submitEcoGiveMoney;
+window.submitEcoTakeMoney = submitEcoTakeMoney;
+window.submitEcoResetBalance = submitEcoResetBalance;
+
+window.fetchAvailableClans = fetchAvailableClans;
+window.handleClanSelectChange = handleClanSelectChange;
+window.submitClanSetGroup = submitClanSetGroup;
+window.submitCreateClan = submitCreateClan;
+window.fetchEtcClanList = fetchEtcClanList;
+window.disbandClan = disbandClan;
 
 function renderPlayerInventory(inventoryList) {
   const itemMap = {};
@@ -576,9 +1106,15 @@ async function fetchRealtimeConsoleLogs() {
       if (logsStr === lastConsoleLogHash) return;
       lastConsoleLogHash = logsStr;
 
-      // Clean ANSI color codes & Minecraft formatting symbols, filter out automatic background /list polling spam
+      // Clean ANSI color codes & Minecraft formatting symbols, filter out automatic background polling spam (/list, data get entity)
       const cleanLogs = json.logs
-        .filter(line => !line.toLowerCase().includes('issued server command: /list') && !line.toLowerCase().includes('there are') && !line.toLowerCase().includes('players online'))
+        .filter(line => {
+          const lower = line.toLowerCase();
+          return !lower.includes('issued server command: /list') && 
+                 !lower.includes('issued server command: /data get entity') && 
+                 !lower.includes('there are 0 out of maximum') && 
+                 !lower.includes('players online');
+        })
         .map(line => {
           return line
             .replace(/\u001b\[[0-9;]*m/g, '')
@@ -705,6 +1241,10 @@ async function fetchOnlinePlayers() {
         maxCount = data.players.max || 20;
       }
 
+      if (onlineList.length > onlineCount) {
+        onlineCount = onlineList.length;
+      }
+
       countText.innerText = `${onlineCount} / ${maxCount} Player Online (ONLINE)`;
       badgeCount.innerText = onlineCount;
 
@@ -712,28 +1252,49 @@ async function fetchOnlinePlayers() {
         tableBody.innerHTML = onlineList.map(p => {
           const name = typeof p === 'object' ? p.name : p;
           const rank = typeof p === 'object' && p.group ? p.group : 'Member';
+          const clanTag = typeof p === 'object' && p.clan ? p.clan : (p.clanTag || '');
+          const balanceVal = typeof p === 'object' && p.balance !== undefined ? p.balance : (p.ecoBalance || null);
+
           const safeName = escapeHTML(name);
 
+          const clanHtml = clanTag 
+            ? `<span class="bg-cyan-950/90 text-cyan-300 border border-cyan-700/50 px-2 py-0.5 rounded text-[11px] font-mono font-bold inline-flex items-center gap-1 shadow-sm"><i class="fa-solid fa-shield-cat text-[10px]"></i> [${escapeHTML(clanTag)}]</span>`
+            : `<span class="text-zinc-500 font-mono text-[11px]">-</span>`;
+
+          const balanceHtml = (balanceVal !== null && balanceVal !== undefined)
+            ? `<span class="text-emerald-400 font-mono font-bold text-xs inline-flex items-center gap-1"><i class="fa-solid fa-coins text-[10px] text-amber-400"></i> ${escapeHTML(String(balanceVal))}</span>`
+            : `<span class="text-zinc-500 font-mono text-[11px]">-</span>`;
+
           return `
-            <tr class="hover:bg-zinc-900/40 transition">
+            <tr onclick="openPlayerDetailModal('${safeName}')" class="hover:bg-zinc-900/60 transition cursor-pointer group" title="Klik baris untuk melihat IP, Geolokasi, & Telemetry ${safeName}">
               <td class="p-3.5 w-12">
-                <img src="https://mc-heads.net/avatar/${safeName}/28" alt="${safeName}" class="w-7 h-7 rounded border border-zinc-700">
+                <img src="https://mc-heads.net/avatar/${safeName}/28" alt="${safeName}" class="w-7 h-7 rounded border border-zinc-700 group-hover:border-rose-500 transition">
               </td>
-              <td class="p-3.5 font-semibold text-white font-mono">
-                ${safeName}
+              <td class="p-3.5 font-semibold text-white font-mono flex items-center gap-1.5">
+                <span>${safeName}</span>
+                <i class="fa-solid fa-circle-info text-[10px] text-zinc-600 group-hover:text-rose-400 transition"></i>
               </td>
               <td class="p-3.5">
                 ${renderRankBadge(rank)}
               </td>
-              <td class="p-3.5 text-right font-mono">
-                <div class="inline-flex items-center gap-1.5">
-                  <button onclick="invseePlayer('${safeName}')" class="bg-blue-950/80 hover:bg-blue-900 border border-blue-600/50 text-blue-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
+              <td class="p-3.5">
+                ${clanHtml}
+              </td>
+              <td class="p-3.5">
+                ${balanceHtml}
+              </td>
+              <td class="p-3.5 text-right font-mono" onclick="event.stopPropagation()">
+                <div class="inline-flex items-center gap-1.5 flex-wrap justify-end">
+                  <button onclick="event.stopPropagation(); invseePlayer('${safeName}')" class="bg-blue-950/80 hover:bg-blue-900 border border-blue-600/50 text-blue-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
                     <i class="fa-solid fa-box-open text-[10px]"></i> Invsee
                   </button>
-                  <button onclick="kickPlayer('${safeName}')" class="bg-amber-950/80 hover:bg-amber-900 border border-amber-600/50 text-amber-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
+                  <button onclick="event.stopPropagation(); openEditPlayerModal('${safeName}')" class="bg-purple-950/80 hover:bg-purple-900 border border-purple-600/50 text-purple-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
+                    <i class="fa-solid fa-user-gear text-[10px]"></i> Edit Player
+                  </button>
+                  <button onclick="event.stopPropagation(); kickPlayer('${safeName}')" class="bg-amber-950/80 hover:bg-amber-900 border border-amber-600/50 text-amber-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
                     <i class="fa-solid fa-user-minus text-[10px]"></i> Kick
                   </button>
-                  <button onclick="banPlayer('${safeName}')" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
+                  <button onclick="event.stopPropagation(); banPlayer('${safeName}')" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
                     <i class="fa-solid fa-gavel text-[10px]"></i> Ban
                   </button>
                 </div>
@@ -742,29 +1303,29 @@ async function fetchOnlinePlayers() {
           `;
         }).join('');
       } else {
-        tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-zinc-500 font-mono">Belum ada player yang sedang online di server.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-zinc-500 font-mono">Belum ada player yang sedang online di server.</td></tr>`;
       }
     } else if (pteroState === 'starting') {
       dot.className = "w-3 h-3 rounded-full bg-amber-500 animate-pulse";
       countText.innerText = "Server Sedang Starting...";
       badgeCount.innerText = "0";
-      tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-amber-400 font-mono"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Server Minecraft sedang dalam proses Startup...</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-amber-400 font-mono"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Server Minecraft sedang dalam proses Startup...</td></tr>`;
     } else if (pteroState === 'stopping') {
       dot.className = "w-3 h-3 rounded-full bg-rose-400 animate-pulse";
       countText.innerText = "Server Sedang Stopping...";
       badgeCount.innerText = "0";
-      tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-rose-400 font-mono"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Server Minecraft sedang mematikan sistem...</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-rose-400 font-mono"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Server Minecraft sedang mematikan sistem...</td></tr>`;
     } else {
       dot.className = "w-3 h-3 rounded-full bg-rose-500";
       countText.innerText = "Server Offline (OFF)";
       badgeCount.innerText = "0";
-      tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-rose-400 font-mono">Server Minecraft sedang offline. Tekan tombol ON untuk menyalakan server.</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-rose-400 font-mono">Server Minecraft sedang offline. Tekan tombol ON untuk menyalakan server.</td></tr>`;
     }
   } catch (err) {
     dot.className = "w-3 h-3 rounded-full bg-amber-500";
     countText.innerText = "Gagal memuat data server";
     badgeCount.innerText = "!";
-    tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-amber-500 font-mono">Gagal mengambil data dari API server Minecraft.</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-amber-500 font-mono">Gagal mengambil data dari API server Minecraft.</td></tr>`;
   }
 }
 
@@ -1318,3 +1879,107 @@ async function savePodiumData(e) {
     }
   }
 }
+
+// ==========================================
+// PLAYER TELEMETRY & GEOLOCATION MODAL (IP, LAT/LONG, ISP)
+// ==========================================
+let currentDetailIpValue = '';
+
+async function openPlayerDetailModal(username) {
+  if (!username) return;
+
+  const modal = document.getElementById('playerDetailModal');
+  const userEl = document.getElementById('detailPlayerUsername');
+  const headEl = document.getElementById('detailPlayerHead');
+  const loadingEl = document.getElementById('detailLoading');
+  const contentEl = document.getElementById('detailContent');
+
+  if (userEl) userEl.innerText = username;
+  if (headEl) headEl.src = `https://mc-heads.net/avatar/${encodeURIComponent(username)}/36`;
+
+  if (modal) modal.classList.remove('hidden');
+  if (loadingEl) loadingEl.classList.remove('hidden');
+  if (contentEl) contentEl.classList.add('hidden');
+
+  try {
+    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
+    const res = await fetch(`${WORKER_PROXY_URL}?action=get_player_geo`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Token': adminToken
+      },
+      body: JSON.stringify({ username })
+    });
+
+    const json = await res.json().catch(() => null);
+
+    if (res.ok && json && json.result === 'success') {
+      currentDetailIpValue = json.ip || 'Internal / Hidden';
+
+      const ipEl = document.getElementById('detailIp');
+      const ispEl = document.getElementById('detailIsp');
+      const countryEl = document.getElementById('detailCountry');
+      const regionEl = document.getElementById('detailRegion');
+      const cityEl = document.getElementById('detailCity');
+      const timezoneEl = document.getElementById('detailTimezone');
+      const coordsEl = document.getElementById('detailCoords');
+      const mapLinkEl = document.getElementById('detailMapLink');
+
+      if (ipEl) ipEl.innerText = json.ip || '---';
+      if (ispEl) ispEl.innerText = json.isp || '---';
+      if (countryEl) countryEl.innerText = json.countryCode ? `${json.country} (${json.countryCode})` : (json.country || '---');
+      if (regionEl) regionEl.innerText = json.region || '---';
+      if (cityEl) cityEl.innerText = json.city || '---';
+      if (timezoneEl) timezoneEl.innerText = json.timezone || '---';
+
+      if (json.lat !== null && json.lon !== null) {
+        if (coordsEl) coordsEl.innerText = `${json.lat}, ${json.lon}`;
+        if (mapLinkEl) {
+          mapLinkEl.href = `https://maps.google.com/?q=${json.lat},${json.lon}`;
+          mapLinkEl.classList.remove('hidden');
+        }
+      } else {
+        if (coordsEl) coordsEl.innerText = 'Koordinat tidak tersedia';
+        if (mapLinkEl) mapLinkEl.classList.add('hidden');
+      }
+
+      // Pre-fill in-game summary from cached player list if available
+      const rankEl = document.getElementById('detailRank');
+      const clanEl = document.getElementById('detailClan');
+      const balEl = document.getElementById('detailBalance');
+
+      if (rankEl) rankEl.innerText = json.group || 'Member';
+      if (clanEl) clanEl.innerText = json.clan ? `[${json.clan}]` : '-';
+      if (balEl) balEl.innerText = json.balance || '$0';
+
+      if (loadingEl) loadingEl.classList.add('hidden');
+      if (contentEl) contentEl.classList.remove('hidden');
+    } else {
+      showToast("Gagal mengambil data geolokasi pemain", "error");
+      if (loadingEl) loadingEl.classList.add('hidden');
+    }
+  } catch (err) {
+    console.error("Player detail fetch error:", err);
+    showToast("Terjadi kesalahan koneksi saat mengambil telemetry", "error");
+    if (loadingEl) loadingEl.classList.add('hidden');
+  }
+}
+
+function closePlayerDetailModal() {
+  const modal = document.getElementById('playerDetailModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function copyDetailIp() {
+  if (!currentDetailIpValue) return;
+  navigator.clipboard.writeText(currentDetailIpValue).then(() => {
+    showToast(`IP ${currentDetailIpValue} tersalin ke clipboard!`, "success");
+  }).catch(() => {
+    showToast("Gagal menyalin IP", "warning");
+  });
+}
+
+window.openPlayerDetailModal = openPlayerDetailModal;
+window.closePlayerDetailModal = closePlayerDetailModal;
+window.copyDetailIp = copyDetailIp;

@@ -82,17 +82,17 @@
 
         <!-- HEADER RIGHT ACTIONS -->
         <div class="flex items-center gap-1.5 shrink-0">
-          <!-- STAFF ONLINE PROFILE BADGE -->
-          <div id="staffProfileBadge" class="hidden items-center gap-2 bg-[#121215] border border-zinc-800 px-2.5 py-1 rounded-xl text-xs font-mono shadow-inner">
-            <div class="relative flex items-center justify-center">
-              <img id="staffAvatarHead" src="https://mc-heads.net/avatar/steve/24" alt="Staff Avatar" class="w-6 h-6 rounded-full border border-rose-500/60 object-cover shadow-sm">
-              <span class="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 border border-[#121215] animate-pulse"></span>
-            </div>
-            <div class="flex flex-col leading-none">
-              <span id="staffUsername" class="text-white font-bold text-[11px]">Staff</span>
-              <span id="staffRankBadge" class="text-[9px] text-rose-400 font-medium">ONLINE</span>
+          <!-- AUTO RELOAD INDICATOR BADGE -->
+          <div id="autoReloadBadge" class="flex items-center gap-1.5 bg-[#121215] border border-zinc-800/90 px-2.5 py-1 rounded-lg text-[10px] font-mono text-zinc-400 select-none shadow-sm" title="Auto Reload Synchronizer (3s)">
+            <i id="autoReloadSpinner" class="fa-solid fa-arrows-rotate text-rose-500 text-[10px]"></i>
+            <span class="hidden md:inline text-zinc-400">Live Sync</span>
+            <div class="w-10 h-1 bg-zinc-900 border border-zinc-800 rounded-full overflow-hidden shrink-0">
+              <div id="autoReloadBar" class="h-full bg-gradient-to-r from-rose-500 to-emerald-400 transition-all duration-100 ease-linear" style="width: 0%;"></div>
             </div>
           </div>
+
+          <!-- STAFF ONLINE PROFILE BADGE CONTAINER -->
+          <div id="staffProfileBadge" class="hidden items-center gap-1.5 font-mono"></div>
 
           <a href="./index.html"
             class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5">
@@ -270,18 +270,20 @@
         <!-- PLAYERS TABLE CONTAINER -->
         <div class="bg-[#121215] border border-zinc-800/80 rounded-xl overflow-hidden shadow-xl">
           <div class="overflow-x-auto custom-scrollbar">
-            <table class="w-full text-left text-xs min-w-[500px]">
+            <table class="w-full text-left text-xs min-w-[780px]">
               <thead class="bg-[#18181b] text-zinc-400 font-mono text-[10px] sm:text-[11px] uppercase border-b border-zinc-800">
                 <tr>
-                  <th class="p-3 sm:p-3.5">Avatar</th>
+                  <th class="p-3 sm:p-3.5 w-12">Avatar</th>
                   <th class="p-3 sm:p-3.5">Username</th>
                   <th class="p-3 sm:p-3.5">Rank Group</th>
+                  <th class="p-3 sm:p-3.5">Clan</th>
+                  <th class="p-3 sm:p-3.5">Balance</th>
                   <th class="p-3 sm:p-3.5 text-right">Aksi Moderasi</th>
                 </tr>
               </thead>
               <tbody id="player-table-list" class="divide-y divide-zinc-800/60 font-sans text-zinc-300">
                 <tr>
-                  <td colspan="4" class="text-center p-8 text-zinc-500 font-mono">Fetching online players from server...</td>
+                  <td colspan="6" class="text-center p-8 text-zinc-500 font-mono">Fetching online players from server...</td>
                 </tr>
               </tbody>
             </table>
@@ -289,9 +291,70 @@
         </div>
       </section>
 
-      <!-- VIEW ETC SECTION (WEBCHAT LOGS) -->
+      <!-- VIEW ETC SECTION (WEBCHAT LOGS & SERVER UTILITIES) -->
       <section id="view-etc" class="space-y-6 hidden">
         
+        <!-- MANAJEMEN CLAN SERVER (TAMBAH, HAPUS, & DAFTAR CLAN) -->
+        <div class="bg-[#121215] border border-zinc-800/80 rounded-xl p-4 sm:p-5 shadow-xl space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-3">
+            <div>
+              <h2 class="text-xs sm:text-sm font-bold text-white font-mono uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-shield-cat text-cyan-400"></i> Manajemen Clan Server (SimpleClans)
+              </h2>
+              <p class="text-[11px] text-zinc-400 font-mono mt-0.5">Tambah clan baru, lihat daftar clan, dan hapus/disband clan di server Minecraft</p>
+            </div>
+            <button onclick="fetchEtcClanList()" title="Refresh Daftar Clan" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5 shrink-0 self-start sm:self-auto">
+              <i class="fa-solid fa-rotate-right text-[11px]"></i> Refresh List
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 font-mono text-xs">
+            <!-- 1. FORM BUAT CLAN BARU -->
+            <div class="bg-[#09090b] border border-zinc-800 rounded-xl p-4 space-y-3 lg:col-span-1">
+              <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2 border-b border-zinc-800 pb-2">
+                <i class="fa-solid fa-square-plus text-cyan-400"></i> Tambah Clan Baru
+              </h3>
+              <div class="space-y-1">
+                <label class="text-[11px] text-zinc-400 font-semibold">TAG Clan (2 - 6 Karakter):</label>
+                <input type="text" id="createClanTagInput" placeholder="Contoh: ATH" class="w-full bg-[#121215] border border-zinc-800 text-white rounded-lg px-3 py-2 focus:outline-none focus:border-cyan-500 placeholder:text-zinc-600 uppercase">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[11px] text-zinc-400 font-semibold">Nama Lengkap Clan:</label>
+                <input type="text" id="createClanNameInput" placeholder="Contoh: Aetheria Alliance" class="w-full bg-[#121215] border border-zinc-800 text-white rounded-lg px-3 py-2 focus:outline-none focus:border-cyan-500 placeholder:text-zinc-600">
+              </div>
+              <button onclick="submitCreateClan()" class="w-full bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-600/50 text-cyan-300 py-2.5 rounded-lg transition font-bold flex items-center justify-center gap-1.5 mt-2">
+                <i class="fa-solid fa-plus text-[11px]"></i> Buat Clan Baru
+              </button>
+            </div>
+
+            <!-- 2. TABEL DAFTAR & HAPUS CLAN -->
+            <div class="bg-[#09090b] border border-zinc-800 rounded-xl overflow-hidden lg:col-span-2 shadow-inner">
+              <div class="p-3 border-b border-zinc-800 bg-[#121215] flex items-center justify-between">
+                <span class="font-bold text-zinc-200 text-xs flex items-center gap-2">
+                  <i class="fa-solid fa-list-check text-emerald-400"></i> Daftar Clan Aktif di Server
+                </span>
+                <span id="etc-clan-count" class="text-[10px] text-zinc-500">0 Clan</span>
+              </div>
+              <div class="overflow-x-auto custom-scrollbar max-h-64">
+                <table class="w-full text-left text-xs min-w-[450px]">
+                  <thead class="bg-[#18181b] text-zinc-400 font-mono text-[10px] uppercase border-b border-zinc-800 sticky top-0 z-10">
+                    <tr>
+                      <th class="p-2.5 w-24">TAG Clan</th>
+                      <th class="p-2.5">Nama Clan</th>
+                      <th class="p-2.5 text-right w-28">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="etc-clan-table-list" class="divide-y divide-zinc-800/60 font-mono text-zinc-300">
+                    <tr>
+                      <td colspan="3" class="text-center p-6 text-zinc-500">Memuat daftar clan...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- LIVE WEBCHAT LOGS -->
         <div class="bg-[#121215] border border-zinc-800/80 rounded-xl p-4 sm:p-5 shadow-xl space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-3">
@@ -341,6 +404,170 @@
     <footer class="border-t border-zinc-800/60 py-4 px-4 text-center text-xs text-zinc-600 font-mono">
       &copy; 2026 Aetheria: Dragon's Eclipse. &bull; Not affiliated with Mojang AB. &bull; Powered by RaditNex Infrastructure
     </footer>
+  </div>
+
+  <!-- EDIT PLAYER MODAL (COMBINED: LUCKPERMS, ECONOMY, & SIMPLECLANS) -->
+  <div id="editPlayerModal"
+    class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center hidden p-3 sm:p-4"
+    onclick="closeEditPlayerModal()">
+    <div class="max-w-lg w-full relative bg-[#121215] border border-zinc-800 rounded-xl p-4 sm:p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar"
+      onclick="event.stopPropagation()">
+      
+      <!-- MODAL HEADER -->
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <div class="flex items-center gap-3">
+          <img id="editPlayerHead" src="https://mc-heads.net/avatar/steve/28" alt="Player Head" class="w-8 h-8 rounded border border-purple-500/50">
+          <div>
+            <h3 class="text-sm font-mono font-bold text-zinc-100 flex items-center gap-2">
+              <i class="fa-solid fa-user-gear text-purple-400"></i> Edit Player: <span id="editPlayerUsername" class="text-purple-400">Username</span>
+            </h3>
+            <p class="text-[11px] font-mono text-zinc-500">Manajemen Rank, Economy, & Clan</p>
+          </div>
+        </div>
+        <button onclick="closeEditPlayerModal()" class="text-zinc-400 hover:text-white text-xs font-mono bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 px-2.5 py-1 rounded-lg transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- SUB-NAVIGATION TABS -->
+      <div class="flex items-center gap-1 bg-[#09090b] p-1 rounded-xl border border-zinc-800 text-xs font-mono">
+        <button id="editPlayerBtnTab-lp" onclick="switchEditPlayerTab('lp')"
+          class="px-2.5 py-1 rounded-lg bg-zinc-800 text-white font-medium transition text-[11px] font-mono flex items-center gap-1">
+          <i class="fa-solid fa-shield-halved text-purple-400"></i> Rank & LP
+        </button>
+        <button id="editPlayerBtnTab-eco" onclick="switchEditPlayerTab('eco')"
+          class="px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white transition text-[11px] font-mono flex items-center gap-1">
+          <i class="fa-solid fa-coins text-amber-400"></i> Balance
+        </button>
+        <button id="editPlayerBtnTab-clan" onclick="switchEditPlayerTab('clan')"
+          class="px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white transition text-[11px] font-mono flex items-center gap-1">
+          <i class="fa-solid fa-flag text-emerald-400"></i> Clan
+        </button>
+      </div>
+
+      <!-- TAB 1: LUCKPERMS (RANK & PERMISSIONS) -->
+      <div id="editPlayerTab-lp" class="space-y-4 font-mono text-xs">
+        <!-- 1. SET GROUP / RANK -->
+        <div class="bg-[#09090b] border border-zinc-800 p-3 rounded-lg space-y-2">
+          <label class="text-[11px] text-zinc-400 font-semibold block flex items-center gap-1.5">
+            <i class="fa-solid fa-shield-halved text-purple-400"></i> Set Group / Rank
+          </label>
+          <div class="flex items-center gap-2">
+            <select id="lpGroupSelect" class="flex-1 bg-[#121215] border border-zinc-800 text-zinc-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-purple-500">
+              <option value="default">default (Player)</option>
+              <option value="vip">vip</option>
+              <option value="mvp">mvp</option>
+              <option value="dragonian">dragonian</option>
+              <option value="helper">helper</option>
+              <option value="admin">admin</option>
+              <option value="owner">owner</option>
+            </select>
+            <button onclick="submitLpSetGroup()" class="bg-purple-950/80 hover:bg-purple-900 border border-purple-600/50 text-purple-300 px-3 py-1.5 rounded-lg transition font-bold shrink-0">
+              Set Rank
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. ADD PERMISSION NODE -->
+        <div class="bg-[#09090b] border border-zinc-800 p-3 rounded-lg space-y-2">
+          <label class="text-[11px] text-zinc-400 font-semibold block flex items-center gap-1.5">
+            <i class="fa-solid fa-key text-emerald-400"></i> Tambah Permission Node
+          </label>
+          <div class="flex items-center gap-2">
+            <input type="text" id="lpPermissionInput" placeholder="Contoh: essentials.fly" class="flex-1 bg-[#121215] border border-zinc-800 text-white rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-500 placeholder:text-zinc-600">
+            <button onclick="submitLpAddPermission()" class="bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-600/50 text-emerald-300 px-3 py-1.5 rounded-lg transition font-bold shrink-0">
+              Tambah
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. UNSET PERMISSION NODE -->
+        <div class="bg-[#09090b] border border-zinc-800 p-3 rounded-lg space-y-2">
+          <label class="text-[11px] text-zinc-400 font-semibold block flex items-center gap-1.5">
+            <i class="fa-solid fa-trash-can text-rose-400"></i> Hapus Permission Node
+          </label>
+          <div class="flex items-center gap-2">
+            <input type="text" id="lpUnsetPermissionInput" placeholder="Contoh: essentials.fly" class="flex-1 bg-[#121215] border border-zinc-800 text-white rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-rose-500 placeholder:text-zinc-600">
+            <button onclick="submitLpUnsetPermission()" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 px-3 py-1.5 rounded-lg transition font-bold shrink-0">
+              Hapus
+            </button>
+          </div>
+        </div>
+
+        <!-- QUICK UTILITY BUTTONS -->
+        <div class="flex items-center justify-between gap-2 pt-2 border-t border-zinc-800">
+          <button onclick="submitLpCheckInfo()" class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 px-3 py-1.5 rounded-lg transition text-[11px] flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-info text-blue-400"></i> Check Info
+          </button>
+          <button onclick="submitLpClearParent()" class="bg-amber-950/80 hover:bg-amber-900 border border-amber-600/50 text-amber-300 px-3 py-1.5 rounded-lg transition text-[11px] flex items-center gap-1.5 font-bold">
+            <i class="fa-solid fa-rotate-left text-amber-400"></i> Clear Parents
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 2: ECONOMY (BALANCE MANAGEMENT) -->
+      <div id="editPlayerTab-eco" class="space-y-4 font-mono text-xs hidden">
+        <div class="bg-[#09090b] border border-zinc-800 p-3.5 rounded-lg space-y-3">
+          <label class="text-[11px] text-zinc-400 font-semibold block flex items-center gap-1.5">
+            <i class="fa-solid fa-coins text-amber-400"></i> Jumlah Saldo / Balance ($)
+          </label>
+          <input type="number" id="ecoAmountInput" placeholder="Masukkan jumlah nominal (e.g. 50000)" min="0" step="100" class="w-full bg-[#121215] border border-zinc-800 text-white rounded-lg px-3 py-2 focus:outline-none focus:border-amber-500 placeholder:text-zinc-600 text-sm">
+          
+          <div class="grid grid-cols-3 gap-2 pt-1">
+            <button onclick="submitEcoSetBalance()" class="bg-blue-950/80 hover:bg-blue-900 border border-blue-600/50 text-blue-300 py-2 rounded-lg transition font-bold text-center flex items-center justify-center gap-1">
+              <i class="fa-solid fa-equals text-[10px]"></i> Set Balance
+            </button>
+            <button onclick="submitEcoGiveMoney()" class="bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-600/50 text-emerald-300 py-2 rounded-lg transition font-bold text-center flex items-center justify-center gap-1">
+              <i class="fa-solid fa-plus text-[10px]"></i> Give Money
+            </button>
+            <button onclick="submitEcoTakeMoney()" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 py-2 rounded-lg transition font-bold text-center flex items-center justify-center gap-1">
+              <i class="fa-solid fa-minus text-[10px]"></i> Take Money
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-zinc-800 flex justify-end">
+          <button onclick="submitEcoResetBalance()" class="bg-amber-950/80 hover:bg-amber-900 border border-amber-600/50 text-amber-300 px-3 py-1.5 rounded-lg transition text-[11px] flex items-center gap-1.5 font-bold">
+            <i class="fa-solid fa-rotate-left text-amber-400"></i> Reset Balance to 0
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 3: SIMPLECLANS (CLAN MANAGEMENT) -->
+      <div id="editPlayerTab-clan" class="space-y-4 font-mono text-xs hidden">
+        <!-- 1. SET PLAYER CLAN GROUP -->
+        <div class="bg-[#09090b] border border-zinc-800 p-3.5 rounded-lg space-y-3">
+          <div class="flex items-center justify-between">
+            <label class="text-[11px] text-zinc-400 font-semibold flex items-center gap-1.5">
+              <i class="fa-solid fa-users-gear text-emerald-400"></i> Set Clan Player
+            </label>
+            <button onclick="fetchAvailableClans()" title="Refresh Daftar Clan" class="text-zinc-500 hover:text-emerald-400 text-[10px] font-mono flex items-center gap-1 transition">
+              <i class="fa-solid fa-rotate-right"></i> Refresh Clan
+            </button>
+          </div>
+          
+          <div class="space-y-2">
+            <!-- DYNAMIC CLAN SELECTOR DROPDOWN -->
+            <select id="clanSelect" onchange="handleClanSelectChange()" class="w-full bg-[#121215] border border-zinc-800 text-zinc-200 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-500 text-xs">
+              <option value="">-- Pilih Clan yang Tersedia --</option>
+              <option value="custom">-- Tulis Custom Tag --</option>
+            </select>
+
+            <input type="text" id="clanTagInput" placeholder="Masukkan Custom Tag Clan (Contoh: ATH)..." class="w-full bg-[#121215] border border-zinc-800 text-white rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-500 placeholder:text-zinc-600 uppercase text-xs hidden">
+            
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button onclick="submitClanSetGroup('force')" class="bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-600/50 text-emerald-300 py-2 rounded-lg transition font-bold flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-right-to-bracket text-[10px]"></i> Set / Join Clan
+              </button>
+              <button onclick="submitClanSetGroup('leave')" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 py-2 rounded-lg transition font-bold flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-user-xmark text-[10px]"></i> Keluar dari Clan
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 
   <!-- INVSEE INVENTORY MODAL -->
@@ -471,6 +698,118 @@
           <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> Buka di Tab Baru
         </a>
       </div>
+    </div>
+  </div>
+
+  <!-- PLAYER DETAILED GEOLOCATION & NETWORK INFO MODAL -->
+  <div id="playerDetailModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center hidden p-3 sm:p-4" onclick="closePlayerDetailModal()">
+    <div class="max-w-2xl w-full bg-[#121215] border border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-2xl space-y-4 font-mono text-xs max-h-[90vh] overflow-y-auto custom-scrollbar" onclick="event.stopPropagation()">
+      
+      <!-- MODAL HEADER -->
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-3.5">
+        <div class="flex items-center gap-3">
+          <img id="detailPlayerHead" src="https://mc-heads.net/avatar/steve/36" alt="Player Head" class="w-9 h-9 rounded-xl border border-rose-500/50 shadow-md">
+          <div>
+            <h3 id="detailPlayerUsername" class="text-sm sm:text-base font-bold text-white tracking-wide">Player Detail</h3>
+            <p id="detailPlayerSubtext" class="text-[11px] text-zinc-400">Network & Geolocation Telemetry</p>
+          </div>
+        </div>
+        <button onclick="closePlayerDetailModal()" class="text-zinc-400 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 px-3 py-1.5 rounded-xl transition text-xs flex items-center gap-1">
+          <i class="fa-solid fa-xmark"></i> Tutup
+        </button>
+      </div>
+
+      <!-- LOADING STATE -->
+      <div id="detailLoading" class="py-12 text-center text-zinc-400 space-y-2">
+        <i class="fa-solid fa-earth-asia fa-spin text-2xl text-rose-500"></i>
+        <p class="text-xs">Mengambil telemetry IP, Geolokasi, & ISP pemain dari server...</p>
+      </div>
+
+      <!-- MAIN CONTENT GRID -->
+      <div id="detailContent" class="hidden space-y-4">
+        
+        <!-- CARD 1: IP & ISP NETWORK -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="bg-[#09090b] border border-zinc-800/90 p-3.5 rounded-xl space-y-1">
+            <span class="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold flex items-center gap-1.5">
+              <i class="fa-solid fa-network-wired text-cyan-400"></i> IP Address
+            </span>
+            <div class="flex items-center justify-between gap-2 pt-1">
+              <span id="detailIp" class="text-sm font-bold text-cyan-300 font-mono">---</span>
+              <button onclick="copyDetailIp()" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2 py-0.5 rounded transition">
+                <i class="fa-solid fa-copy"></i> Copy
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-[#09090b] border border-zinc-800/90 p-3.5 rounded-xl space-y-1">
+            <span class="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold flex items-center gap-1.5">
+              <i class="fa-solid fa-wifi text-emerald-400"></i> ISP / Provider
+            </span>
+            <p id="detailIsp" class="text-xs font-semibold text-emerald-300 pt-1 leading-snug">---</p>
+          </div>
+        </div>
+
+        <!-- CARD 2: LOCATION & COORDINATES -->
+        <div class="bg-[#09090b] border border-zinc-800/90 p-4 rounded-xl space-y-3">
+          <h4 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2 border-b border-zinc-800/80 pb-2">
+            <i class="fa-solid fa-location-dot text-rose-500"></i> Lokasi & Koordinat Geografis
+          </h4>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div>
+              <span class="text-[10px] text-zinc-500 block">Negara</span>
+              <span id="detailCountry" class="font-semibold text-zinc-200">---</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-zinc-500 block">Provinsi / Region</span>
+              <span id="detailRegion" class="font-semibold text-zinc-200">---</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-zinc-500 block">Kota</span>
+              <span id="detailCity" class="font-semibold text-zinc-200">---</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-zinc-500 block">Zona Waktu</span>
+              <span id="detailTimezone" class="font-semibold text-zinc-200">---</span>
+            </div>
+          </div>
+
+          <!-- LATITUDE & LONGITUDE PREVIEW CARD -->
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-[#121215] border border-zinc-800 p-3 rounded-lg gap-2 text-xs">
+            <div>
+              <span class="text-[10px] text-zinc-500 uppercase block font-semibold">Koordinat GPS (Lat, Long)</span>
+              <span id="detailCoords" class="font-bold text-rose-400 font-mono text-xs">---, ---</span>
+            </div>
+            <a id="detailMapLink" href="#" target="_blank" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shrink-0">
+              <i class="fa-solid fa-map-location-dot"></i> Buka Google Maps
+            </a>
+          </div>
+        </div>
+
+        <!-- CARD 3: IN-GAME STATUS & ACCOUNT SUMMARY -->
+        <div class="bg-[#09090b] border border-zinc-800/90 p-4 rounded-xl space-y-3">
+          <h4 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2 border-b border-zinc-800/80 pb-2">
+            <i class="fa-solid fa-id-card text-amber-400"></i> Info Akun Server
+          </h4>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+            <div>
+              <span class="text-[10px] text-zinc-500 block">Rank / Group</span>
+              <span id="detailRank" class="font-semibold text-zinc-200">Member</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-zinc-500 block">Clan Tag</span>
+              <span id="detailClan" class="font-semibold text-zinc-200">-</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-zinc-500 block">Saldo Uang</span>
+              <span id="detailBalance" class="font-semibold text-emerald-400 font-mono">$0</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
     </div>
   </div>
 
