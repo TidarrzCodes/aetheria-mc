@@ -112,7 +112,7 @@
         </div>
 
         <!-- SEARCH & DATE FILTER BAR -->
-        <div class="bg-[#121215] border border-zinc-800/80 p-3 sm:p-4 rounded-xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 text-xs font-mono">
+        <div class="bg-[#121215] border border-zinc-800/80 p-3 sm:p-4 rounded-xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5 text-xs font-mono">
           <!-- SEARCH INPUT -->
           <div class="relative flex-1">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"></i>
@@ -120,33 +120,34 @@
               class="w-full bg-[#09090b] border border-zinc-800 rounded-lg pl-9 pr-3 py-2 text-white placeholder:text-zinc-600 focus:outline-none focus:border-rose-500/60 transition">
           </div>
 
-          <!-- DATE & SORT CONTROLS -->
-          <div class="flex flex-wrap items-center gap-2">
+          <!-- DATE & SORT CONTROLS GRID -->
+          <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
             <!-- TANGGAL MULAI -->
-            <div class="flex items-center gap-1.5 bg-[#09090b] border border-zinc-800 px-2.5 py-1.5 rounded-lg">
-              <span class="text-zinc-500 text-[11px]">Dari:</span>
+            <div class="flex items-center gap-1.5 bg-[#09090b] border border-zinc-800 px-2.5 py-1.5 rounded-lg col-span-1">
+              <span class="text-zinc-500 text-[10px] sm:text-[11px] shrink-0">Dari:</span>
               <input type="date" id="startDateInput" onchange="handleFilterChange()"
-                class="bg-transparent text-zinc-200 focus:outline-none text-xs font-mono">
+                class="bg-transparent text-zinc-200 focus:outline-none text-[11px] sm:text-xs font-mono w-full min-w-0">
             </div>
 
             <!-- TANGGAL AKHIR -->
-            <div class="flex items-center gap-1.5 bg-[#09090b] border border-zinc-800 px-2.5 py-1.5 rounded-lg">
-              <span class="text-zinc-500 text-[11px]">S/D:</span>
+            <div class="flex items-center gap-1.5 bg-[#09090b] border border-zinc-800 px-2.5 py-1.5 rounded-lg col-span-1">
+              <span class="text-zinc-500 text-[10px] sm:text-[11px] shrink-0">S/D:</span>
               <input type="date" id="endDateInput" onchange="handleFilterChange()"
-                class="bg-transparent text-zinc-200 focus:outline-none text-xs font-mono">
+                class="bg-transparent text-zinc-200 focus:outline-none text-[11px] sm:text-xs font-mono w-full min-w-0">
             </div>
 
             <!-- URUTKAN TANGGAL -->
             <select id="dateSortSelect" onchange="handleFilterChange()"
-              class="bg-[#09090b] border border-zinc-800 text-zinc-200 rounded-lg px-2.5 py-2 focus:outline-none text-xs font-mono">
+              class="bg-[#09090b] border border-zinc-800 text-zinc-200 rounded-lg px-2.5 py-2 focus:outline-none text-xs font-mono col-span-1">
               <option value="newest">Urutan: Terbaru</option>
               <option value="oldest">Urutan: Terlama</option>
             </select>
 
             <!-- RESET FILTER -->
             <button onclick="resetOrderFilters()" title="Reset Filter"
-              class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white px-2.5 py-2 rounded-lg transition">
-              <i class="fa-solid fa-rotate-left"></i>
+              class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white px-2.5 py-2 rounded-lg transition col-span-1 flex items-center justify-center gap-1.5 font-mono text-xs">
+              <i class="fa-solid fa-rotate-left text-[11px]"></i>
+              <span class="sm:hidden">Reset</span>
             </button>
           </div>
         </div>

@@ -18,6 +18,12 @@ body {
   border-radius: 4px;
 }
 
+/* Color indicator icon for dark mode date picker in WebKit */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+  cursor: pointer;
+}
+
 /* Mobile Responsiveness & Touch Optimization */
 @media (max-width: 640px) {
   table {
@@ -31,7 +37,13 @@ body {
     padding-bottom: 0.625rem !important;
   }
 
-  button, a {
+  button, a, input, select {
     touch-action: manipulation;
+  }
+
+  /* Make date inputs fit nicely on small screens */
+  input[type="date"] {
+    min-width: 0;
+    max-width: 100%;
   }
 }
