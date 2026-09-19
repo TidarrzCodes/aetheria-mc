@@ -697,12 +697,12 @@ async function fetchOnlinePlayers() {
       } else {
         tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-zinc-500 font-mono">Belum ada player yang sedang online di server.</td></tr>`;
       }
-    } else if (currentState === 'starting') {
+    } else if (pteroState === 'starting') {
       dot.className = "w-3 h-3 rounded-full bg-amber-500 animate-pulse";
       countText.innerText = "Server Sedang Starting...";
       badgeCount.innerText = "0";
       tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-amber-400 font-mono"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Server Minecraft sedang dalam proses Startup...</td></tr>`;
-    } else if (currentState === 'stopping') {
+    } else if (pteroState === 'stopping') {
       dot.className = "w-3 h-3 rounded-full bg-rose-400 animate-pulse";
       countText.innerText = "Server Sedang Stopping...";
       badgeCount.innerText = "0";
