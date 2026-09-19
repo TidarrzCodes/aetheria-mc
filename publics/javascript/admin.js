@@ -340,7 +340,7 @@ async function fetchOnlinePlayers() {
 async function fetchOrders() {
   const container = document.getElementById('order-list');
   const icon = document.getElementById('refresh-icon');
-  icon.classList.add('fa-spin');
+  if (icon) icon.classList.add('fa-spin');
 
   try {
     const res = await fetch(WORKER_PROXY_URL);
@@ -350,13 +350,13 @@ async function fetchOrders() {
       ordersData = (json.data || []).reverse();
       renderOrders();
     } else {
-      container.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-rose-400 font-mono">Gagal membaca data dari Proxy.</td></tr>`;
+      if (container) container.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-rose-400 font-mono">Gagal membaca data dari Proxy.</td></tr>`;
     }
   } catch (err) {
     console.error(err);
-    container.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-rose-500 font-mono">Kesalahan koneksi Proxy Gateway endpoint.</td></tr>`;
+    if (container) container.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-rose-500 font-mono">Kesalahan koneksi Proxy Gateway endpoint.</td></tr>`;
   } finally {
-    icon.classList.remove('fa-spin');
+    if (icon) icon.classList.remove('fa-spin');
   }
 }
 
