@@ -275,21 +275,22 @@ function renderPlayerInventory(inventoryList) {
 function renderSlotInnerHtml(slotNum, item, placeholderIcon = '', defaultLabel = '') {
   if (item && item.id) {
     const itemName = formatItemName(item.id);
-    const cleanId = item.id.toLowerCase().replace(/^minecraft:/, '');
-    const iconUrl = `https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.1/items/${cleanId}.png`;
+    const cleanId = item.id.toLowerCase().replace(/^minecraft:/, '').trim();
+    const primaryUrl = `https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.1/items/${cleanId}.png`;
     const countBadge = item.count > 1 ? `<span class="mc-slot-count">${item.count}</span>` : '';
 
     return `
       <div class="mc-slot group relative" title="${escapeHTML(itemName)} (${item.count}) [Slot ${slotNum}]">
-        <img src="${iconUrl}" 
+        <img src="${primaryUrl}" 
              alt="${escapeHTML(itemName)}" 
              class="mc-slot-item-img"
-             onerror="this.onerror=null; this.src='https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/item/${escapeHTML(cleanId)}.png';">
+             data-step="0"
+             onerror="handleItemImgError(this, '${escapeHTML(cleanId)}')">
         ${countBadge}
         <div class="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 hidden group-hover:flex flex-col items-center pointer-events-none z-30">
           <div class="bg-zinc-950/95 border border-zinc-700 text-zinc-100 text-[10px] font-mono py-1 px-2 rounded shadow-2xl whitespace-nowrap">
             <div class="font-bold text-rose-400">${escapeHTML(itemName)}</div>
-            <div class="text-[9px] text-zinc-400">Jumlah: ${item.count} &bull; Slot: ${slotNum}</div>
+            <div class="text-[9px] text-zinc-400">Jumlah: ${item.count} &bull; Slot: ${slotNum} &bull; ID: ${escapeHTML(cleanId)}</div>
           </div>
         </div>
       </div>
@@ -303,6 +304,40 @@ function renderSlotInnerHtml(slotNum, item, placeholderIcon = '', defaultLabel =
     </div>
   `;
 }
+
+function handleItemImgError(img, cleanId) {
+  if (!img) return;
+  const currentStep = parseInt(img.dataset.step || '0', 10);
+  const nextStep = currentStep + 1;
+  img.dataset.step = String(nextStep);
+
+  const safeId = String(cleanId).toLowerCase().trim();
+
+  // Multi-tier fallback pipeline: Item textures -> Block textures across multiple Minecraft CDNs
+  const sources = [
+    `https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.1/items/${safeId}.png`,
+    `https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.1/blocks/${safeId}.png`,
+    `https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/item/${safeId}.png`,
+    `https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/block/${safeId}.png`,
+    `https://mc-heads.net/item/${safeId}`
+  ];
+
+  if (nextStep < sources.length) {
+    img.src = sources[nextStep];
+  } else {
+    // Hide broken img & display text badge if all CDNs fail
+    img.style.display = 'none';
+    const parent = img.parentElement;
+    if (parent && !parent.querySelector('.mc-fallback-badge')) {
+      const badge = document.createElement('span');
+      badge.className = 'mc-fallback-badge text-[10px] font-mono font-bold text-rose-300 truncate max-w-[34px] block text-center uppercase select-none';
+      badge.innerText = safeId.replace(/_/g, '').substring(0, 3);
+      parent.appendChild(badge);
+    }
+  }
+}
+
+window.handleItemImgError = handleItemImgError;
 
 function formatItemName(id) {
   if (!id) return '';
