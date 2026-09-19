@@ -305,22 +305,86 @@ function renderSlotInnerHtml(slotNum, item, placeholderIcon = '', defaultLabel =
   `;
 }
 
+const ITEM_ID_ALIASES = {
+  // Food & Cooked items
+  'cooked_beef': ['cooked_beef', 'beef_cooked'],
+  'cooked_porkchop': ['cooked_porkchop', 'porkchop_cooked'],
+  'cooked_chicken': ['cooked_chicken', 'chicken_cooked'],
+  'cooked_mutton': ['cooked_mutton', 'mutton_cooked'],
+  'cooked_cod': ['cooked_cod', 'fish_cooked', 'raw_fish'],
+  'cooked_salmon': ['cooked_salmon', 'salmon_cooked'],
+  'porkchop': ['porkchop', 'porkchop_raw'],
+  'beef': ['beef', 'beef_raw'],
+  'chicken': ['chicken', 'chicken_raw'],
+
+  // Books & Potions & Special items
+  'enchanted_book': ['enchanted_book', 'book_enchanted'],
+  'written_book': ['written_book', 'book_written'],
+  'writable_book': ['writable_book', 'book_writable'],
+  'glass_bottle': ['glass_bottle', 'potion_bottle_empty'],
+  'totem_of_undying': ['totem_of_undying', 'totem'],
+  'experience_bottle': ['experience_bottle', 'bottle_o_enchanting'],
+
+  // Gold tools & armor
+  'golden_sword': ['golden_sword', 'gold_sword'],
+  'golden_shovel': ['golden_shovel', 'gold_shovel'],
+  'golden_pickaxe': ['golden_pickaxe', 'gold_pickaxe'],
+  'golden_axe': ['golden_axe', 'gold_axe'],
+  'golden_hoe': ['golden_hoe', 'gold_hoe'],
+  'golden_helmet': ['golden_helmet', 'gold_helmet'],
+  'golden_chestplate': ['golden_chestplate', 'gold_chestplate'],
+  'golden_leggings': ['golden_leggings', 'gold_leggings'],
+  'golden_boots': ['golden_boots', 'gold_boots'],
+  'golden_apple': ['golden_apple', 'apple_golden'],
+  'enchanted_golden_apple': ['enchanted_golden_apple', 'apple_golden_enchanted', 'golden_apple'],
+
+  // Wooden tools
+  'wooden_sword': ['wooden_sword', 'wood_sword'],
+  'wooden_shovel': ['wooden_shovel', 'wood_shovel'],
+  'wooden_pickaxe': ['wooden_pickaxe', 'wood_pickaxe'],
+  'wooden_axe': ['wooden_axe', 'wood_axe'],
+  'wooden_hoe': ['wooden_hoe', 'wood_hoe'],
+
+  // Redstone & utility
+  'redstone': ['redstone', 'redstone_dust'],
+  'repeater': ['repeater', 'diode'],
+  'comparator': ['comparator'],
+  'clock': ['clock', 'watch']
+};
+
+function getItemSourceUrls(cleanId) {
+  const safeId = String(cleanId || '').toLowerCase().replace(/["']/g, '').replace(/^minecraft:/, '').trim();
+  if (!safeId) return [];
+
+  const idVariants = [safeId];
+  if (ITEM_ID_ALIASES[safeId]) {
+    ITEM_ID_ALIASES[safeId].forEach(alias => {
+      if (!idVariants.includes(alias)) idVariants.push(alias);
+    });
+  }
+
+  const urls = [];
+  idVariants.forEach(id => {
+    urls.push(`https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.1/items/${id}.png`);
+    urls.push(`https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.1/blocks/${id}.png`);
+    urls.push(`https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.12.2/items/${id}.png`);
+    urls.push(`https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.12.2/blocks/${id}.png`);
+    urls.push(`https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/item/${id}.png`);
+    urls.push(`https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/block/${id}.png`);
+    urls.push(`https://mc-heads.net/item/${id}`);
+    urls.push(`https://minecraftitemids.com/item/128/${id}.png`);
+  });
+
+  return urls;
+}
+
 function handleItemImgError(img, cleanId) {
   if (!img) return;
   const currentStep = parseInt(img.dataset.step || '0', 10);
   const nextStep = currentStep + 1;
   img.dataset.step = String(nextStep);
 
-  const safeId = String(cleanId).toLowerCase().trim();
-
-  // Multi-tier fallback pipeline: Item textures -> Block textures across multiple Minecraft CDNs
-  const sources = [
-    `https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.1/items/${safeId}.png`,
-    `https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.1/blocks/${safeId}.png`,
-    `https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/item/${safeId}.png`,
-    `https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/block/${safeId}.png`,
-    `https://mc-heads.net/item/${safeId}`
-  ];
+  const sources = getItemSourceUrls(cleanId);
 
   if (nextStep < sources.length) {
     img.src = sources[nextStep];
@@ -331,7 +395,7 @@ function handleItemImgError(img, cleanId) {
     if (parent && !parent.querySelector('.mc-fallback-badge')) {
       const badge = document.createElement('span');
       badge.className = 'mc-fallback-badge text-[10px] font-mono font-bold text-rose-300 truncate max-w-[34px] block text-center uppercase select-none';
-      badge.innerText = safeId.replace(/_/g, '').substring(0, 3);
+      badge.innerText = String(cleanId).replace(/_/g, '').substring(0, 3);
       parent.appendChild(badge);
     }
   }
