@@ -148,7 +148,6 @@ function switchMainTab(tabName) {
     if (viewEtc) viewEtc.classList.remove('hidden');
     if (btnEtc) btnEtc.className = "px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition flex items-center gap-1.5 text-xs";
     fetchWebChatLogs();
-    fetchPodiumLeaderboard();
   }
 }
 
