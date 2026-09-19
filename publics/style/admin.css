@@ -1,11 +1,12 @@
 body {
   background-color: #09090b;
   color: #f4f4f5;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-  height: 6px;
-  width: 6px;
+  height: 4px;
+  width: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
@@ -15,4 +16,22 @@ body {
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #27272a;
   border-radius: 4px;
+}
+
+/* Mobile Responsiveness & Touch Optimization */
+@media (max-width: 640px) {
+  table {
+    font-size: 11px;
+  }
+
+  th, td {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    padding-top: 0.625rem !important;
+    padding-bottom: 0.625rem !important;
+  }
+
+  button, a {
+    touch-action: manipulation;
+  }
 }
