@@ -44,12 +44,12 @@
   <!-- MAIN DASHBOARD CONTENT -->
   <div id="dashboardContent" class="min-h-screen flex flex-col">
     <header class="border-b border-zinc-800 bg-[#09090b]/95 sticky top-0 z-40 backdrop-blur-md">
-      <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2 sm:py-0 sm:h-16 flex flex-row items-center justify-between gap-2">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-0 sm:h-16 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
         
         <!-- BRAND & NAVIGATION TABS -->
-        <div class="flex items-center gap-2 sm:gap-6 min-w-0">
+        <div class="flex items-center gap-2 sm:gap-6 min-w-0 shrink-0">
           <div class="flex items-center gap-2 shrink-0">
-            <img src="./library/aetheria.png" alt="Aetheria Logo" class="w-7 h-7 sm:w-8 sm:h-8 object-contain">
+            <img src="./library/aetheria.png" alt="Aetheria Logo" class="w-6 h-6 sm:w-8 sm:h-8 object-contain">
             <div class="hidden sm:flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
               <h1 class="text-xs sm:text-sm font-bold text-white tracking-wide uppercase font-mono">
@@ -81,12 +81,12 @@
         </div>
 
         <!-- HEADER RIGHT ACTIONS -->
-        <div class="flex items-center gap-1.5 shrink-0">
+        <div class="flex items-center gap-1.5 flex-wrap sm:flex-nowrap shrink-0">
           <!-- AUTO RELOAD INDICATOR BADGE -->
-          <div id="autoReloadBadge" class="flex items-center gap-1.5 bg-[#121215] border border-zinc-800/90 px-2.5 py-1 rounded-lg text-[10px] font-mono text-zinc-400 select-none shadow-sm" title="Auto Reload Synchronizer (3s)">
+          <div id="autoReloadBadge" class="flex items-center gap-1.5 bg-[#121215] border border-zinc-800/90 px-2 py-1 rounded-lg text-[10px] font-mono text-zinc-400 select-none shadow-sm" title="Auto Reload Synchronizer (3s)">
             <i id="autoReloadSpinner" class="fa-solid fa-arrows-rotate text-rose-500 text-[10px]"></i>
             <span class="hidden md:inline text-zinc-400">Live Sync</span>
-            <div class="w-10 h-1 bg-zinc-900 border border-zinc-800 rounded-full overflow-hidden shrink-0">
+            <div class="w-8 sm:w-10 h-1 bg-zinc-900 border border-zinc-800 rounded-full overflow-hidden shrink-0">
               <div id="autoReloadBar" class="h-full bg-gradient-to-r from-rose-500 to-emerald-400 transition-all duration-100 ease-linear" style="width: 0%;"></div>
             </div>
           </div>
@@ -95,12 +95,12 @@
           <div id="staffProfileBadge" class="hidden items-center gap-1.5 font-mono"></div>
 
           <a href="./index.html"
-            class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5">
+            class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5">
             <i class="fa-solid fa-house text-[10px]"></i>
             <span class="hidden sm:inline">Home</span>
           </a>
           <button onclick="handleLogout()"
-            class="bg-rose-950/60 hover:bg-rose-900/80 border border-rose-600/40 text-rose-300 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5">
+            class="bg-rose-950/60 hover:bg-rose-900/80 border border-rose-600/40 text-rose-300 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5">
             <i class="fa-solid fa-right-from-bracket text-[10px]"></i>
             <span class="hidden sm:inline">Logout</span>
           </button>

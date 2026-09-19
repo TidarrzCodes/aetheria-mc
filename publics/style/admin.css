@@ -17,6 +17,7 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
+  width: 100%;
 }
 
 /* =========================================================================
@@ -131,36 +132,56 @@ input:focus, select:focus, textarea:focus {
   #editPlayerModal > div,
   #editClanModal > div,
   #playerDetailModal > div {
-    max-height: 92vh;
+    max-height: 90vh;
     overflow-y: auto;
   }
 }
 
 /* HP / Smartphone Specifics (max-width: 640px) */
 @media (max-width: 640px) {
-  /* Header Nav Bar Compact Scaling */
+  /* Header Nav Bar Compact Scaling without overlap */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+
+  header .max-w-7xl {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    row-gap: 0.5rem !important;
+  }
+
   header nav {
     padding: 2px !important;
   }
 
   header nav button {
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
+    padding-left: 0.4rem !important;
+    padding-right: 0.4rem !important;
     font-size: 10px !important;
   }
 
   #autoReloadBadge {
     padding-left: 0.4rem;
     padding-right: 0.4rem;
+    font-size: 9px !important;
   }
 
   #autoReloadBadge div {
-    width: 2rem !important; /* Compact progress bar on phone */
+    width: 1.75rem !important; /* Compact progress bar on phone */
   }
 
-  /* Compact Table Layout for Mobile */
+  #staffProfileBadge {
+    max-width: 110px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  /* Table Cell Padding & White-space rules */
   table {
-    font-size: 10.5px;
+    font-size: 10px;
+    width: 100%;
   }
 
   th, td {
@@ -168,9 +189,21 @@ input:focus, select:focus, textarea:focus {
     padding-right: 0.375rem !important;
     padding-top: 0.5rem !important;
     padding-bottom: 0.5rem !important;
+    white-space: nowrap;
   }
 
-  /* Prevent button misclicks on small screens */
+  /* Prevent button misclicks and overlapping in moderation column */
+  td .inline-flex {
+    flex-wrap: wrap !important;
+    gap: 0.25rem !important;
+  }
+
+  td button {
+    padding: 0.25rem 0.375rem !important;
+    font-size: 10px !important;
+  }
+
+  /* Touch optimization for mobile */
   button, a, input, select {
     touch-action: manipulation;
   }
@@ -180,20 +213,26 @@ input:focus, select:focus, textarea:focus {
     max-width: 100%;
   }
 
-  /* Modal Padding Adjustments */
+  /* Modal Padding & Boundary Fixes */
   #invseeModal, #editPlayerModal, #editClanModal, #playerDetailModal {
-    padding: 0.375rem;
+    padding: 0.375rem !important;
   }
 
-  #staffProfileBadge {
-    max-width: 120px;
-    overflow: hidden;
+  #invseeModal > div,
+  #editPlayerModal > div,
+  #editClanModal > div,
+  #playerDetailModal > div {
+    padding: 0.875rem !important;
+    width: 96vw !important;
+    max-width: 96vw !important;
+    border-radius: 0.875rem !important;
   }
 
   /* Console Terminal Text Size on HP */
   #consoleTerminalWindow {
     font-size: 10px;
-    min-height: 140px;
+    min-height: 130px;
+    padding: 0.5rem !important;
   }
 }
 
