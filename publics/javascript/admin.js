@@ -483,11 +483,82 @@ async function updateStatus(id, newStatus, username, itemName) {
   }
 }
 
+function extractGDriveFileId(url) {
+  if (!url) return null;
+  const str = String(url).trim();
+  const matchFile = str.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  const matchId = str.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  return matchFile ? matchFile[1] : (matchId ? matchId[1] : null);
+}
+
 function viewImage(url) {
-  document.getElementById('modalImg').src = url;
-  document.getElementById('imageModal').classList.remove('hidden');
+  if (!url || url.trim() === '' || url === 'null' || url === 'undefined') {
+    showToast("Gambar tidak tersedia / belum diunggah untuk pesanan ini.", "error");
+    return;
+  }
+
+  const rawUrl = String(url).trim();
+  const modalImg = document.getElementById('modalImg');
+  const modalIframe = document.getElementById('modalIframe');
+  const modalLoading = document.getElementById('modalLoading');
+  const modalImgLink = document.getElementById('modalImgLink');
+
+  // Reset display
+  if (modalImg) modalImg.classList.add('hidden');
+  if (modalIframe) modalIframe.classList.add('hidden');
+  if (modalLoading) modalLoading.classList.remove('hidden');
+  if (modalImgLink) modalImgLink.href = rawUrl;
+
+  const modal = document.getElementById('imageModal');
+  if (modal) modal.classList.remove('hidden');
+
+  const fileId = extractGDriveFileId(rawUrl);
+
+  // CASE 1: Base64 Image Data (Misal TTD Canvas Signature Pad)
+  if (rawUrl.startsWith('data:image')) {
+    if (modalImg) {
+      modalImg.src = rawUrl;
+      modalImg.onload = () => {
+        if (modalLoading) modalLoading.classList.add('hidden');
+        modalImg.classList.remove('hidden');
+      };
+    }
+    return;
+  }
+
+  // CASE 2: Google Drive File URL (Gunakan GDrive Embedded Preview iFrame)
+  if (fileId) {
+    const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+    if (modalIframe) {
+      modalIframe.src = previewUrl;
+      modalIframe.onload = () => {
+        if (modalLoading) modalLoading.classList.add('hidden');
+        modalIframe.classList.remove('hidden');
+      };
+    }
+    return;
+  }
+
+  // CASE 3: Standard Image URL Direct Link
+  if (modalImg) {
+    modalImg.src = rawUrl;
+    modalImg.onload = () => {
+      if (modalLoading) modalLoading.classList.add('hidden');
+      modalImg.classList.remove('hidden');
+    };
+    modalImg.onerror = () => {
+      if (modalLoading) modalLoading.classList.add('hidden');
+      showToast("Gagal memuat gambar dari URL tersebut.", "error");
+    };
+  }
 }
 
 function closeImageModal() {
-  document.getElementById('imageModal').classList.add('hidden');
+  const modal = document.getElementById('imageModal');
+  const modalIframe = document.getElementById('modalIframe');
+  const modalImg = document.getElementById('modalImg');
+
+  if (modalIframe) modalIframe.src = '';
+  if (modalImg) modalImg.src = '';
+  if (modal) modal.classList.add('hidden');
 }

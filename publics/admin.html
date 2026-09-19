@@ -216,12 +216,33 @@
 
   <!-- IMAGE MODAL -->
   <div id="imageModal"
-    class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4"
+    class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4"
     onclick="closeImageModal()">
-    <div class="max-w-2xl w-full text-center">
-      <img id="modalImg" src=""
-        class="max-h-[80vh] mx-auto rounded-lg border border-zinc-700 shadow-2xl object-contain">
-      <p class="mt-3 text-xs text-zinc-400 font-mono">Tekan tombol Esc atau klik di mana saja untuk menutup</p>
+    <div class="max-w-3xl w-full text-center relative bg-[#121215] border border-zinc-800 rounded-xl p-4 shadow-2xl" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-3 mb-3">
+        <h3 class="text-xs font-mono font-bold text-zinc-200 uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-image text-rose-500"></i> Media Preview
+        </h3>
+        <button onclick="closeImageModal()" class="text-zinc-400 hover:text-white text-xs font-mono bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 px-3 py-1 rounded transition">
+          &times; Tutup
+        </button>
+      </div>
+      
+      <!-- IMAGE OR IFRAME CONTAINER -->
+      <div class="relative w-full min-h-[300px] max-h-[70vh] flex items-center justify-center bg-zinc-950 rounded-lg overflow-hidden border border-zinc-800">
+        <img id="modalImg" src="" class="max-h-[68vh] w-auto mx-auto object-contain hidden">
+        <iframe id="modalIframe" src="" class="w-full h-[65vh] border-0 hidden"></iframe>
+        <div id="modalLoading" class="text-xs font-mono text-zinc-500 flex items-center gap-2">
+          <i class="fa-solid fa-spinner fa-spin text-rose-500"></i> Memuat gambar...
+        </div>
+      </div>
+
+      <div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-400 font-mono">
+        <span class="text-[11px] text-zinc-500">Klik tombol Tutup atau area gelap untuk kembali</span>
+        <a id="modalImgLink" href="#" target="_blank" class="text-rose-400 hover:text-rose-300 hover:underline flex items-center gap-1.5 font-medium">
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> Buka di Tab Baru
+        </a>
+      </div>
     </div>
   </div>
 
