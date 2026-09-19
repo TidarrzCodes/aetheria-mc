@@ -152,10 +152,12 @@ function switchMainTab(tabName) {
 }
 
 function syncCurrentTab() {
+  // Always sync player badge count & status in background
+  fetchOnlinePlayers();
+
   if (currentMainTab === 'orders') {
     fetchOrders();
   } else if (currentMainTab === 'players') {
-    fetchOnlinePlayers();
     fetchRealtimeConsoleLogs();
   } else if (currentMainTab === 'etc') {
     fetchWebChatLogs();
@@ -737,11 +739,15 @@ async function fetchOrders() {
       ordersData = (json.data || []).reverse();
       renderOrders();
     } else {
-      if (container) container.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-rose-400 font-mono">Gagal membaca data dari Proxy (${json?.message || 'Error'}).</td></tr>`;
+      if (container && ordersData.length === 0) {
+        container.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-rose-400 font-mono">Gagal membaca data dari Proxy (${json?.message || 'Error'}).</td></tr>`;
+      }
     }
   } catch (err) {
     console.error(err);
-    if (container) container.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-rose-500 font-mono">Kesalahan koneksi Proxy Gateway endpoint.</td></tr>`;
+    if (container && ordersData.length === 0) {
+      container.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-rose-500 font-mono">Kesalahan koneksi Proxy Gateway endpoint.</td></tr>`;
+    }
   } finally {
     if (icon) icon.classList.remove('fa-spin');
   }
