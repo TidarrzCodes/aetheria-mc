@@ -108,7 +108,7 @@ function unlockDashboard() {
   const dash = document.getElementById('dashboardContent');
   if (dash) dash.classList.remove('hidden');
   syncCurrentTab();
-  setInterval(syncCurrentTab, 2000); // Fast 2-second real-time sync
+  setInterval(syncCurrentTab, 8000); // Optimized 8-second refresh to save Cloudflare Worker quota
 }
 
 function handleLogout() {
@@ -152,12 +152,10 @@ function switchMainTab(tabName) {
 }
 
 function syncCurrentTab() {
-  // Always sync player badge count & status in background
-  fetchOnlinePlayers();
-
   if (currentMainTab === 'orders') {
     fetchOrders();
   } else if (currentMainTab === 'players') {
+    fetchOnlinePlayers();
     fetchRealtimeConsoleLogs();
   } else if (currentMainTab === 'etc') {
     fetchWebChatLogs();
@@ -640,13 +638,16 @@ async function fetchOnlinePlayers() {
   const badgeCount = document.getElementById('nav-player-badge');
 
   try {
-    // Fetch status server & realtime online player list via RCON
+    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
     const [pteroRes, mcsrvRes, rconPlayersRes] = await Promise.all([
       fetch(`${WORKER_PROXY_URL}?action=get_server_status`).catch(() => null),
       fetch(`https://api.mcsrvstat.us/3/${SERVER_DOMAIN}`).catch(() => null),
       fetch(`${WORKER_PROXY_URL}?action=get_online_players`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Admin-Token': adminToken
+        }
       }).catch(() => null)
     ]);
 
@@ -748,7 +749,12 @@ async function fetchOrders() {
   if (icon) icon.classList.add('fa-spin');
 
   try {
-    const res = await fetch(WORKER_PROXY_URL);
+    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
+    const res = await fetch(WORKER_PROXY_URL, {
+      headers: {
+        'X-Admin-Token': adminToken
+      }
+    });
     const json = await res.json();
 
     if (Array.isArray(json)) {
