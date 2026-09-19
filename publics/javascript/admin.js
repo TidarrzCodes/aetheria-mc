@@ -730,11 +730,14 @@ async function fetchOrders() {
     const res = await fetch(WORKER_PROXY_URL);
     const json = await res.json();
 
-    if (json.result === 'success') {
+    if (Array.isArray(json)) {
+      ordersData = json.reverse();
+      renderOrders();
+    } else if (json && json.result === 'success') {
       ordersData = (json.data || []).reverse();
       renderOrders();
     } else {
-      if (container) container.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-rose-400 font-mono">Gagal membaca data dari Proxy.</td></tr>`;
+      if (container) container.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-rose-400 font-mono">Gagal membaca data dari Proxy (${json?.message || 'Error'}).</td></tr>`;
     }
   } catch (err) {
     console.error(err);
