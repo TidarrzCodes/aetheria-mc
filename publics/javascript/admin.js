@@ -360,14 +360,61 @@ async function fetchOrders() {
   }
 }
 
+function handleFilterChange() {
+  renderOrders();
+}
+
+function resetOrderFilters() {
+  const searchInput = document.getElementById('orderSearchInput');
+  const startDate = document.getElementById('startDateInput');
+  const endDate = document.getElementById('endDateInput');
+  const dateSort = document.getElementById('dateSortSelect');
+
+  if (searchInput) searchInput.value = '';
+  if (startDate) startDate.value = '';
+  if (endDate) endDate.value = '';
+  if (dateSort) dateSort.value = 'newest';
+
+  renderOrders();
+}
+
+function parseOrderDate(dateStr) {
+  if (!dateStr) return 0;
+  // Parse format "19/9/2026, 07.44.08" atau ISO date
+  const parts = String(dateStr).split(',');
+  if (parts.length >= 1) {
+    const dParts = parts[0].trim().split('/');
+    if (dParts.length === 3) {
+      const day = parseInt(dParts[0], 10);
+      const month = parseInt(dParts[1], 10) - 1;
+      const year = parseInt(dParts[2], 10);
+      
+      let hour = 0, min = 0, sec = 0;
+      if (parts[1]) {
+        const tParts = parts[1].trim().split('.');
+        if (tParts.length === 3) {
+          hour = parseInt(tParts[0], 10);
+          min = parseInt(tParts[1], 10);
+          sec = parseInt(tParts[2], 10);
+        }
+      }
+      return new Date(year, month, day, hour, min, sec).getTime();
+    }
+  }
+  const parsed = Date.parse(dateStr);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
 function filterStatus(status) {
   currentFilter = status;
   ['ALL', 'PENDING', 'APPROVED', 'REJECTED'].forEach(st => {
     const btn = document.getElementById(`tab-${st}`);
-    if (st === status) {
-      btn.className = "px-3 py-1.5 rounded-md bg-zinc-800 text-white font-medium transition";
-    } else {
-      btn.className = "px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition";
+    if (btn) {
+      if (st === status) {
+        btn.className = "px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition shrink-0";
+      } else {
+        btn.className = "px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition shrink-0";
+      }
     }
   });
   renderOrders();
@@ -379,11 +426,48 @@ function renderOrders() {
   document.getElementById('stat-pending').innerText = ordersData.filter(o => o.status === 'PENDING').length;
   document.getElementById('stat-approved').innerText = ordersData.filter(o => o.status === 'APPROVED').length;
 
-  const filtered = ordersData.filter(o => currentFilter === 'ALL' || o.status === currentFilter);
+  const searchQuery = (document.getElementById('orderSearchInput')?.value || '').toLowerCase().trim();
+  const startDateVal = document.getElementById('startDateInput')?.value;
+  const endDateVal = document.getElementById('endDateInput')?.value;
+  const dateSortVal = document.getElementById('dateSortSelect')?.value || 'newest';
+
+  const startTime = startDateVal ? new Date(startDateVal + 'T00:00:00').getTime() : null;
+  const endTime = endDateVal ? new Date(endDateVal + 'T23:59:59').getTime() : null;
+
+  let filtered = ordersData.filter(o => {
+    // Filter status tab
+    if (currentFilter !== 'ALL' && o.status !== currentFilter) return false;
+
+    // Filter Pencarian Teks (ID, Username, Item Name, Category)
+    if (searchQuery) {
+      const matchId = String(o.id || '').toLowerCase().includes(searchQuery);
+      const matchUser = String(o.username || '').toLowerCase().includes(searchQuery);
+      const matchItem = String(o.itemName || '').toLowerCase().includes(searchQuery);
+      const matchCat = String(o.category || '').toLowerCase().includes(searchQuery);
+      if (!matchId && !matchUser && !matchItem && !matchCat) return false;
+    }
+
+    // Filter Rentang Tanggal
+    if (startTime || endTime) {
+      const ordTime = parseOrderDate(o.timestamp);
+      if (startTime && ordTime < startTime) return false;
+      if (endTime && ordTime > endTime) return false;
+    }
+
+    return true;
+  });
+
+  // Urutkan Tanggal
+  filtered.sort((a, b) => {
+    const timeA = parseOrderDate(a.timestamp);
+    const timeB = parseOrderDate(b.timestamp);
+    return dateSortVal === 'oldest' ? timeA - timeB : timeB - timeA;
+  });
+
   document.getElementById('row-count').innerText = `${filtered.length} record(s)`;
 
   if (filtered.length === 0) {
-    container.innerHTML = `<tr><td colspan="7" class="text-center p-8 text-zinc-500 font-mono">Tidak ada pesanan ditemukan.</td></tr>`;
+    container.innerHTML = `<tr><td colspan="7" class="text-center p-8 text-zinc-500 font-mono">Tidak ada pesanan yang sesuai filter.</td></tr>`;
     return;
   }
 
