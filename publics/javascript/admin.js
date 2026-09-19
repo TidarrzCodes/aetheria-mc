@@ -112,6 +112,7 @@ function unlockDashboard() {
 function handleLogout() {
   eraseCookie('aetheria_admin_token');
   sessionStorage.removeItem('aetheria_admin_auth');
+  localStorage.removeItem('aetheria_player_user');
   window.location.href = './login.html';
 }
 

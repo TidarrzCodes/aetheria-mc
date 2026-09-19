@@ -132,6 +132,11 @@ async function handleLoginSubmit(e) {
 
   if (!username || !password) return;
 
+  // Clear previous session states before new login attempt
+  eraseCookie('aetheria_admin_token');
+  sessionStorage.removeItem('aetheria_admin_auth');
+  localStorage.removeItem('aetheria_player_user');
+
   errorBox.classList.add('hidden');
   btn.innerText = "Memverifikasi...";
   btn.disabled = true;
