@@ -626,17 +626,37 @@ async function fetchOnlinePlayers() {
   const badgeCount = document.getElementById('nav-player-badge');
 
   try {
-    const response = await fetch(`https://api.mcsrvstat.us/3/${SERVER_DOMAIN}`);
-    const data = await response.json();
+    // 1. Fetch Realtime Pterodactyl Server State (running, starting, stopping, offline)
+    const pteroRes = await fetch(`${WORKER_PROXY_URL}?action=get_server_status`).catch(() => null);
+    const pteroData = pteroRes ? await pteroRes.json().catch(() => null) : null;
 
-    if (data.online) {
+    let isOnline = false;
+    let currentState = 'offline';
+
+    if (pteroData && pteroData.result === 'success') {
+      currentState = pteroData.state;
+      isOnline = pteroData.online;
+    }
+
+    // 2. Fetch Player List dari mcsrvstat
+    const response = await fetch(`https://api.mcsrvstat.us/3/${SERVER_DOMAIN}`).catch(() => null);
+    const data = response ? await response.json().catch(() => null) : null;
+
+    if (!pteroData || pteroData.result !== 'success') {
+      if (data) {
+        isOnline = !!data.online;
+        currentState = data.online ? 'running' : 'offline';
+      }
+    }
+
+    if (currentState === 'running' || isOnline) {
       dot.className = "w-3 h-3 rounded-full bg-emerald-500 animate-pulse";
-      const online = data.players ? data.players.online : 0;
-      const max = data.players ? data.players.max : 0;
-      countText.innerText = `${online} / ${max} Player Online`;
+      const online = data && data.players ? data.players.online : 0;
+      const max = data && data.players ? data.players.max : 0;
+      countText.innerText = `${online} / ${max} Player Online (ONLINE)`;
       badgeCount.innerText = online;
 
-      if (data.players && data.players.list && data.players.list.length > 0) {
+      if (data && data.players && data.players.list && data.players.list.length > 0) {
         tableBody.innerHTML = data.players.list.map(p => {
           const name = typeof p === 'object' ? p.name : p;
           const rank = typeof p === 'object' && p.group ? p.group : 'Member';
@@ -672,11 +692,21 @@ async function fetchOnlinePlayers() {
       } else {
         tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-zinc-500 font-mono">Belum ada player yang sedang online di server.</td></tr>`;
       }
+    } else if (currentState === 'starting') {
+      dot.className = "w-3 h-3 rounded-full bg-amber-500 animate-pulse";
+      countText.innerText = "Server Sedang Starting...";
+      badgeCount.innerText = "0";
+      tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-amber-400 font-mono"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Server Minecraft sedang dalam proses Startup...</td></tr>`;
+    } else if (currentState === 'stopping') {
+      dot.className = "w-3 h-3 rounded-full bg-rose-400 animate-pulse";
+      countText.innerText = "Server Sedang Stopping...";
+      badgeCount.innerText = "0";
+      tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-rose-400 font-mono"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Server Minecraft sedang mematikan sistem...</td></tr>`;
     } else {
       dot.className = "w-3 h-3 rounded-full bg-rose-500";
-      countText.innerText = "Server Offline / Maintenance";
+      countText.innerText = "Server Offline (OFF)";
       badgeCount.innerText = "0";
-      tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-rose-400 font-mono">Server Minecraft sedang offline.</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-rose-400 font-mono">Server Minecraft sedang offline. Tekan tombol ON untuk menyalakan server.</td></tr>`;
     }
   } catch (err) {
     dot.className = "w-3 h-3 rounded-full bg-amber-500";
