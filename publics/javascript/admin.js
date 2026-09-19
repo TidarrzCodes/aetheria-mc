@@ -640,14 +640,19 @@ async function fetchOnlinePlayers() {
   const badgeCount = document.getElementById('nav-player-badge');
 
   try {
-    // Fetch kedua status API secara independen
-    const [pteroRes, mcsrvRes] = await Promise.all([
+    // Fetch status server & realtime online player list via RCON
+    const [pteroRes, mcsrvRes, rconPlayersRes] = await Promise.all([
       fetch(`${WORKER_PROXY_URL}?action=get_server_status`).catch(() => null),
-      fetch(`https://api.mcsrvstat.us/3/${SERVER_DOMAIN}`).catch(() => null)
+      fetch(`https://api.mcsrvstat.us/3/${SERVER_DOMAIN}`).catch(() => null),
+      fetch(`${WORKER_PROXY_URL}?action=get_online_players`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      }).catch(() => null)
     ]);
 
     const pteroData = pteroRes ? await pteroRes.json().catch(() => null) : null;
     const data = mcsrvRes ? await mcsrvRes.json().catch(() => null) : null;
+    const rconData = rconPlayersRes ? await rconPlayersRes.json().catch(() => null) : null;
 
     const mcOnline = data ? !!data.online : false;
     const pteroState = (pteroData && pteroData.result === 'success') ? pteroData.state : null;
@@ -658,13 +663,27 @@ async function fetchOnlinePlayers() {
 
     if (isOnline) {
       dot.className = "w-3 h-3 rounded-full bg-emerald-500 animate-pulse";
-      const online = data && data.players ? data.players.online : 0;
-      const max = data && data.players ? data.players.max : 0;
-      countText.innerText = `${online} / ${max} Player Online (ONLINE)`;
-      badgeCount.innerText = online;
+      
+      // Utamakan realtime RCON player list jika tersedia, fallback ke mcsrvstat
+      let onlineList = [];
+      let onlineCount = 0;
+      let maxCount = 20;
 
-      if (data && data.players && data.players.list && data.players.list.length > 0) {
-        tableBody.innerHTML = data.players.list.map(p => {
+      if (rconData && rconData.result === 'success') {
+        onlineList = rconData.players || [];
+        onlineCount = typeof rconData.online === 'number' ? rconData.online : onlineList.length;
+        maxCount = rconData.max || 20;
+      } else if (data && data.players) {
+        onlineList = data.players.list || [];
+        onlineCount = data.players.online || 0;
+        maxCount = data.players.max || 20;
+      }
+
+      countText.innerText = `${onlineCount} / ${maxCount} Player Online (ONLINE)`;
+      badgeCount.innerText = onlineCount;
+
+      if (onlineList.length > 0) {
+        tableBody.innerHTML = onlineList.map(p => {
           const name = typeof p === 'object' ? p.name : p;
           const rank = typeof p === 'object' && p.group ? p.group : 'Member';
           const safeName = escapeHTML(name);
