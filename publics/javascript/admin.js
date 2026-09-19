@@ -626,30 +626,23 @@ async function fetchOnlinePlayers() {
   const badgeCount = document.getElementById('nav-player-badge');
 
   try {
-    // 1. Fetch Realtime Pterodactyl Server State (running, starting, stopping, offline)
-    const pteroRes = await fetch(`${WORKER_PROXY_URL}?action=get_server_status`).catch(() => null);
+    // Fetch kedua status API secara independen
+    const [pteroRes, mcsrvRes] = await Promise.all([
+      fetch(`${WORKER_PROXY_URL}?action=get_server_status`).catch(() => null),
+      fetch(`https://api.mcsrvstat.us/3/${SERVER_DOMAIN}`).catch(() => null)
+    ]);
+
     const pteroData = pteroRes ? await pteroRes.json().catch(() => null) : null;
+    const data = mcsrvRes ? await mcsrvRes.json().catch(() => null) : null;
 
-    let isOnline = false;
-    let currentState = 'offline';
+    const mcOnline = data ? !!data.online : false;
+    const pteroState = (pteroData && pteroData.result === 'success') ? pteroData.state : null;
+    const pteroOnline = (pteroData && pteroData.result === 'success') ? pteroData.online : false;
 
-    if (pteroData && pteroData.result === 'success') {
-      currentState = pteroData.state;
-      isOnline = pteroData.online;
-    }
+    // Server dinyatakan ONLINE jika SALAH SATU API mengonfirmasi online!
+    const isOnline = mcOnline || pteroOnline || pteroState === 'running';
 
-    // 2. Fetch Player List dari mcsrvstat
-    const response = await fetch(`https://api.mcsrvstat.us/3/${SERVER_DOMAIN}`).catch(() => null);
-    const data = response ? await response.json().catch(() => null) : null;
-
-    if (!pteroData || pteroData.result !== 'success') {
-      if (data) {
-        isOnline = !!data.online;
-        currentState = data.online ? 'running' : 'offline';
-      }
-    }
-
-    if (currentState === 'running' || isOnline) {
+    if (isOnline) {
       dot.className = "w-3 h-3 rounded-full bg-emerald-500 animate-pulse";
       const online = data && data.players ? data.players.online : 0;
       const max = data && data.players ? data.players.max : 0;
