@@ -22,6 +22,11 @@ function getCookie(name) {
   return null;
 }
 
+function eraseCookie(name) {
+  document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+  document.cookie = name + '=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+}
+
 // TOAST NOTIFICATIONS
 function showToast(message, type = 'info') {
   const container = document.getElementById('toast-container');
@@ -100,6 +105,14 @@ function showToast(message, type = 'info') {
 
 // CHECK ACTIVE SESSION ON LOAD
 document.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('logout') === 'true' || urlParams.get('reset') === 'true') {
+    eraseCookie('aetheria_admin_token');
+    sessionStorage.removeItem('aetheria_admin_auth');
+    localStorage.removeItem('aetheria_player_user');
+    return;
+  }
+
   const adminCookie = getCookie('aetheria_admin_token');
   const sessionAuth = sessionStorage.getItem('aetheria_admin_auth');
   const playerUser = localStorage.getItem('aetheria_player_user');
@@ -108,38 +121,50 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast("Anda sudah login sebagai Staff/Admin. Mengalihkan...", "info");
     setTimeout(() => {
       window.location.href = './admin.html';
-    }, 1000);
+    }, 800);
   } else if (playerUser) {
     try {
       const data = JSON.parse(playerUser);
       showToast(`Selamat datang kembali, ${data.username}! Mengalihkan...`, "info");
       setTimeout(() => {
         window.location.href = './players.html';
-      }, 1000);
+      }, 800);
     } catch (e) {}
   }
 });
 
 // SUBMIT LOGIN FORM HANDLER
 async function handleLoginSubmit(e) {
-  e.preventDefault();
+  if (e && e.preventDefault) e.preventDefault();
 
-  const username = document.getElementById('loginUsername').value.trim();
-  const password = document.getElementById('loginPassword').value;
+  const usernameEl = document.getElementById('loginUsername');
+  const passwordEl = document.getElementById('loginPassword');
   const errorBox = document.getElementById('loginError');
   const errorText = document.getElementById('loginErrorText');
   const btn = document.getElementById('btnLogin');
 
-  if (!username || !password) return;
+  const username = usernameEl ? usernameEl.value.trim() : '';
+  const password = passwordEl ? passwordEl.value : '';
+
+  if (!username || !password) {
+    if (errorBox && errorText) {
+      errorText.innerText = "Username dan Password wajib diisi!";
+      errorBox.classList.remove('hidden');
+    }
+    showToast("Username dan Password wajib diisi!", "error");
+    return;
+  }
 
   // Clear previous session states before new login attempt
   eraseCookie('aetheria_admin_token');
   sessionStorage.removeItem('aetheria_admin_auth');
   localStorage.removeItem('aetheria_player_user');
 
-  errorBox.classList.add('hidden');
-  btn.innerText = "Memverifikasi...";
-  btn.disabled = true;
+  if (errorBox) errorBox.classList.add('hidden');
+  if (btn) {
+    btn.innerText = "Memverifikasi...";
+    btn.disabled = true;
+  }
 
   try {
     const res = await fetch(`${WORKER_PROXY_URL}?action=player_login`, {
@@ -164,7 +189,7 @@ async function handleLoginSubmit(e) {
         showToast(`Login Staff Berhasil (${data.rank})! Mengalihkan ke Dashboard Staff...`, "success");
         setTimeout(() => {
           window.location.href = './admin.html';
-        }, 1000);
+        }, 800);
       } else {
         // Player Authentication
         const playerData = {
@@ -176,22 +201,38 @@ async function handleLoginSubmit(e) {
         showToast(`Selamat datang ${playerData.username}! Mengalihkan ke Dashboard...`, "success");
         setTimeout(() => {
           window.location.href = './players.html';
-        }, 1000);
+        }, 800);
       }
 
     } else {
       const msg = (data && data.message) || "Username atau password in-game (/login) salah!";
-      errorText.innerText = msg;
-      errorBox.classList.remove('hidden');
+      if (errorBox && errorText) {
+        errorText.innerText = msg;
+        errorBox.classList.remove('hidden');
+      }
       showToast(msg, "error");
     }
   } catch (err) {
     console.error('Login Error:', err);
-    errorText.innerText = "Gagal terhubung ke server verifikasi AuthMe.";
-    errorBox.classList.remove('hidden');
+    if (errorBox && errorText) {
+      errorText.innerText = "Gagal terhubung ke server verifikasi AuthMe.";
+      errorBox.classList.remove('hidden');
+    }
     showToast("Kesalahan jaringan saat verifikasi akun.", "error");
   } finally {
-    btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Masuk Sekarang`;
-    btn.disabled = false;
+    if (btn) {
+      btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Masuk Sekarang`;
+      btn.disabled = false;
+    }
   }
+}
+
+function forceResetSession() {
+  eraseCookie('aetheria_admin_token');
+  sessionStorage.removeItem('aetheria_admin_auth');
+  localStorage.removeItem('aetheria_player_user');
+  showToast("Sesi berhasil direset. Silakan login kembali.", "info");
+  setTimeout(() => {
+    window.location.href = './login.html?reset=true';
+  }, 300);
 }
