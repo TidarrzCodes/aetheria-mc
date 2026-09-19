@@ -104,9 +104,8 @@ document.addEventListener('keydown', (e) => {
 function unlockDashboard() {
   const dash = document.getElementById('dashboardContent');
   if (dash) dash.classList.remove('hidden');
-  fetchOrders();
-  fetchOnlinePlayers();
-  setInterval(fetchOnlinePlayers, 30000);
+  syncCurrentTab();
+  setInterval(syncCurrentTab, 5000);
 }
 
 function handleLogout() {
@@ -128,11 +127,13 @@ function switchMainTab(tabName) {
     viewPlayers.classList.add('hidden');
     btnOrders.className = "px-3 py-1.5 rounded-md bg-zinc-800 text-white font-medium transition flex items-center gap-2";
     btnPlayers.className = "px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition flex items-center gap-2";
+    fetchOrders();
   } else {
     viewOrders.classList.add('hidden');
     viewPlayers.classList.remove('hidden');
     btnPlayers.className = "px-3 py-1.5 rounded-md bg-zinc-800 text-white font-medium transition flex items-center gap-2";
     btnOrders.className = "px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition flex items-center gap-2";
+    fetchOnlinePlayers();
   }
 }
 
@@ -142,7 +143,6 @@ function syncCurrentTab() {
   } else {
     fetchOnlinePlayers();
   }
-  showToast("Data berhasil disinkronkan", "info");
 }
 
 // MODERASI PLAYER: KICK, BAN, INVSEE, & CUSTOM COMMAND
@@ -223,25 +223,18 @@ function appendConsoleOutput(command, output, isError = false) {
   const terminal = document.getElementById('consoleTerminalWindow');
   if (!terminal) return;
 
-  const timeStr = new Date().toLocaleTimeString();
-
   const cmdLine = document.createElement('div');
-  cmdLine.className = "text-rose-400 font-bold flex items-start gap-1.5 pt-1.5 border-t border-zinc-800/40";
-  cmdLine.innerHTML = `<span class="text-zinc-500 text-[10px] shrink-0">[${timeStr}]</span> <span class="font-mono">&gt; ${escapeHTML(command)}</span>`;
+  cmdLine.className = "text-white font-medium font-mono pt-1";
+  cmdLine.innerText = command;
   terminal.appendChild(cmdLine);
 
   if (output && output.trim()) {
     const outLine = document.createElement('pre');
     outLine.className = isError 
-      ? "text-rose-400 whitespace-pre-wrap pl-4 text-[11px] font-mono leading-relaxed" 
-      : "text-emerald-400 whitespace-pre-wrap pl-4 text-[11px] font-mono leading-relaxed";
+      ? "text-rose-400 whitespace-pre-wrap font-mono leading-relaxed text-xs" 
+      : "text-zinc-300 whitespace-pre-wrap font-mono leading-relaxed text-xs";
     outLine.innerText = output.trim();
     terminal.appendChild(outLine);
-  } else {
-    const noOutLine = document.createElement('div');
-    noOutLine.className = "text-zinc-500 italic pl-4 text-[10px]";
-    noOutLine.innerText = "[Console]: Command executed on server.";
-    terminal.appendChild(noOutLine);
   }
 
   terminal.scrollTop = terminal.scrollHeight;

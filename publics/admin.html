@@ -77,11 +77,6 @@
 
         <!-- HEADER RIGHT ACTIONS -->
         <div class="flex items-center justify-end gap-2 shrink-0 border-t border-zinc-800/60 md:border-t-0 pt-2 md:pt-0">
-          <button onclick="syncCurrentTab()"
-            class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5">
-            <i class="fa-solid fa-arrows-rotate text-[10px]" id="refresh-icon"></i>
-            <span class="hidden sm:inline">Sync Data</span>
-          </button>
           <a href="./index.html"
             class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5">
             <i class="fa-solid fa-house text-[10px]"></i>
@@ -158,30 +153,20 @@
 
       <!-- VIEW PLAYERS SECTION -->
       <section id="view-players" class="hidden space-y-4 sm:space-y-6">
-        <!-- QUICK CONSOLE COMMAND EXECUTION WIDGET -->
-        <div class="bg-[#121215] border border-zinc-800/80 p-3.5 sm:p-4 rounded-xl shadow-xl space-y-3">
-          <div class="flex items-center justify-between">
-            <label class="block text-xs font-mono text-zinc-400 uppercase font-semibold">
-              <i class="fa-solid fa-terminal text-rose-500 mr-1.5"></i> Live Server Console Terminal
-            </label>
-            <button onclick="clearConsoleLog()" class="text-[10px] font-mono text-zinc-500 hover:text-zinc-300 transition flex items-center gap-1">
-              <i class="fa-solid fa-trash-can"></i> Clear Terminal
-            </button>
+        <!-- CONSOLE TERMINAL WIDGET (CLEAN & SIMPLE LIKE PTERODACTYL) -->
+        <div class="bg-[#121215] border border-zinc-800/80 rounded-xl overflow-hidden shadow-xl font-mono text-xs">
+          <!-- CONSOLE LOG BOX -->
+          <div id="consoleTerminalWindow" class="bg-[#0b0c0e] p-3 sm:p-4 text-zinc-300 min-h-[160px] max-h-72 overflow-y-auto custom-scrollbar font-mono text-xs leading-relaxed space-y-1">
+            <div class="text-zinc-600">// Server Console Window</div>
           </div>
 
-          <!-- TERMINAL LOG WINDOW -->
-          <div id="consoleTerminalWindow" class="bg-[#050608] border border-zinc-800/90 rounded-xl p-3 font-mono text-xs text-zinc-300 max-h-56 sm:max-h-64 overflow-y-auto custom-scrollbar space-y-1 shadow-inner">
-            <div class="text-zinc-500 text-[11px]">// Live Console Terminal Ready. Type command below to execute on server...</div>
-          </div>
-
-          <form onsubmit="sendConsoleCommand(event)" class="flex flex-col sm:flex-row gap-2">
-            <div class="relative flex-1">
-              <span class="absolute left-3 top-2.5 text-rose-500 font-mono text-xs font-bold">&gt;&gt;</span>
-              <input type="text" id="consoleCommandInput" placeholder="misal: kick PlayerName / lp user PlayerName info..."
-                class="w-full bg-[#09090b] border border-zinc-800 focus:border-rose-500 focus:outline-none pl-8 pr-3.5 py-2 rounded-lg text-white font-mono text-xs transition">
-            </div>
-            <button type="submit" id="btnSendConsole" class="bg-rose-600 hover:bg-rose-500 text-white font-mono text-xs font-bold px-4 py-2 rounded-lg transition uppercase tracking-wider shrink-0 flex items-center justify-center gap-1.5">
-              <i class="fa-solid fa-paper-plane text-[11px]"></i> Kirim Command
+          <!-- BOTTOM COMMAND INPUT -->
+          <form onsubmit="sendConsoleCommand(event)" class="flex items-center border-t border-zinc-800 bg-[#07080a] px-3 py-2">
+            <span class="text-rose-500 font-bold mr-2 text-xs select-none">&gt;&gt;</span>
+            <input type="text" id="consoleCommandInput" placeholder="Type a command..." autocomplete="off"
+              class="flex-1 bg-transparent text-white focus:outline-none font-mono text-xs placeholder:text-zinc-600">
+            <button type="submit" id="btnSendConsole" class="text-xs text-rose-400 hover:text-rose-300 font-bold px-2 py-1 transition font-mono uppercase">
+              Send
             </button>
           </form>
         </div>
