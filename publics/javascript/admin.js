@@ -403,7 +403,7 @@ function renderOrders() {
         <span class="text-zinc-200 font-medium block">${escapeHTML(ord.itemName)}</span>
         <span class="text-[10px] font-mono text-zinc-500 uppercase">${escapeHTML(ord.category)}</span>
       </td>
-      <td class="p-3.5 font-mono font-medium text-emerald-400">${escapeHTML(ord.price)}</td>
+      <td class="p-3.5 font-mono font-medium text-emerald-400">${formatRupiah(ord.price)}</td>
       <td class="p-3.5 text-center">
         <div class="inline-flex gap-1.5">
           <button onclick="viewImage('${escapeHTML(ord.proofUrl)}')" class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 px-2.5 py-1 rounded text-[11px] font-mono transition">
@@ -431,6 +431,13 @@ function renderOrders() {
       </td>
     </tr>
   `).join('');
+}
+
+function formatRupiah(val) {
+  if (val === undefined || val === null || val === '') return 'Rp 0';
+  const numStr = String(val).replace(/[^0-9]/g, '');
+  if (!numStr) return escapeHTML(val);
+  return 'Rp ' + Number(numStr).toLocaleString('id-ID');
 }
 
 function getStatusBadge(status) {
