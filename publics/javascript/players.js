@@ -223,6 +223,8 @@ async function fetchPlayerInventoryHUD(usernameOverride) {
   const errorMsgEl = document.getElementById('playerInvErrorMessage');
   const contentEl = document.getElementById('playerInvContent');
 
+  const localCacheKey = `aetheria_inv_cache_${username.toLowerCase()}`;
+
   if (statusEl) statusEl.innerText = `Menghubungkan ke server...`;
   if (loadingEl) loadingEl.classList.remove('hidden');
   if (errorEl) errorEl.classList.add('hidden');
@@ -238,19 +240,59 @@ async function fetchPlayerInventoryHUD(usernameOverride) {
     const json = await res.json().catch(() => null);
 
     if (res.ok && json && json.result === 'success' && Array.isArray(json.inventory)) {
+      // Simpan data inventori terbaru ke localStorage
+      localStorage.setItem(localCacheKey, JSON.stringify(json.inventory));
+
       renderPlayerHUDInventory(json.inventory);
-      if (statusEl) statusEl.innerHTML = `<span class="text-emerald-400 font-bold"><i class="fa-solid fa-circle text-[8px] mr-1"></i> Live Inventory (${json.inventory.length} item(s))</span>`;
+      if (json.isCached) {
+        if (statusEl) statusEl.innerHTML = `<span class="text-amber-400 font-bold"><i class="fa-solid fa-clock-rotate-left text-[10px] mr-1"></i> Data Terakhir (${json.inventory.length} item(s) - Offline)</span>`;
+      } else {
+        if (statusEl) statusEl.innerHTML = `<span class="text-emerald-400 font-bold"><i class="fa-solid fa-circle text-[8px] mr-1"></i> Live Inventory (${json.inventory.length} item(s))</span>`;
+      }
       if (loadingEl) loadingEl.classList.add('hidden');
       if (contentEl) contentEl.classList.remove('hidden');
-    } else {
-      const errorMsg = (json && json.message) || `Karakter "${username}" sedang offline atau data inventori tidak ditemukan. Masuk ke server in-game untuk melihat item.`;
-      if (statusEl) statusEl.innerText = `Status: Offline / Belum masuk server`;
-      if (errorMsgEl) errorMsgEl.innerText = errorMsg;
-      if (loadingEl) loadingEl.classList.add('hidden');
-      if (errorEl) errorEl.classList.remove('hidden');
+      return;
     }
+
+    // Jika server offline / 404, coba fallback dari localStorage
+    const savedLocalInv = localStorage.getItem(localCacheKey);
+    if (savedLocalInv) {
+      try {
+        const localInv = JSON.parse(savedLocalInv);
+        if (Array.isArray(localInv)) {
+          renderPlayerHUDInventory(localInv);
+          if (statusEl) statusEl.innerHTML = `<span class="text-amber-400 font-bold"><i class="fa-solid fa-clock-rotate-left text-[10px] mr-1"></i> Data Terakhir (${localInv.length} item(s) - Offline)</span>`;
+          if (loadingEl) loadingEl.classList.add('hidden');
+          if (contentEl) contentEl.classList.remove('hidden');
+          return;
+        }
+      } catch (e) {}
+    }
+
+    const errorMsg = (json && json.message) || `Karakter "${username}" sedang offline dan belum ada riwayat inventori tersimpan. Masuk ke server in-game untuk menampilkan item.`;
+    if (statusEl) statusEl.innerText = `Status: Offline / Belum ada riwayat`;
+    if (errorMsgEl) errorMsgEl.innerText = errorMsg;
+    if (loadingEl) loadingEl.classList.add('hidden');
+    if (errorEl) errorEl.classList.remove('hidden');
+
   } catch (err) {
     console.error("Error HUD Inventory:", err);
+
+    // Fallback ke localStorage saat error jaringan
+    const savedLocalInv = localStorage.getItem(localCacheKey);
+    if (savedLocalInv) {
+      try {
+        const localInv = JSON.parse(savedLocalInv);
+        if (Array.isArray(localInv)) {
+          renderPlayerHUDInventory(localInv);
+          if (statusEl) statusEl.innerHTML = `<span class="text-amber-400 font-bold"><i class="fa-solid fa-clock-rotate-left text-[10px] mr-1"></i> Data Terakhir (Offline)</span>`;
+          if (loadingEl) loadingEl.classList.add('hidden');
+          if (contentEl) contentEl.classList.remove('hidden');
+          return;
+        }
+      } catch (e) {}
+    }
+
     if (statusEl) statusEl.innerText = `Status: Gagal memuat data`;
     if (errorMsgEl) errorMsgEl.innerText = "Kesalahan jaringan saat mengambil item dari server.";
     if (loadingEl) loadingEl.classList.add('hidden');
