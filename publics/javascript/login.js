@@ -152,8 +152,8 @@ async function handleLoginSubmit(e) {
 
       if (isStaff) {
         // Staff Authentication
-        const authPayload = JSON.stringify({ username: data.username || username, rank: data.rank, token: Date.now() });
-        setCookie('aetheria_admin_token', btoa(authPayload), 1);
+        const staffToken = data.token || btoa(JSON.stringify({ username: data.username || username, rank: data.rank, time: Date.now() }));
+        setCookie('aetheria_admin_token', staffToken, 1);
         sessionStorage.setItem('aetheria_admin_auth', 'true');
 
         showToast(`Login Staff Berhasil (${data.rank})! Mengalihkan ke Dashboard Staff...`, "success");

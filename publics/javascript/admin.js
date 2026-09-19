@@ -180,9 +180,13 @@ async function sendConsoleCommand(e) {
 
 async function executeAdminCommand(command, successMessage) {
   try {
+    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
     const res = await fetch(`${WORKER_PROXY_URL}?action=admin_command`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Admin-Token': adminToken
+      },
       body: JSON.stringify({ command })
     });
 
@@ -398,9 +402,13 @@ async function updateStatus(id, newStatus, username, itemName) {
   if (!confirm(confirmMsg)) return;
 
   try {
+    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
     const res = await fetch(`${WORKER_PROXY_URL}?action=update_status`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Admin-Token': adminToken
+      },
       body: JSON.stringify({
         id: id,
         status: newStatus,

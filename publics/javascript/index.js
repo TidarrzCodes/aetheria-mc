@@ -132,8 +132,23 @@ function renderHeroRankBadge(rankName) {
   return `<span class="bg-slate-800 text-slate-400 border border-slate-700 px-1.5 py-0.5 rounded text-[9px] font-mono-code font-semibold">MEMBER</span>`;
 }
 
+function escapeHTML(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+let isFetchingPlayers = false;
+
 // FETCH LIVE ONLINE PLAYERS WITH TAB LIST BADGES
 async function fetchOnlinePlayers() {
+  if (isFetchingPlayers) return;
+  isFetchingPlayers = true;
+
   const dot = document.getElementById('server-status-dot');
   const countText = document.getElementById('player-count-text');
   const container = document.getElementById('player-list-container');
@@ -143,41 +158,46 @@ async function fetchOnlinePlayers() {
     const data = await response.json();
 
     if (data.online) {
-      dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
+      if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
       const onlineCount = data.players ? data.players.online : 0;
       const maxCount = data.players ? data.players.max : 0;
-      countText.innerText = `${onlineCount} / ${maxCount} Warriors Online`;
+      if (countText) countText.innerText = `${onlineCount} / ${maxCount} Warriors Online`;
 
-      if (data.players && data.players.list && data.players.list.length > 0) {
-        container.innerHTML = data.players.list.map(player => {
-          const playerName = typeof player === 'object' ? player.name : player;
-          const playerRank = typeof player === 'object' && player.group ? player.group : 'Member';
+      if (container) {
+        if (data.players && data.players.list && data.players.list.length > 0) {
+          container.innerHTML = data.players.list.map(player => {
+            const playerName = typeof player === 'object' ? player.name : player;
+            const playerRank = typeof player === 'object' && player.group ? player.group : 'Member';
+            const safeName = escapeHTML(playerName);
 
-          return `
-            <div class="flex items-center gap-2 bg-slate-900/90 border border-slate-800 hover:border-rose-500/50 px-3 py-1.5 rounded-xl transition shadow-md">
-              <img src="https://mc-heads.net/avatar/${playerName}/24" alt="${playerName}" class="w-5 h-5 rounded">
-              <span class="text-[11px] font-mono-code text-slate-200 font-semibold">${playerName}</span>
-              ${renderHeroRankBadge(playerRank)}
+            return `
+              <div class="flex items-center gap-2 bg-slate-900/90 border border-slate-800 hover:border-rose-500/50 px-3 py-1.5 rounded-xl transition shadow-md">
+                <img src="https://mc-heads.net/avatar/${safeName}/24" alt="${safeName}" class="w-5 h-5 rounded">
+                <span class="text-[11px] font-mono-code text-slate-200 font-semibold">${safeName}</span>
+                ${renderHeroRankBadge(playerRank)}
+              </div>
+            `;
+          }).join('');
+        } else {
+          container.innerHTML = `
+            <div class="text-[11px] sm:text-xs text-slate-400 font-mono-code flex items-center gap-2 py-1">
+              <i class="fa-solid fa-shield-halved text-slate-500"></i> Belum ada player/ksatria yang online saat ini.
             </div>
           `;
-        }).join('');
-      } else {
-        container.innerHTML = `
-          <div class="text-[11px] sm:text-xs text-slate-400 font-mono-code flex items-center gap-2 py-1">
-            <i class="fa-solid fa-shield-halved text-slate-500"></i> Belum ada player/ksatria yang online saat ini.
-          </div>
-        `;
+        }
       }
     } else {
-      dot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
-      countText.innerText = "Server Offline";
-      container.innerHTML = `<span class="text-xs text-red-400 font-mono-code">Server sedang offline / Maintenance.</span>`;
+      if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
+      if (countText) countText.innerText = "Server Offline";
+      if (container) container.innerHTML = `<span class="text-xs text-red-400 font-mono-code">Server sedang offline / Maintenance.</span>`;
     }
   } catch (err) {
     console.error("Gagal mengambil status server:", err);
-    dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
-    countText.innerText = "Status Tidak Tersedia";
-    container.innerHTML = `<span class="text-xs text-amber-400 font-mono-code">Gagal memuat list player online.</span>`;
+    if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
+    if (countText) countText.innerText = "Status Tidak Tersedia";
+    if (container) container.innerHTML = `<span class="text-xs text-amber-400 font-mono-code">Gagal memuat list player online.</span>`;
+  } finally {
+    isFetchingPlayers = false;
   }
 }
 
