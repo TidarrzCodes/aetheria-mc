@@ -453,6 +453,16 @@ async function updateStatus(id, newStatus, username, itemName) {
 
   if (!confirm(confirmMsg)) return;
 
+  // Simpan status lama untuk rollback jika error
+  const targetIndex = ordersData.findIndex(o => String(o.id) === String(id));
+  const oldStatus = targetIndex !== -1 ? ordersData[targetIndex].status : null;
+
+  // Optimistic UI Update: Langsung ubah status di tampilan lokal
+  if (targetIndex !== -1) {
+    ordersData[targetIndex].status = newStatus;
+    renderOrders();
+  }
+
   try {
     const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
     const res = await fetch(`${WORKER_PROXY_URL}?action=update_status`, {
@@ -475,10 +485,19 @@ async function updateStatus(id, newStatus, username, itemName) {
       showToast(`Status berhasil diperbarui ke ${newStatus}!`, "success");
       fetchOrders();
     } else {
+      // Rollback jika server return error
+      if (targetIndex !== -1 && oldStatus) {
+        ordersData[targetIndex].status = oldStatus;
+        renderOrders();
+      }
       showToast("Gagal memperbarui database: " + (json.message || "Error tidak diketahui"), "error");
     }
   } catch (err) {
     console.error(err);
+    if (targetIndex !== -1 && oldStatus) {
+      ordersData[targetIndex].status = oldStatus;
+      renderOrders();
+    }
     showToast("Kesalahan koneksi saat memperbarui status.", "error");
   }
 }
