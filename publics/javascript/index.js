@@ -586,6 +586,16 @@ const LEADERBOARD_DATA = {
     { rank: 6, username: 'SlayerZero', stat: 'Rp 75.000', title: 'Guild Founder' },
     { rank: 7, username: 'Nico_Blade', stat: 'Rp 50.000', title: 'Honorary Knight' },
     { rank: 8, username: 'Phantom_X', stat: 'Rp 25.000', title: 'VIP Supporter' }
+  ],
+  baltop: [
+    { rank: 1, username: 'Darrzz', stat: '5.450.000 Coins', title: 'Sultan Ekonomi' },
+    { rank: 2, username: 'AytidarG_', stat: '3.820.000 Coins', title: 'Banker Realm' },
+    { rank: 3, username: 'Radit_Dev', stat: '2.150.000 Coins', title: 'Merchant King' },
+    { rank: 4, username: 'EnderKnight99', stat: '1.400.000 Coins', title: 'Rich Tycoon' },
+    { rank: 5, username: 'Vortex_Hunter', stat: '950.000 Coins', title: 'Gold Hoarder' },
+    { rank: 6, username: 'SlayerZero', stat: '620.000 Coins', title: 'Coin Collector' },
+    { rank: 7, username: 'Nico_Blade', stat: '450.000 Coins', title: 'Trader' },
+    { rank: 8, username: 'Phantom_X', stat: '300.000 Coins', title: 'Saver' }
   ]
 };
 
@@ -593,6 +603,7 @@ let currentLbCategory = 'kills';
 const skinViewers = {};
 
 function initLeaderboard() {
+  fetchCustomLeaderboardData();
   renderLeaderboard('kills');
 
   let resizeTimer;
@@ -602,6 +613,23 @@ function initLeaderboard() {
       if (currentLbCategory) renderLeaderboard(currentLbCategory);
     }, 250);
   });
+}
+
+async function fetchCustomLeaderboardData() {
+  try {
+    const res = await fetch(`${WORKER_PROXY_URL}?action=get_leaderboard`);
+    const json = await res.json().catch(() => null);
+    if (res.ok && json && json.result === 'success' && json.data && typeof json.data === 'object') {
+      ['kills', 'playtime', 'donators', 'baltop'].forEach(cat => {
+        if (Array.isArray(json.data[cat]) && json.data[cat].length > 0) {
+          LEADERBOARD_DATA[cat] = json.data[cat];
+        }
+      });
+      renderLeaderboard(currentLbCategory);
+    }
+  } catch (e) {
+    // Fallback to static leaderboard data
+  }
 }
 
 function renderSkinViewer(canvasId, fallbackId, imgId, username) {
@@ -662,7 +690,7 @@ function switchLeaderboardCategory(cat) {
   playUiSound(650, 'square');
   currentLbCategory = cat;
 
-  ['kills', 'playtime', 'donators'].forEach(c => {
+  ['kills', 'playtime', 'donators', 'baltop'].forEach(c => {
     const tabBtn = document.getElementById(`lb-tab-${c}`);
     if (tabBtn) {
       if (c === cat) {
@@ -684,6 +712,7 @@ function renderLeaderboard(cat) {
     if (cat === 'kills') tableTitle.innerText = "Total Kills";
     else if (cat === 'playtime') tableTitle.innerText = "Jam Bermain";
     else if (cat === 'donators') tableTitle.innerText = "Total Donasi";
+    else if (cat === 'baltop') tableTitle.innerText = "Total Uang (Coins)";
   }
 
   const r1 = data[0] || { username: 'None', stat: '-', title: '-' };

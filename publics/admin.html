@@ -72,6 +72,11 @@
               <span id="nav-player-badge"
                 class="bg-zinc-800 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded font-bold">0</span>
             </button>
+            <button onclick="switchMainTab('etc')" id="main-tab-etc"
+              class="px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center gap-1.5 text-xs">
+              <i class="fa-solid fa-sliders text-[11px]"></i>
+              <span>ETC</span>
+            </button>
           </nav>
         </div>
 
@@ -270,6 +275,213 @@
             </table>
           </div>
         </div>
+      </section>
+
+      <!-- VIEW ETC SECTION (PODIUM EDITOR & WEBCHAT LOGS) -->
+      <section id="view-etc" class="space-y-6 hidden">
+        
+        <!-- SECTION 1: PODIUM LEADERBOARD EDITOR -->
+        <div class="bg-[#121215] border border-zinc-800/80 rounded-xl p-4 sm:p-5 shadow-xl space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-3">
+            <div>
+              <h2 class="text-xs sm:text-sm font-bold text-white font-mono uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-trophy text-amber-400"></i> Manajer Podium & Hall of Fame Leaderboard
+              </h2>
+              <p class="text-[11px] text-zinc-400 font-mono mt-0.5">Edit peringkat 3D Podium & Tabel Ranks di Landing Page Web</p>
+            </div>
+            
+            <!-- Category Selector Tabs -->
+            <div class="flex items-center gap-1 bg-[#09090b] p-1 rounded-lg border border-zinc-800 font-mono text-xs overflow-x-auto custom-scrollbar">
+              <button onclick="switchPodiumCategory('kills')" id="podium-cat-kills" class="px-3 py-1.5 rounded-md bg-rose-600 text-white font-semibold transition shrink-0">
+                <i class="fa-solid fa-skull text-[10px]"></i> Kills
+              </button>
+              <button onclick="switchPodiumCategory('playtime')" id="podium-cat-playtime" class="px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition shrink-0">
+                <i class="fa-solid fa-clock text-[10px]"></i> Playtime
+              </button>
+              <button onclick="switchPodiumCategory('donators')" id="podium-cat-donators" class="px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition shrink-0">
+                <i class="fa-solid fa-gem text-[10px]"></i> Donators
+              </button>
+              <button onclick="switchPodiumCategory('baltop')" id="podium-cat-baltop" class="px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition shrink-0">
+                <i class="fa-solid fa-coins text-[10px]"></i> Top Baltop
+              </button>
+            </div>
+          </div>
+
+          <!-- Podium Form Fields -->
+          <form onsubmit="savePodiumData(event)" class="space-y-4">
+            
+            <!-- TOP 3 PODIUM CARDS -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <!-- RANK 1 -->
+              <div class="bg-[#09090b] border border-amber-500/30 rounded-xl p-3.5 space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-mono font-bold text-amber-400 flex items-center gap-1.5">
+                    <i class="fa-solid fa-crown"></i> Rank 1 (Juara Utama)
+                  </span>
+                  <span class="text-[10px] font-mono text-zinc-500">Center Podium</span>
+                </div>
+                <div>
+                  <label class="text-[10px] font-mono text-zinc-400 block mb-1">Minecraft Username</label>
+                  <input type="text" id="podium-r1-username" required placeholder="AytidarG_" class="w-full bg-[#121215] border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-amber-500 focus:outline-none font-mono">
+                </div>
+                <div>
+                  <label class="text-[10px] font-mono text-zinc-400 block mb-1">Gelar / Title</label>
+                  <input type="text" id="podium-r1-title" required placeholder="Supreme Warlord" class="w-full bg-[#121215] border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-amber-500 focus:outline-none font-mono">
+                </div>
+                <div>
+                  <label class="text-[10px] font-mono text-zinc-400 block mb-1">Stat Value</label>
+                  <input type="text" id="podium-r1-stat" required placeholder="154 Kills / 5.450.000 Coins" class="w-full bg-[#121215] border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-amber-500 focus:outline-none font-mono">
+                </div>
+              </div>
+
+              <!-- RANK 2 -->
+              <div class="bg-[#09090b] border border-slate-400/30 rounded-xl p-3.5 space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-mono font-bold text-slate-300 flex items-center gap-1.5">
+                    <i class="fa-solid fa-medal"></i> Rank 2 (Runner Up)
+                  </span>
+                  <span class="text-[10px] font-mono text-zinc-500">Left Podium</span>
+                </div>
+                <div>
+                  <label class="text-[10px] font-mono text-zinc-400 block mb-1">Minecraft Username</label>
+                  <input type="text" id="podium-r2-username" required placeholder="Darrzz" class="w-full bg-[#121215] border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-slate-400 focus:outline-none font-mono">
+                </div>
+                <div>
+                  <label class="text-[10px] font-mono text-zinc-400 block mb-1">Gelar / Title</label>
+                  <input type="text" id="podium-r2-title" required placeholder="Shadow Blade" class="w-full bg-[#121215] border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-slate-400 focus:outline-none font-mono">
+                </div>
+                <div>
+                  <label class="text-[10px] font-mono text-zinc-400 block mb-1">Stat Value</label>
+                  <input type="text" id="podium-r2-stat" required placeholder="112 Kills" class="w-full bg-[#121215] border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-slate-400 focus:outline-none font-mono">
+                </div>
+              </div>
+
+              <!-- RANK 3 -->
+              <div class="bg-[#09090b] border border-amber-700/30 rounded-xl p-3.5 space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-mono font-bold text-amber-600 flex items-center gap-1.5">
+                    <i class="fa-solid fa-award"></i> Rank 3 (Juara 3)
+                  </span>
+                  <span class="text-[10px] font-mono text-zinc-500">Right Podium</span>
+                </div>
+                <div>
+                  <label class="text-[10px] font-mono text-zinc-400 block mb-1">Minecraft Username</label>
+                  <input type="text" id="podium-r3-username" required placeholder="Radit_Dev" class="w-full bg-[#121215] border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-amber-700 focus:outline-none font-mono">
+                </div>
+                <div>
+                  <label class="text-[10px] font-mono text-zinc-400 block mb-1">Gelar / Title</label>
+                  <input type="text" id="podium-r3-title" required placeholder="Dragon Slayer" class="w-full bg-[#121215] border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-amber-700 focus:outline-none font-mono">
+                </div>
+                <div>
+                  <label class="text-[10px] font-mono text-zinc-400 block mb-1">Stat Value</label>
+                  <input type="text" id="podium-r3-stat" required placeholder="87 Kills" class="w-full bg-[#121215] border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-amber-700 focus:outline-none font-mono">
+                </div>
+              </div>
+            </div>
+
+            <!-- RANKS 4 - 8 LIST EDITOR TABLE -->
+            <div class="bg-[#09090b] border border-zinc-800 rounded-xl p-3 overflow-x-auto custom-scrollbar space-y-2">
+              <h3 class="text-xs font-mono font-semibold text-zinc-300 uppercase tracking-wider">Peringkat 4 Sampai 8</h3>
+              <table class="w-full text-left text-xs min-w-[500px]">
+                <thead class="bg-[#121215] text-zinc-400 font-mono text-[10px] uppercase border-b border-zinc-800">
+                  <tr>
+                    <th class="p-2 w-16">Rank</th>
+                    <th class="p-2">Username</th>
+                    <th class="p-2">Title</th>
+                    <th class="p-2">Stat Value</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-800/60 font-mono text-xs text-zinc-300">
+                  <!-- Rank 4 -->
+                  <tr>
+                    <td class="p-2 text-zinc-500 font-bold">#4</td>
+                    <td class="p-2"><input type="text" id="podium-r4-username" required class="w-full bg-[#121215] border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:outline-none"></td>
+                    <td class="p-2"><input type="text" id="podium-r4-title" required class="w-full bg-[#121215] border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:outline-none"></td>
+                    <td class="p-2"><input type="text" id="podium-r4-stat" required class="w-full bg-[#121215] border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:outline-none"></td>
+                  </tr>
+                  <!-- Rank 5 -->
+                  <tr>
+                    <td class="p-2 text-zinc-500 font-bold">#5</td>
+                    <td class="p-2"><input type="text" id="podium-r5-username" required class="w-full bg-[#121215] border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:outline-none"></td>
+                    <td class="p-2"><input type="text" id="podium-r5-title" required class="w-full bg-[#121215] border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:outline-none"></td>
+                    <td class="p-2"><input type="text" id="podium-r5-stat" required class="w-full bg-[#121215] border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:outline-none"></td>
+                  </tr>
+                  <!-- Rank 6 -->
+                  <tr>
+                    <td class="p-2 text-zinc-500 font-bold">#6</td>
+                    <td class="p-2"><input type="text" id="podium-r6-username" required class="w-full bg-[#121215] border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:outline-none"></td>
+                    <td class="p-2"><input type="text" id="podium-r6-title" required class="w-full bg-[#121215] border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:outline-none"></td>
+                    <td class="p-2"><input type="text" id="podium-r6-stat" required class="w-full bg-[#121215] border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:outline-none"></td>
+                  </tr>
+                  <!-- Rank 7 -->
+                  <tr>
+                    <td class="p-2 text-zinc-500 font-bold">#7</td>
+                    <td class="p-2"><input type="text" id="podium-r7-username" required class="w-full bg-[#121215] border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:outline-none"></td>
+                    <td class="p-2"><input type="text" id="podium-r7-title" required class="w-full bg-[#121215] border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:outline-none"></td>
+                    <td class="p-2"><input type="text" id="podium-r7-stat" required class="w-full bg-[#121215] border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:outline-none"></td>
+                  </tr>
+                  <!-- Rank 8 -->
+                  <tr>
+                    <td class="p-2 text-zinc-500 font-bold">#8</td>
+                    <td class="p-2"><input type="text" id="podium-r8-username" required class="w-full bg-[#121215] border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:outline-none"></td>
+                    <td class="p-2"><input type="text" id="podium-r8-title" required class="w-full bg-[#121215] border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:outline-none"></td>
+                    <td class="p-2"><input type="text" id="podium-r8-stat" required class="w-full bg-[#121215] border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:outline-none"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-1">
+              <button type="submit" id="btnSavePodium" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center gap-2 shadow-lg shadow-amber-900/30">
+                <i class="fa-solid fa-floppy-disk"></i> Simpan & Update Podium
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- SECTION 2: LIVE WEBCHAT LOGS -->
+        <div class="bg-[#121215] border border-zinc-800/80 rounded-xl p-4 sm:p-5 shadow-xl space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-3">
+            <div>
+              <h2 class="text-xs sm:text-sm font-bold text-white font-mono uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-comments text-cyan-400"></i> Live WebChat Log History
+              </h2>
+              <p class="text-[11px] text-zinc-400 font-mono mt-0.5">Histori percakapan pemain dari WebChat ke server Minecraft</p>
+            </div>
+            
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <div class="relative flex-1 sm:w-64">
+                <input type="text" id="webchatSearchInput" oninput="filterWebChatLogs()" placeholder="Cari username, email, pesan..." class="w-full bg-[#09090b] border border-zinc-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white focus:border-cyan-500 focus:outline-none font-mono">
+                <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-zinc-500 text-[11px]"></i>
+              </div>
+              <button onclick="fetchWebChatLogs()" title="Refresh WebChat Logs" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 p-2 rounded-lg text-xs transition shrink-0">
+                <i class="fa-solid fa-rotate-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- WebChat Logs Table -->
+          <div class="bg-[#09090b] border border-zinc-800 rounded-xl overflow-hidden shadow-inner">
+            <div class="overflow-x-auto custom-scrollbar max-h-96">
+              <table class="w-full text-left text-xs min-w-[650px]">
+                <thead class="bg-[#18181b] text-zinc-400 font-mono text-[10px] uppercase border-b border-zinc-800 sticky top-0 z-10">
+                  <tr>
+                    <th class="p-3 w-36">Waktu</th>
+                    <th class="p-3 w-40">Username</th>
+                    <th class="p-3 w-52">Email</th>
+                    <th class="p-3">Histori Pesan</th>
+                  </tr>
+                </thead>
+                <tbody id="webchat-table-list" class="divide-y divide-zinc-800/60 font-mono text-zinc-300">
+                  <tr>
+                    <td colspan="4" class="text-center p-8 text-zinc-500">Memuat histori WebChat...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       </section>
     </main>
 

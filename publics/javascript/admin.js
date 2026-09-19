@@ -122,31 +122,44 @@ function switchMainTab(tabName) {
   currentMainTab = tabName;
   const viewOrders = document.getElementById('view-orders');
   const viewPlayers = document.getElementById('view-players');
+  const viewEtc = document.getElementById('view-etc');
   const btnOrders = document.getElementById('main-tab-orders');
   const btnPlayers = document.getElementById('main-tab-players');
+  const btnEtc = document.getElementById('main-tab-etc');
+
+  if (viewOrders) viewOrders.classList.add('hidden');
+  if (viewPlayers) viewPlayers.classList.add('hidden');
+  if (viewEtc) viewEtc.classList.add('hidden');
+
+  if (btnOrders) btnOrders.className = "px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center gap-1.5 text-xs";
+  if (btnPlayers) btnPlayers.className = "px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center gap-1.5 text-xs";
+  if (btnEtc) btnEtc.className = "px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center gap-1.5 text-xs";
 
   if (tabName === 'orders') {
-    viewOrders.classList.remove('hidden');
-    viewPlayers.classList.add('hidden');
-    btnOrders.className = "px-3 py-1.5 rounded-md bg-zinc-800 text-white font-medium transition flex items-center gap-2";
-    btnPlayers.className = "px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition flex items-center gap-2";
+    if (viewOrders) viewOrders.classList.remove('hidden');
+    if (btnOrders) btnOrders.className = "px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition flex items-center gap-1.5 text-xs";
     fetchOrders();
-  } else {
-    viewOrders.classList.add('hidden');
-    viewPlayers.classList.remove('hidden');
-    btnPlayers.className = "px-3 py-1.5 rounded-md bg-zinc-800 text-white font-medium transition flex items-center gap-2";
-    btnOrders.className = "px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition flex items-center gap-2";
+  } else if (tabName === 'players') {
+    if (viewPlayers) viewPlayers.classList.remove('hidden');
+    if (btnPlayers) btnPlayers.className = "px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition flex items-center gap-1.5 text-xs";
     fetchOnlinePlayers();
     fetchRealtimeConsoleLogs();
+  } else if (tabName === 'etc') {
+    if (viewEtc) viewEtc.classList.remove('hidden');
+    if (btnEtc) btnEtc.className = "px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition flex items-center gap-1.5 text-xs";
+    fetchWebChatLogs();
+    fetchPodiumLeaderboard();
   }
 }
 
 function syncCurrentTab() {
   if (currentMainTab === 'orders') {
     fetchOrders();
-  } else {
+  } else if (currentMainTab === 'players') {
     fetchOnlinePlayers();
     fetchRealtimeConsoleLogs();
+  } else if (currentMainTab === 'etc') {
+    fetchWebChatLogs();
   }
 }
 
@@ -1036,4 +1049,214 @@ function closeImageModal() {
   if (modalIframe) modalIframe.src = '';
   if (modalImg) modalImg.src = '';
   if (modal) modal.classList.add('hidden');
+}
+
+// ==========================================
+// ETC TAB: WEBCHAT LOGS & PODIUM LEADERBOARD
+// ==========================================
+let allWebChatLogs = [];
+let currentPodiumCategory = 'kills';
+let podiumDataStore = {
+  kills: [
+    { rank: 1, username: 'AytidarG_', stat: '154 Kills', title: 'Supreme Warlord' },
+    { rank: 2, username: 'Darrzz', stat: '112 Kills', title: 'Shadow Blade' },
+    { rank: 3, username: 'Radit_Dev', stat: '87 Kills', title: 'Dragon Slayer' },
+    { rank: 4, username: 'Vortex_Hunter', stat: '64 Kills', title: 'Vanguard' },
+    { rank: 5, username: 'EnderKnight99', stat: '51 Kills', title: 'Berserker' },
+    { rank: 6, username: 'Nico_Blade', stat: '43 Kills', title: 'Gladiator' },
+    { rank: 7, username: 'SlayerZero', stat: '38 Kills', title: 'Assassin' },
+    { rank: 8, username: 'Phantom_X', stat: '29 Kills', title: 'Executioner' }
+  ],
+  playtime: [
+    { rank: 1, username: 'Darrzz', stat: '342 Jam', title: 'Veteran Realm' },
+    { rank: 2, username: 'AytidarG_', stat: '285 Jam', title: 'Sentinel Guard' },
+    { rank: 3, username: 'Radit_Dev', stat: '210 Jam', title: 'Ancient Wanderer' },
+    { rank: 4, username: 'CraftMaster_ID', stat: '176 Jam', title: 'Guild Keeper' },
+    { rank: 5, username: 'DragonRider', stat: '145 Jam', title: 'Dragon Tamer' },
+    { rank: 6, username: 'Shadow_Walker', stat: '128 Jam', title: 'Explorer' },
+    { rank: 7, username: 'MinerFortyNine', stat: '98 Jam', title: 'Deep Miner' },
+    { rank: 8, username: 'Aether_Hero', stat: '74 Jam', title: 'Adventurer' }
+  ],
+  donators: [
+    { rank: 1, username: 'Darrzz', stat: 'Rp 450.000', title: 'Sultan Realm' },
+    { rank: 2, username: 'AytidarG_', stat: 'Rp 325.000', title: 'Royal Patron' },
+    { rank: 3, username: 'Radit_Dev', stat: 'Rp 200.000', title: 'Crown Sponsor' },
+    { rank: 4, username: 'EnderKnight99', stat: 'Rp 150.000', title: 'Mythic Supporter' },
+    { rank: 5, username: 'Vortex_Hunter', stat: 'Rp 100.000', title: 'Dragon Benefactor' },
+    { rank: 6, username: 'SlayerZero', stat: 'Rp 75.000', title: 'Guild Founder' },
+    { rank: 7, username: 'Nico_Blade', stat: 'Rp 50.000', title: 'Honorary Knight' },
+    { rank: 8, username: 'Phantom_X', stat: 'Rp 25.000', title: 'VIP Supporter' }
+  ],
+  baltop: [
+    { rank: 1, username: 'Darrzz', stat: '5.450.000 Coins', title: 'Sultan Ekonomi' },
+    { rank: 2, username: 'AytidarG_', stat: '3.820.000 Coins', title: 'Banker Realm' },
+    { rank: 3, username: 'Radit_Dev', stat: '2.150.000 Coins', title: 'Merchant King' },
+    { rank: 4, username: 'EnderKnight99', stat: '1.400.000 Coins', title: 'Rich Tycoon' },
+    { rank: 5, username: 'Vortex_Hunter', stat: '950.000 Coins', title: 'Gold Hoarder' },
+    { rank: 6, username: 'SlayerZero', stat: '620.000 Coins', title: 'Coin Collector' },
+    { rank: 7, username: 'Nico_Blade', stat: '450.000 Coins', title: 'Trader' },
+    { rank: 8, username: 'Phantom_X', stat: '300.000 Coins', title: 'Saver' }
+  ]
+};
+
+async function fetchWebChatLogs() {
+  const tableBody = document.getElementById('webchat-table-list');
+  try {
+    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
+    const res = await fetch(`${WORKER_PROXY_URL}?action=get_webchat_logs`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Token': adminToken
+      }
+    });
+
+    const json = await res.json().catch(() => null);
+    if (res.ok && json && json.result === 'success' && Array.isArray(json.logs)) {
+      allWebChatLogs = json.logs;
+      renderWebChatLogs(allWebChatLogs);
+    } else {
+      if (tableBody) tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-6 text-zinc-500">Belum ada histori WebChat tersimpan.</td></tr>`;
+    }
+  } catch (err) {
+    console.error("Gagal mengambil WebChat logs:", err);
+    if (tableBody) tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-6 text-rose-400">Kesalahan koneksi saat mengambil data WebChat.</td></tr>`;
+  }
+}
+
+function renderWebChatLogs(logs) {
+  const tableBody = document.getElementById('webchat-table-list');
+  if (!tableBody) return;
+
+  if (!Array.isArray(logs) || logs.length === 0) {
+    tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-6 text-zinc-500">Tidak ada pesan WebChat yang cocok.</td></tr>`;
+    return;
+  }
+
+  tableBody.innerHTML = logs.map(item => {
+    const timeStr = item.timestamp ? new Date(item.timestamp).toLocaleString('id-ID') : '-';
+    const safeUser = escapeHTML(item.username || 'Guest');
+    const safeEmail = escapeHTML(item.email || '-');
+    const safeMsg = escapeHTML(item.message || '');
+
+    return `
+      <tr class="hover:bg-zinc-800/40 transition">
+        <td class="p-3 text-zinc-500 text-[11px] font-mono whitespace-nowrap">${timeStr}</td>
+        <td class="p-3 font-semibold text-cyan-400 flex items-center gap-2">
+          <img src="https://mc-heads.net/avatar/${encodeURIComponent(item.username || 'steve')}/20" alt="avatar" class="w-4 h-4 rounded">
+          <span>${safeUser}</span>
+        </td>
+        <td class="p-3 text-zinc-400 text-xs font-mono">${safeEmail}</td>
+        <td class="p-3 text-zinc-200 font-mono text-xs break-words">${safeMsg}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterWebChatLogs() {
+  const query = (document.getElementById('webchatSearchInput')?.value || '').toLowerCase();
+  if (!query) {
+    renderWebChatLogs(allWebChatLogs);
+    return;
+  }
+
+  const filtered = allWebChatLogs.filter(log => 
+    (log.username || '').toLowerCase().includes(query) ||
+    (log.email || '').toLowerCase().includes(query) ||
+    (log.message || '').toLowerCase().includes(query)
+  );
+
+  renderWebChatLogs(filtered);
+}
+
+async function fetchPodiumLeaderboard() {
+  try {
+    const res = await fetch(`${WORKER_PROXY_URL}?action=get_leaderboard`);
+    const json = await res.json().catch(() => null);
+    if (res.ok && json && json.result === 'success' && json.leaderboard) {
+      podiumDataStore = json.leaderboard;
+    }
+  } catch (err) {
+    console.error("Gagal mengambil leaderboard backend:", err);
+  }
+  populatePodiumForm(currentPodiumCategory);
+}
+
+function switchPodiumCategory(category) {
+  currentPodiumCategory = category;
+  ['kills', 'playtime', 'donators', 'baltop'].forEach(cat => {
+    const btn = document.getElementById(`podium-cat-${cat}`);
+    if (btn) {
+      if (cat === category) {
+        btn.className = cat === 'kills' ? "px-3 py-1.5 rounded-md bg-rose-600 text-white font-semibold transition shrink-0" :
+                        cat === 'playtime' ? "px-3 py-1.5 rounded-md bg-indigo-600 text-white font-semibold transition shrink-0" :
+                        cat === 'donators' ? "px-3 py-1.5 rounded-md bg-purple-600 text-white font-semibold transition shrink-0" :
+                        "px-3 py-1.5 rounded-md bg-amber-600 text-white font-semibold transition shrink-0";
+      } else {
+        btn.className = "px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition shrink-0";
+      }
+    }
+  });
+
+  populatePodiumForm(category);
+}
+
+function populatePodiumForm(category) {
+  const list = podiumDataStore[category] || [];
+  for (let r = 1; r <= 8; r++) {
+    const item = list.find(x => Number(x.rank) === r) || { username: '', title: '', stat: '' };
+    const elUser = document.getElementById(`podium-r${r}-username`);
+    const elTitle = document.getElementById(`podium-r${r}-title`);
+    const elStat = document.getElementById(`podium-r${r}-stat`);
+
+    if (elUser) elUser.value = item.username || '';
+    if (elTitle) elTitle.value = item.title || '';
+    if (elStat) elStat.value = item.stat || '';
+  }
+}
+
+async function savePodiumData(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnSavePodium');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
+  }
+
+  const newCategoryData = [];
+  for (let r = 1; r <= 8; r++) {
+    const username = document.getElementById(`podium-r${r}-username`)?.value.trim() || '';
+    const title = document.getElementById(`podium-r${r}-title`)?.value.trim() || '';
+    const stat = document.getElementById(`podium-r${r}-stat`)?.value.trim() || '';
+    newCategoryData.push({ rank: r, username, title, stat });
+  }
+
+  podiumDataStore[currentPodiumCategory] = newCategoryData;
+
+  try {
+    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
+    const res = await fetch(`${WORKER_PROXY_URL}?action=update_leaderboard`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Token': adminToken
+      },
+      body: JSON.stringify({ leaderboard: podiumDataStore })
+    });
+
+    const json = await res.json().catch(() => null);
+    if (res.ok && json && json.result === 'success') {
+      showToast(`Podium leaderboard (${currentPodiumCategory.toUpperCase()}) berhasil diperbarui & disimpan!`, "success");
+    } else {
+      showToast("Gagal menyimpan podium: " + (json?.message || "Error server"), "error");
+    }
+  } catch (err) {
+    console.error(err);
+    showToast("Kesalahan koneksi saat menyimpan podium leaderboard.", "error");
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan & Update Podium`;
+    }
+  }
 }
