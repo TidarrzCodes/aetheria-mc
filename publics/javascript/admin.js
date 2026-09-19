@@ -98,7 +98,10 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeImageModal();
+  if (e.key === 'Escape') {
+    closeImageModal();
+    closeInvseeModal();
+  }
 });
 
 function unlockDashboard() {
@@ -165,8 +168,149 @@ async function banPlayer(username) {
 }
 
 async function invseePlayer(username) {
-  const command = `invsee ${username}`;
-  await executeAdminCommand(command, `Command "/invsee ${username}" dikirim ke konsol.`);
+  if (!username) return;
+
+  const modal = document.getElementById('invseeModal');
+  const userEl = document.getElementById('invseeUsername');
+  const headEl = document.getElementById('invseePlayerHead');
+  const loadingEl = document.getElementById('invseeLoading');
+  const errorEl = document.getElementById('invseeError');
+  const errorMsgEl = document.getElementById('invseeErrorMessage');
+  const contentEl = document.getElementById('invseeContent');
+
+  if (userEl) userEl.innerText = username;
+  if (headEl) headEl.src = `https://mc-heads.net/avatar/${encodeURIComponent(username)}/28`;
+
+  if (modal) modal.classList.remove('hidden');
+  if (loadingEl) loadingEl.classList.remove('hidden');
+  if (errorEl) errorEl.classList.add('hidden');
+  if (contentEl) contentEl.classList.add('hidden');
+
+  try {
+    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
+    const res = await fetch(`${WORKER_PROXY_URL}?action=get_inventory`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Admin-Token': adminToken
+      },
+      body: JSON.stringify({ username })
+    });
+
+    const json = await res.json().catch(() => null);
+
+    if (res.ok && json && json.result === 'success' && Array.isArray(json.inventory)) {
+      renderPlayerInventory(json.inventory);
+      if (loadingEl) loadingEl.classList.add('hidden');
+      if (contentEl) contentEl.classList.remove('hidden');
+    } else {
+      const errorMsg = (json && json.message) || `Player "${username}" offline atau data inventori tidak ditemukan.`;
+      if (errorMsgEl) errorMsgEl.innerText = errorMsg;
+      if (loadingEl) loadingEl.classList.add('hidden');
+      if (errorEl) errorEl.classList.remove('hidden');
+    }
+  } catch (err) {
+    console.error("Invsee fetch error:", err);
+    if (errorMsgEl) errorMsgEl.innerText = "Kesalahan koneksi saat mengambil inventori pemain.";
+    if (loadingEl) loadingEl.classList.add('hidden');
+    if (errorEl) errorEl.classList.remove('hidden');
+  }
+}
+
+function closeInvseeModal() {
+  const modal = document.getElementById('invseeModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function renderPlayerInventory(inventoryList) {
+  const itemMap = {};
+  if (Array.isArray(inventoryList)) {
+    inventoryList.forEach(item => {
+      if (item && typeof item.slot === 'number') {
+        itemMap[item.slot] = item;
+      }
+    });
+  }
+
+  // 1. Armor Slots (103: Helmet, 102: Chestplate, 101: Leggings, 100: Boots) & Offhand (-106)
+  const armorSlots = [
+    { slot: 103, elId: 'invsee-slot-103', placeholder: '<i class="fa-solid fa-helmet-safety text-zinc-700 text-xs"></i>', label: 'Helmet' },
+    { slot: 102, elId: 'invsee-slot-102', placeholder: '<i class="fa-solid fa-shirt text-zinc-700 text-xs"></i>', label: 'Chestplate' },
+    { slot: 101, elId: 'invsee-slot-101', placeholder: '<i class="fa-solid fa-user text-zinc-700 text-xs"></i>', label: 'Leggings' },
+    { slot: 100, elId: 'invsee-slot-100', placeholder: '<i class="fa-solid fa-socks text-zinc-700 text-xs"></i>', label: 'Boots' },
+    { slot: -106, elId: 'invsee-slot--106', placeholder: '<i class="fa-solid fa-shield text-zinc-700 text-xs"></i>', label: 'Offhand' }
+  ];
+
+  armorSlots.forEach(cfg => {
+    const el = document.getElementById(cfg.elId);
+    if (el) {
+      const item = itemMap[cfg.slot];
+      el.innerHTML = renderSlotInnerHtml(cfg.slot, item, cfg.placeholder, cfg.label);
+    }
+  });
+
+  // 2. Main Inventory Grid (Slots 9 to 35)
+  const mainGrid = document.getElementById('mainInventoryGrid');
+  if (mainGrid) {
+    let mainHtml = '';
+    for (let s = 9; s <= 35; s++) {
+      const item = itemMap[s];
+      mainHtml += renderSlotInnerHtml(s, item);
+    }
+    mainGrid.innerHTML = mainHtml;
+  }
+
+  // 3. Hotbar Grid (Slots 0 to 8)
+  const hotbarGrid = document.getElementById('hotbarGrid');
+  if (hotbarGrid) {
+    let hotbarHtml = '';
+    for (let s = 0; s <= 8; s++) {
+      const item = itemMap[s];
+      hotbarHtml += renderSlotInnerHtml(s, item);
+    }
+    hotbarGrid.innerHTML = hotbarHtml;
+  }
+}
+
+function renderSlotInnerHtml(slotNum, item, placeholderIcon = '', defaultLabel = '') {
+  if (item && item.id) {
+    const itemName = formatItemName(item.id);
+    const cleanId = item.id.toLowerCase().replace(/^minecraft:/, '');
+    const iconUrl = `https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.1/items/${cleanId}.png`;
+    const countBadge = item.count > 1 ? `<span class="mc-slot-count">${item.count}</span>` : '';
+
+    return `
+      <div class="mc-slot group relative" title="${escapeHTML(itemName)} (${item.count}) [Slot ${slotNum}]">
+        <img src="${iconUrl}" 
+             alt="${escapeHTML(itemName)}" 
+             class="mc-slot-item-img"
+             onerror="this.onerror=null; this.src='https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/item/${escapeHTML(cleanId)}.png';">
+        ${countBadge}
+        <div class="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 hidden group-hover:flex flex-col items-center pointer-events-none z-30">
+          <div class="bg-zinc-950/95 border border-zinc-700 text-zinc-100 text-[10px] font-mono py-1 px-2 rounded shadow-2xl whitespace-nowrap">
+            <div class="font-bold text-rose-400">${escapeHTML(itemName)}</div>
+            <div class="text-[9px] text-zinc-400">Jumlah: ${item.count} &bull; Slot: ${slotNum}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  const titleText = defaultLabel ? `${defaultLabel} (Kosong)` : `Kosong [Slot ${slotNum}]`;
+  return `
+    <div class="mc-slot mc-slot-empty" title="${escapeHTML(titleText)}">
+      ${placeholderIcon}
+    </div>
+  `;
+}
+
+function formatItemName(id) {
+  if (!id) return '';
+  const clean = id.replace(/^minecraft:/, '');
+  return clean
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
 }
 
 async function sendConsoleCommand(e) {

@@ -255,6 +255,105 @@
     </footer>
   </div>
 
+  <!-- INVSEE INVENTORY MODAL -->
+  <div id="invseeModal"
+    class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center hidden p-3 sm:p-4"
+    onclick="closeInvseeModal()">
+    <div class="max-w-xl w-full relative bg-[#121215] border border-zinc-800 rounded-xl p-4 sm:p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar"
+      onclick="event.stopPropagation()">
+      
+      <!-- MODAL HEADER -->
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <div class="flex items-center gap-3">
+          <img id="invseePlayerHead" src="https://mc-heads.net/avatar/steve/28" alt="Player Head" class="w-8 h-8 rounded border border-zinc-700">
+          <div>
+            <h3 class="text-sm font-mono font-bold text-zinc-100 flex items-center gap-2">
+              <i class="fa-solid fa-box-open text-rose-500"></i> Inventori: <span id="invseeUsername" class="text-rose-400">Username</span>
+            </h3>
+            <p class="text-[11px] font-mono text-zinc-500">Inspeksi item in-game pemain</p>
+          </div>
+        </div>
+        <button onclick="closeInvseeModal()" class="text-zinc-400 hover:text-white text-xs font-mono bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 px-3 py-1.5 rounded-lg transition flex items-center gap-1">
+          <i class="fa-solid fa-xmark"></i> Tutup
+        </button>
+      </div>
+
+      <!-- LOADING STATE -->
+      <div id="invseeLoading" class="py-12 text-center text-xs font-mono text-zinc-400 flex flex-col items-center justify-center gap-2">
+        <i class="fa-solid fa-spinner fa-spin text-rose-500 text-2xl"></i>
+        <span>Memuat data inventori dari server Minecraft...</span>
+      </div>
+
+      <!-- ERROR STATE -->
+      <div id="invseeError" class="hidden py-8 text-center text-xs font-mono text-rose-400 bg-rose-950/20 border border-rose-900/50 rounded-lg p-4">
+        <i class="fa-solid fa-triangle-exclamation text-lg mb-1 block"></i>
+        <span id="invseeErrorMessage">Gagal mengambil inventori player.</span>
+      </div>
+
+      <!-- INVENTORY CONTENT -->
+      <div id="invseeContent" class="hidden space-y-4">
+        <!-- ARMOR & OFFHAND SECTION -->
+        <div class="bg-[#09090b] border border-zinc-800/80 p-3 rounded-xl">
+          <p class="text-[10px] font-mono text-zinc-500 uppercase mb-2 font-semibold tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-shield-halved text-amber-500"></i> Armor & Offhand
+          </p>
+          <div class="flex flex-wrap items-center justify-between sm:justify-start gap-2.5">
+            <!-- Helmet (103) -->
+            <div class="flex flex-col items-center gap-1">
+              <span class="text-[9px] font-mono text-zinc-500 uppercase">Helm</span>
+              <div id="invsee-slot-103" class="mc-slot"></div>
+            </div>
+            <!-- Chestplate (102) -->
+            <div class="flex flex-col items-center gap-1">
+              <span class="text-[9px] font-mono text-zinc-500 uppercase">Chest</span>
+              <div id="invsee-slot-102" class="mc-slot"></div>
+            </div>
+            <!-- Leggings (101) -->
+            <div class="flex flex-col items-center gap-1">
+              <span class="text-[9px] font-mono text-zinc-500 uppercase">Legs</span>
+              <div id="invsee-slot-101" class="mc-slot"></div>
+            </div>
+            <!-- Boots (100) -->
+            <div class="flex flex-col items-center gap-1">
+              <span class="text-[9px] font-mono text-zinc-500 uppercase">Boots</span>
+              <div id="invsee-slot-100" class="mc-slot"></div>
+            </div>
+            
+            <!-- Separator -->
+            <div class="h-10 w-[1px] bg-zinc-800 mx-1 hidden sm:block"></div>
+
+            <!-- Offhand (-106) -->
+            <div class="flex flex-col items-center gap-1">
+              <span class="text-[9px] font-mono text-amber-500/80 uppercase">Offhand</span>
+              <div id="invsee-slot--106" class="mc-slot border-amber-500/40"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MAIN INVENTORY SECTION (3 x 9) -->
+        <div class="bg-[#09090b] border border-zinc-800/80 p-3 rounded-xl overflow-x-auto custom-scrollbar">
+          <p class="text-[10px] font-mono text-zinc-500 uppercase mb-2 font-semibold tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-boxes-stacked text-rose-500"></i> Main Inventory (Slot 9 - 35)
+          </p>
+          <div id="mainInventoryGrid" class="grid grid-cols-9 gap-1.5 min-w-[340px] justify-items-center">
+            <!-- 27 slots (9 to 35) -->
+          </div>
+        </div>
+
+        <!-- HOTBAR SECTION (1 x 9) -->
+        <div class="bg-[#09090b] border border-zinc-800/80 p-3 rounded-xl overflow-x-auto custom-scrollbar">
+          <p class="text-[10px] font-mono text-zinc-500 uppercase mb-2 font-semibold tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-hand text-emerald-500"></i> Hotbar (Slot 0 - 8)
+          </p>
+          <div id="hotbarGrid" class="grid grid-cols-9 gap-1.5 min-w-[340px] justify-items-center">
+            <!-- 9 slots (0 to 8) -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- IMAGE MODAL -->
   <div id="imageModal"
     class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4"

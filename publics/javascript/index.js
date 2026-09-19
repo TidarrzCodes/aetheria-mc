@@ -56,52 +56,79 @@ function playUiSound(freq = 440, type = 'sine', duration = 0.08) {
   } catch (e) { }
 }
 
-// EMBERS PARTICLE ENGINE
+// LIGHTWEIGHT & FAST EMBERS PARTICLE ENGINE (OPTIMIZED FPS & CPU)
 (function initEmbers() {
   const canvas = document.getElementById('emberCanvas');
+  if (!canvas) return;
   const ctx = canvas.getContext('2d');
+  
   let width = canvas.width = window.innerWidth;
   let height = canvas.height = window.innerHeight;
   let mouse = { x: width / 2, y: height / 2 };
+  let isTabActive = true;
+  let lastTime = 0;
+  const fpsInterval = 1000 / 30; // Cap at 30 FPS for super light performance
+
+  const isMobile = window.innerWidth < 768;
+  const particleCount = isMobile ? 22 : 35; // Fewer particles = zero lag
 
   window.addEventListener('mousemove', (e) => {
     mouse.x = e.clientX;
     mouse.y = e.clientY;
-  });
+  }, { passive: true });
 
+  let resizeTimer;
   window.addEventListener('resize', () => {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }, 200);
   });
 
-  const embers = Array.from({ length: 65 }, () => ({
+  document.addEventListener('visibilitychange', () => {
+    isTabActive = document.visibilityState === 'visible';
+    if (isTabActive) requestAnimationFrame(draw);
+  });
+
+  const embers = Array.from({ length: particleCount }, () => ({
     x: Math.random() * width,
     y: Math.random() * height,
-    r: Math.random() * 2.5 + 0.6,
-    dx: (Math.random() - 0.5) * 0.7,
-    dy: -Math.random() * 1.5 - 0.4,
-    alpha: Math.random() * 0.85 + 0.15
+    r: Math.random() * 2.2 + 0.6,
+    dx: (Math.random() - 0.5) * 0.5,
+    dy: -Math.random() * 1.2 - 0.3,
+    alpha: Math.random() * 0.75 + 0.25
   }));
 
-  function draw() {
+  function draw(currentTime) {
+    if (!isTabActive) return;
+
+    requestAnimationFrame(draw);
+
+    const elapsed = currentTime - lastTime;
+    if (elapsed < fpsInterval) return;
+    lastTime = currentTime - (elapsed % fpsInterval);
+
     ctx.clearRect(0, 0, width, height);
-    embers.forEach(e => {
+
+    for (let i = 0; i < embers.length; i++) {
+      const e = embers[i];
       ctx.beginPath();
       ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(244, 63, 94, ${e.alpha})`;
       ctx.fill();
 
-      e.x += e.dx + (mouse.x - width / 2) * 0.00005;
+      e.x += e.dx + (mouse.x - width / 2) * 0.00003;
       e.y += e.dy;
 
       if (e.y < 0) {
         e.y = height + 10;
         e.x = Math.random() * width;
       }
-    });
-    requestAnimationFrame(draw);
+    }
   }
-  draw();
+
+  requestAnimationFrame(draw);
 })();
 
 // LIGHTBOX FUNCTIONS
@@ -283,6 +310,11 @@ window.addEventListener('DOMContentLoaded', () => {
   try {
     fetchOnlinePlayers();
     setInterval(fetchOnlinePlayers, 30000);
+  } catch (e) { console.error(e); }
+
+  try {
+    initLeaderboard();
+    syncDonatorsFromWorker();
   } catch (e) { console.error(e); }
 });
 
@@ -520,3 +552,229 @@ function toggleWebChatPopup() {
 }
 
 window.toggleWebChatPopup = toggleWebChatPopup;
+
+// =========================================================================
+// 3D MINECRAFT SKIN LEADERBOARD SYSTEM (TOP KILLS, PLAYTIME, DONATORS)
+// =========================================================================
+const LEADERBOARD_DATA = {
+  kills: [
+    { rank: 1, username: 'AytidarG_', stat: '154 Kills', title: 'Supreme Warlord' },
+    { rank: 2, username: 'Darrzz', stat: '112 Kills', title: 'Shadow Blade' },
+    { rank: 3, username: 'Radit_Dev', stat: '87 Kills', title: 'Dragon Slayer' },
+    { rank: 4, username: 'Vortex_Hunter', stat: '64 Kills', title: 'Vanguard' },
+    { rank: 5, username: 'EnderKnight99', stat: '51 Kills', title: 'Berserker' },
+    { rank: 6, username: 'Nico_Blade', stat: '43 Kills', title: 'Gladiator' },
+    { rank: 7, username: 'SlayerZero', stat: '38 Kills', title: 'Assassin' },
+    { rank: 8, username: 'Phantom_X', stat: '29 Kills', title: 'Executioner' }
+  ],
+  playtime: [
+    { rank: 1, username: 'Darrzz', stat: '342 Jam', title: 'Veteran Realm' },
+    { rank: 2, username: 'AytidarG_', stat: '285 Jam', title: 'Sentinel Guard' },
+    { rank: 3, username: 'Radit_Dev', stat: '210 Jam', title: 'Ancient Wanderer' },
+    { rank: 4, username: 'CraftMaster_ID', stat: '176 Jam', title: 'Guild Keeper' },
+    { rank: 5, username: 'DragonRider', stat: '145 Jam', title: 'Dragon Tamer' },
+    { rank: 6, username: 'Shadow_Walker', stat: '128 Jam', title: 'Explorer' },
+    { rank: 7, username: 'MinerFortyNine', stat: '98 Jam', title: 'Deep Miner' },
+    { rank: 8, username: 'Aether_Hero', stat: '74 Jam', title: 'Adventurer' }
+  ],
+  donators: [
+    { rank: 1, username: 'Darrzz', stat: 'Rp 450.000', title: 'Sultan Realm' },
+    { rank: 2, username: 'AytidarG_', stat: 'Rp 325.000', title: 'Royal Patron' },
+    { rank: 3, username: 'Radit_Dev', stat: 'Rp 200.000', title: 'Crown Sponsor' },
+    { rank: 4, username: 'EnderKnight99', stat: 'Rp 150.000', title: 'Mythic Supporter' },
+    { rank: 5, username: 'Vortex_Hunter', stat: 'Rp 100.000', title: 'Dragon Benefactor' },
+    { rank: 6, username: 'SlayerZero', stat: 'Rp 75.000', title: 'Guild Founder' },
+    { rank: 7, username: 'Nico_Blade', stat: 'Rp 50.000', title: 'Honorary Knight' },
+    { rank: 8, username: 'Phantom_X', stat: 'Rp 25.000', title: 'VIP Supporter' }
+  ]
+};
+
+let currentLbCategory = 'kills';
+const skinViewers = {};
+
+function initLeaderboard() {
+  renderLeaderboard('kills');
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      if (currentLbCategory) renderLeaderboard(currentLbCategory);
+    }, 250);
+  });
+}
+
+function renderSkinViewer(canvasId, fallbackId, imgId, username) {
+  const canvas = document.getElementById(canvasId);
+  const fallback = document.getElementById(fallbackId);
+  const img = document.getElementById(imgId);
+  if (!canvas) return;
+
+  const skinTextureUrl = `https://mc-heads.net/skin/${encodeURIComponent(username)}`;
+  const renderFallbackUrl = `https://mc-heads.net/body/${encodeURIComponent(username)}/right`;
+
+  if (skinViewers[canvasId]) {
+    try { skinViewers[canvasId].dispose(); } catch (e) {}
+    skinViewers[canvasId] = null;
+  }
+
+  if (typeof skinview3d !== 'undefined' && skinview3d.SkinViewer) {
+    try {
+      if (fallback) fallback.classList.add('hidden');
+      canvas.classList.remove('hidden');
+
+      const width = canvas.parentElement ? canvas.parentElement.clientWidth : 200;
+      const height = canvas.parentElement ? canvas.parentElement.clientHeight : 250;
+
+      const viewer = new skinview3d.SkinViewer({
+        canvas: canvas,
+        width: width || 200,
+        height: height || 250,
+        skin: skinTextureUrl
+      });
+
+      viewer.fov = 70;
+      viewer.zoom = 0.85;
+      viewer.autoRotate = true;
+      viewer.autoRotateSpeed = 0.8;
+
+      if (skinview3d.WalkingAnimation) {
+        viewer.animation = new skinview3d.WalkingAnimation();
+        viewer.animation.speed = 0.5;
+      }
+
+      skinViewers[canvasId] = viewer;
+      return;
+    } catch (err) {
+      console.warn("skinview3d WebGL failed:", err);
+    }
+  }
+
+  // Fallback if skinview3d / WebGL unavailable
+  canvas.classList.add('hidden');
+  if (fallback && img) {
+    img.src = renderFallbackUrl;
+    fallback.classList.remove('hidden');
+  }
+}
+
+function switchLeaderboardCategory(cat) {
+  playUiSound(650, 'square');
+  currentLbCategory = cat;
+
+  ['kills', 'playtime', 'donators'].forEach(c => {
+    const tabBtn = document.getElementById(`lb-tab-${c}`);
+    if (tabBtn) {
+      if (c === cat) {
+        tabBtn.className = "flex-1 sm:flex-none px-3.5 py-2 rounded-lg bg-rose-600 text-white shadow-lg shadow-rose-900/40 transition flex items-center justify-center gap-2";
+      } else {
+        tabBtn.className = "flex-1 sm:flex-none px-3.5 py-2 rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-2";
+      }
+    }
+  });
+
+  renderLeaderboard(cat);
+}
+
+function renderLeaderboard(cat) {
+  const data = LEADERBOARD_DATA[cat] || LEADERBOARD_DATA.kills;
+
+  const tableTitle = document.getElementById('lb-table-stat-title');
+  if (tableTitle) {
+    if (cat === 'kills') tableTitle.innerText = "Total Kills";
+    else if (cat === 'playtime') tableTitle.innerText = "Jam Bermain";
+    else if (cat === 'donators') tableTitle.innerText = "Total Donasi";
+  }
+
+  const r1 = data[0] || { username: 'None', stat: '-', title: '-' };
+  const r2 = data[1] || { username: 'None', stat: '-', title: '-' };
+  const r3 = data[2] || { username: 'None', stat: '-', title: '-' };
+
+  // Set Rank 1 (Gold)
+  const elName1 = document.getElementById('nameRank1');
+  const elStat1 = document.getElementById('statRank1');
+  const elBadge1 = document.getElementById('badgeRank1');
+  if (elName1) elName1.innerText = r1.username;
+  if (elStat1) elStat1.innerText = r1.stat;
+  if (elBadge1) elBadge1.innerText = r1.title || 'Champion';
+  renderSkinViewer('skinCanvasRank1', 'fallbackRank1', 'imgRank1', r1.username);
+
+  // Set Rank 2 (Silver)
+  const elName2 = document.getElementById('nameRank2');
+  const elStat2 = document.getElementById('statRank2');
+  const elBadge2 = document.getElementById('badgeRank2');
+  if (elName2) elName2.innerText = r2.username;
+  if (elStat2) elStat2.innerText = r2.stat;
+  if (elBadge2) elBadge2.innerText = r2.title || 'Silver Knight';
+  renderSkinViewer('skinCanvasRank2', 'fallbackRank2', 'imgRank2', r2.username);
+
+  // Set Rank 3 (Bronze)
+  const elName3 = document.getElementById('nameRank3');
+  const elStat3 = document.getElementById('statRank3');
+  const elBadge3 = document.getElementById('badgeRank3');
+  if (elName3) elName3.innerText = r3.username;
+  if (elStat3) elStat3.innerText = r3.stat;
+  if (elBadge3) elBadge3.innerText = r3.title || 'Bronze Knight';
+  renderSkinViewer('skinCanvasRank3', 'fallbackRank3', 'imgRank3', r3.username);
+
+  // Set Table (#4 - #10)
+  const tableBody = document.getElementById('leaderboardListTable');
+  if (tableBody) {
+    const others = data.slice(3);
+    if (others.length === 0) {
+      tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-slate-500 italic font-mono-code">Belum ada data ksatria lain.</td></tr>`;
+    } else {
+      tableBody.innerHTML = others.map(item => `
+        <tr class="hover:bg-slate-900/60 transition font-mono-code">
+          <td class="p-3 text-center font-bold text-slate-400">#${item.rank}</td>
+          <td class="p-3">
+            <div class="flex items-center gap-2.5">
+              <img src="https://mc-heads.net/avatar/${escapeHTML(item.username)}/24" alt="${escapeHTML(item.username)}" class="w-6 h-6 rounded border border-slate-700">
+              <span class="font-bold text-slate-200">${escapeHTML(item.username)}</span>
+            </div>
+          </td>
+          <td class="p-3 text-slate-400 text-[11px]">${escapeHTML(item.title || 'Warrior')}</td>
+          <td class="p-3 text-right font-bold ${cat === 'donators' ? 'text-emerald-400' : (cat === 'kills' ? 'text-rose-400' : 'text-amber-400')}">${escapeHTML(item.stat)}</td>
+        </tr>
+      `).join('');
+    }
+  }
+}
+
+async function syncDonatorsFromWorker() {
+  try {
+    const res = await fetch(WORKER_PROXY_URL);
+    const json = await res.json();
+    if (json && json.result === 'success' && Array.isArray(json.data)) {
+      const totals = {};
+      json.data.forEach(ord => {
+        if (ord.status === 'APPROVED' && ord.username && ord.price) {
+          const numPrice = Number(String(ord.price).replace(/[^0-9]/g, '')) || 0;
+          if (numPrice > 0) {
+            totals[ord.username] = (totals[ord.username] || 0) + numPrice;
+          }
+        }
+      });
+
+      const sorted = Object.entries(totals)
+        .map(([user, amt]) => ({ username: user, amount: amt }))
+        .sort((a, b) => b.amount - a.amount);
+
+      if (sorted.length > 0) {
+        LEADERBOARD_DATA.donators = sorted.map((item, index) => ({
+          rank: index + 1,
+          username: item.username,
+          stat: 'Rp ' + item.amount.toLocaleString('id-ID'),
+          title: index === 0 ? 'Sultan Realm' : (index === 1 ? 'Royal Patron' : (index === 2 ? 'Crown Sponsor' : 'Supporter'))
+        }));
+        if (currentLbCategory === 'donators') {
+          renderLeaderboard('donators');
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("Could not sync donators from worker:", e);
+  }
+}
+
+window.switchLeaderboardCategory = switchLeaderboardCategory;

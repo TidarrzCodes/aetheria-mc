@@ -129,3 +129,140 @@ input[type="file"]::file-selector-button:hover {
     box-shadow: 0 0 12px rgba(244, 63, 94, 0.25);
   }
 }
+
+/* =========================================================================
+   REALM 3D STAGE & PODIUM PEDESTAL STYLES
+   ========================================================================= */
+
+.podium-stage-container {
+  perspective: 1200px;
+}
+
+.podium-block-wrapper {
+  transform-style: preserve-3d;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.podium-block-wrapper:hover {
+  transform: translateY(-8px);
+}
+
+/* 3D Top Surface Platform where player skin stands */
+.podium-top-surface {
+  position: relative;
+  width: 92%;
+  height: 34px;
+  border-radius: 50%;
+  transform: rotateX(65deg);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
+  margin-bottom: -17px;
+  z-index: 2;
+}
+
+.podium-top-gold {
+  background: radial-gradient(ellipse at center, #fef08a 0%, #f59e0b 50%, #78350f 100%);
+  border: 3px solid #fde047;
+  box-shadow: 0 0 35px rgba(245, 158, 11, 0.7), inset 0 0 20px rgba(254, 240, 138, 0.9);
+}
+
+.podium-top-silver {
+  background: radial-gradient(ellipse at center, #f8fafc 0%, #94a3b8 50%, #334155 100%);
+  border: 3px solid #e2e8f0;
+  box-shadow: 0 0 25px rgba(148, 163, 184, 0.6), inset 0 0 15px rgba(248, 250, 252, 0.9);
+}
+
+.podium-top-bronze {
+  background: radial-gradient(ellipse at center, #ffedd5 0%, #d97706 50%, #451a03 100%);
+  border: 3px solid #f97316;
+  box-shadow: 0 0 25px rgba(217, 119, 6, 0.6), inset 0 0 15px rgba(255, 237, 213, 0.9);
+}
+
+/* 3D Front Face Pedestal Block */
+.podium-front-block {
+  position: relative;
+  width: 100%;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+  z-index: 1;
+}
+
+.podium-front-gold {
+  background: linear-gradient(180deg, #b45309 0%, #78350f 35%, #451a03 80%, #1c0a00 100%);
+  border-top: 3px solid #fde047;
+  border-left: 2px solid #f59e0b;
+  border-right: 2px solid #78350f;
+  box-shadow: inset 0 2px 10px rgba(253, 224, 71, 0.5), 0 15px 35px rgba(0, 0, 0, 0.85);
+}
+
+.podium-front-silver {
+  background: linear-gradient(180deg, #64748b 0%, #334155 35%, #1e293b 80%, #0f172a 100%);
+  border-top: 3px solid #cbd5e1;
+  border-left: 2px solid #94a3b8;
+  border-right: 2px solid #334155;
+  box-shadow: inset 0 2px 10px rgba(248, 250, 252, 0.4), 0 15px 35px rgba(0, 0, 0, 0.85);
+}
+
+.podium-front-bronze {
+  background: linear-gradient(180deg, #9a3412 0%, #7c2d12 35%, #431407 80%, #1a0500 100%);
+  border-top: 3px solid #fb923c;
+  border-left: 2px solid #ea580c;
+  border-right: 2px solid #7c2d12;
+  box-shadow: inset 0 2px 10px rgba(251, 146, 60, 0.4), 0 15px 35px rgba(0, 0, 0, 0.85);
+}
+
+/* 3D Embossed Rank Numbers */
+.podium-rank-num {
+  font-family: 'Cinzel Decorative', serif;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.podium-num-gold {
+  color: #fef08a;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.9), 0 0 25px rgba(245, 158, 11, 0.9);
+}
+
+.podium-num-silver {
+  color: #f8fafc;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.9), 0 0 20px rgba(148, 163, 184, 0.8);
+}
+
+.podium-num-bronze {
+  color: #ffedd5;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.9), 0 0 20px rgba(217, 119, 6, 0.8);
+}
+
+/* Spotlight Glow Effect beneath the 3D canvas */
+.skin-spotlight {
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 75%;
+  height: 25px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(8px);
+}
+
+.spotlight-gold {
+  background: rgba(245, 158, 11, 0.65);
+  box-shadow: 0 0 35px rgba(245, 158, 11, 0.85);
+}
+
+.spotlight-silver {
+  background: rgba(148, 163, 184, 0.55);
+  box-shadow: 0 0 28px rgba(148, 163, 184, 0.75);
+}
+
+.spotlight-bronze {
+  background: rgba(217, 119, 6, 0.55);
+  box-shadow: 0 0 28px rgba(217, 119, 6, 0.75);
+}
