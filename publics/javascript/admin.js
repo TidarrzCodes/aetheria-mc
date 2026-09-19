@@ -1192,6 +1192,8 @@ function renderRankBadge(rankName) {
   return `<span class="bg-zinc-800 text-zinc-400 border border-zinc-700 px-2 py-0.5 rounded text-[10px] font-mono font-semibold">PLAYER</span>`;
 }
 
+let cachedOnlinePlayersList = null;
+
 async function fetchOnlinePlayers() {
   const dot = document.getElementById('player-tab-dot');
   const countText = document.getElementById('player-tab-count');
@@ -1226,7 +1228,7 @@ async function fetchOnlinePlayers() {
     if (isOnline) {
       dot.className = "w-3 h-3 rounded-full bg-emerald-500 animate-pulse";
       
-      // Utamakan realtime RCON player list jika tersedia, fallback ke mcsrvstat
+      // Utamakan realtime RCON player list jika tersedia, fallback ke mcsrvstat / cache
       let onlineList = [];
       let onlineCount = 0;
       let maxCount = 20;
@@ -1235,10 +1237,15 @@ async function fetchOnlinePlayers() {
         onlineList = rconData.players || [];
         onlineCount = typeof rconData.online === 'number' ? rconData.online : onlineList.length;
         maxCount = rconData.max || 20;
+        cachedOnlinePlayersList = onlineList;
       } else if (data && data.players) {
         onlineList = data.players.list || [];
         onlineCount = data.players.online || 0;
         maxCount = data.players.max || 20;
+        if (onlineList.length > 0) cachedOnlinePlayersList = onlineList;
+      } else if (cachedOnlinePlayersList !== null && cachedOnlinePlayersList.length > 0) {
+        onlineList = cachedOnlinePlayersList;
+        onlineCount = onlineList.length;
       }
 
       if (onlineList.length > onlineCount) {
