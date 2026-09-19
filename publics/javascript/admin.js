@@ -412,6 +412,60 @@ function formatItemName(id) {
     .join(' ');
 }
 
+async function controlServerPower(signal) {
+  const signalNames = {
+    start: 'MENYALAKAN (ON)',
+    stop: 'MEMATIKAN (OFF)',
+    restart: 'MEREBOOT (RESTART)'
+  };
+  const label = signalNames[signal] || signal;
+
+  if (!confirm(`Apakah Anda yakin ingin ${label} server Minecraft?`)) {
+    return;
+  }
+
+  const btnStart = document.getElementById('btnPowerStart');
+  const btnRestart = document.getElementById('btnPowerRestart');
+  const btnStop = document.getElementById('btnPowerStop');
+
+  [btnStart, btnRestart, btnStop].forEach(btn => {
+    if (btn) btn.disabled = true;
+  });
+
+  try {
+    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
+    const res = await fetch(`${WORKER_PROXY_URL}?action=server_power`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Admin-Token': adminToken
+      },
+      body: JSON.stringify({ signal })
+    });
+
+    const json = await res.json().catch(() => null);
+
+    if (res.ok && json && json.result === 'success') {
+      showToast(json.message || `Signal ${signal} berhasil dikirim ke server!`, "success");
+      appendConsoleOutput(`[POWER STATE] Signal ${signal.toUpperCase()}`, json.message || "Power signal executed.", false);
+      setTimeout(fetchOnlinePlayers, 3000);
+    } else {
+      const errorMsg = (json && json.message) || "Gagal mengubah status power server.";
+      showToast("Gagal: " + errorMsg, "error");
+      appendConsoleOutput(`[POWER STATE] Signal ${signal.toUpperCase()}`, errorMsg, true);
+    }
+  } catch (err) {
+    console.error("Power control error:", err);
+    showToast("Kesalahan koneksi saat menghubungi Worker.", "error");
+  } finally {
+    [btnStart, btnRestart, btnStop].forEach(btn => {
+      if (btn) btn.disabled = false;
+    });
+  }
+}
+
+window.controlServerPower = controlServerPower;
+
 async function sendConsoleCommand(e) {
   e.preventDefault();
   const input = document.getElementById('consoleCommandInput');
