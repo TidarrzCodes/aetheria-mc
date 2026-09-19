@@ -185,6 +185,8 @@ async function handleLoginSubmit(e) {
         const staffToken = data.token || btoa(JSON.stringify({ username: data.username || username, rank: data.rank, time: Date.now() }));
         setCookie('aetheria_admin_token', staffToken, 1);
         sessionStorage.setItem('aetheria_admin_auth', 'true');
+        sessionStorage.setItem('aetheria_admin_username', data.username || username);
+        sessionStorage.setItem('aetheria_admin_rank', data.rank || 'Staff');
 
         showToast(`Login Staff Berhasil (${data.rank})! Mengalihkan ke Dashboard Staff...`, "success");
         setTimeout(() => {

@@ -82,6 +82,18 @@
 
         <!-- HEADER RIGHT ACTIONS -->
         <div class="flex items-center gap-1.5 shrink-0">
+          <!-- STAFF ONLINE PROFILE BADGE -->
+          <div id="staffProfileBadge" class="hidden items-center gap-2 bg-[#121215] border border-zinc-800 px-2.5 py-1 rounded-xl text-xs font-mono shadow-inner">
+            <div class="relative flex items-center justify-center">
+              <img id="staffAvatarHead" src="https://mc-heads.net/avatar/steve/24" alt="Staff Avatar" class="w-6 h-6 rounded-full border border-rose-500/60 object-cover shadow-sm">
+              <span class="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 border border-[#121215] animate-pulse"></span>
+            </div>
+            <div class="flex flex-col leading-none">
+              <span id="staffUsername" class="text-white font-bold text-[11px]">Staff</span>
+              <span id="staffRankBadge" class="text-[9px] text-rose-400 font-medium">ONLINE</span>
+            </div>
+          </div>
+
           <a href="./index.html"
             class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5">
             <i class="fa-solid fa-house text-[10px]"></i>

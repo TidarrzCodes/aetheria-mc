@@ -107,8 +107,31 @@ document.addEventListener('keydown', (e) => {
 function unlockDashboard() {
   const dash = document.getElementById('dashboardContent');
   if (dash) dash.classList.remove('hidden');
+
+  // Load and render logged-in Staff Profile Badge
+  renderStaffProfileBadge();
+
   syncCurrentTab();
   setInterval(syncCurrentTab, 8000); // Optimized 8-second refresh to save Cloudflare Worker quota
+}
+
+function renderStaffProfileBadge() {
+  const badgeEl = document.getElementById('staffProfileBadge');
+  const userEl = document.getElementById('staffUsername');
+  const rankEl = document.getElementById('staffRankBadge');
+  const avatarEl = document.getElementById('staffAvatarHead');
+
+  if (!badgeEl) return;
+
+  const savedUser = localStorage.getItem('aetheria_player_user') || sessionStorage.getItem('aetheria_admin_username') || 'Admin';
+  const savedRank = sessionStorage.getItem('aetheria_admin_rank') || 'Staff';
+
+  if (userEl) userEl.innerText = savedUser;
+  if (rankEl) rankEl.innerText = savedRank.toUpperCase();
+  if (avatarEl) avatarEl.src = `https://mc-heads.net/avatar/${encodeURIComponent(savedUser)}/24`;
+
+  badgeEl.classList.remove('hidden');
+  badgeEl.classList.add('flex');
 }
 
 function handleLogout() {
@@ -553,12 +576,14 @@ async function fetchRealtimeConsoleLogs() {
       if (logsStr === lastConsoleLogHash) return;
       lastConsoleLogHash = logsStr;
 
-      // Clean ANSI color codes & Minecraft formatting symbols
-      const cleanLogs = json.logs.map(line => {
-        return line
-          .replace(/\u001b\[[0-9;]*m/g, '')
-          .replace(/§[0-9a-fk-or]/gi, '');
-      });
+      // Clean ANSI color codes & Minecraft formatting symbols, filter out automatic background /list polling spam
+      const cleanLogs = json.logs
+        .filter(line => !line.toLowerCase().includes('issued server command: /list') && !line.toLowerCase().includes('there are') && !line.toLowerCase().includes('players online'))
+        .map(line => {
+          return line
+            .replace(/\u001b\[[0-9;]*m/g, '')
+            .replace(/§[0-9a-fk-or]/gi, '');
+        });
 
       const isScrolledToBottom = terminal.scrollHeight - terminal.clientHeight <= terminal.scrollTop + 50;
 
