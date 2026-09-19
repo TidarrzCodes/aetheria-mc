@@ -108,7 +108,7 @@ function unlockDashboard() {
   const dash = document.getElementById('dashboardContent');
   if (dash) dash.classList.remove('hidden');
   syncCurrentTab();
-  setInterval(syncCurrentTab, 5000);
+  setInterval(syncCurrentTab, 2000); // Fast 2-second real-time sync
 }
 
 function handleLogout() {
@@ -137,6 +137,7 @@ function switchMainTab(tabName) {
     btnPlayers.className = "px-3 py-1.5 rounded-md bg-zinc-800 text-white font-medium transition flex items-center gap-2";
     btnOrders.className = "px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition flex items-center gap-2";
     fetchOnlinePlayers();
+    fetchRealtimeConsoleLogs();
   }
 }
 
@@ -145,6 +146,7 @@ function syncCurrentTab() {
     fetchOrders();
   } else {
     fetchOnlinePlayers();
+    fetchRealtimeConsoleLogs();
   }
 }
 
@@ -516,13 +518,62 @@ async function executeAdminCommand(command, successMessage) {
   }
 }
 
+let lastConsoleLogHash = '';
+
+async function fetchRealtimeConsoleLogs() {
+  const terminal = document.getElementById('consoleTerminalWindow');
+  if (!terminal) return;
+
+  try {
+    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
+    const res = await fetch(`${WORKER_PROXY_URL}?action=get_console_logs`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Admin-Token': adminToken
+      }
+    });
+
+    const json = await res.json().catch(() => null);
+
+    if (res.ok && json && json.result === 'success' && Array.isArray(json.logs)) {
+      const logsStr = json.logs.join('\n');
+      if (logsStr === lastConsoleLogHash) return;
+      lastConsoleLogHash = logsStr;
+
+      // Clean ANSI color codes & Minecraft formatting symbols
+      const cleanLogs = json.logs.map(line => {
+        return line
+          .replace(/\u001b\[[0-9;]*m/g, '')
+          .replace(/§[0-9a-fk-or]/gi, '');
+      });
+
+      const isScrolledToBottom = terminal.scrollHeight - terminal.clientHeight <= terminal.scrollTop + 50;
+
+      terminal.innerHTML = cleanLogs.map(line => {
+        const lower = line.toLowerCase();
+        const isError = lower.includes('error') || lower.includes('exception') || lower.includes('warn');
+        const isCmd = lower.includes('[webchat]') || lower.includes('issued server command');
+        const colorClass = isError ? 'text-rose-400 font-semibold' : (isCmd ? 'text-amber-300 font-medium' : 'text-zinc-300');
+        return `<div class="${colorClass} leading-relaxed text-[11px] font-mono break-all">${escapeHTML(line)}</div>`;
+      }).join('');
+
+      if (isScrolledToBottom || terminal.scrollTop === 0) {
+        terminal.scrollTop = terminal.scrollHeight;
+      }
+    }
+  } catch (err) {
+    // Silent fail for background console log polling
+  }
+}
+
 function appendConsoleOutput(command, output, isError = false) {
   const terminal = document.getElementById('consoleTerminalWindow');
   if (!terminal) return;
 
   const cmdLine = document.createElement('div');
   cmdLine.className = "text-white font-medium font-mono pt-1";
-  cmdLine.innerText = command;
+  cmdLine.innerText = `>> ${command}`;
   terminal.appendChild(cmdLine);
 
   if (output && output.trim()) {
@@ -535,6 +586,7 @@ function appendConsoleOutput(command, output, isError = false) {
   }
 
   terminal.scrollTop = terminal.scrollHeight;
+  setTimeout(fetchRealtimeConsoleLogs, 1000);
 }
 
 function clearConsoleLog() {
