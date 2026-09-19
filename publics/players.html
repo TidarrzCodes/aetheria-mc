@@ -97,36 +97,91 @@
         </div>
       </section>
 
-      <!-- REALM ONLINE PLAYERS TAB -->
+      <!-- PLAYER LIVE INVENTORY & HUD SECTION -->
       <section class="supreme-card p-6 rounded-2xl border-slate-800 space-y-4 shadow-xl">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-slate-800">
           <div>
             <h3 class="text-lg font-bold text-white font-mono-code flex items-center gap-2">
-              <span id="player-tab-dot" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span> KSATRIA ONLINE IN-GAME
+              <i class="fa-solid fa-box-open text-rose-500"></i> INVENTORI IN-GAME KAMU
             </h3>
-            <p id="player-tab-count" class="text-xs text-slate-400 font-mono-code mt-0.5">Memuat data server...</p>
+            <p id="player-inv-status" class="text-xs text-slate-400 font-mono-code mt-0.5">Memuat data item dari server...</p>
           </div>
-          <button onclick="fetchOnlinePlayers()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs px-3 py-1.5 rounded-xl font-mono-code text-slate-300 transition flex items-center gap-1.5">
-            <i class="fa-solid fa-arrows-rotate text-[10px]"></i> Refresh Status
+          <button onclick="fetchPlayerInventoryHUD()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs px-3.5 py-1.5 rounded-xl font-mono-code text-slate-300 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-rotate text-[11px]"></i> Refresh Inventori
           </button>
         </div>
 
-        <div class="overflow-x-auto custom-scrollbar">
-          <table class="w-full text-left text-xs font-mono-code">
-            <thead class="bg-slate-950 text-slate-400 uppercase text-[11px]">
-              <tr>
-                <th class="p-3">Avatar</th>
-                <th class="p-3">Username</th>
-                <th class="p-3">Gelar / Rank</th>
-                <th class="p-3 text-right">Status</th>
-              </tr>
-            </thead>
-            <tbody id="player-table-list" class="divide-y divide-slate-800/60 text-slate-300">
-              <tr>
-                <td colspan="4" class="text-center p-6 text-slate-500">Memanggil daftar pemain dari server...</td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- LOADING STATE -->
+        <div id="playerInvLoading" class="py-10 text-center text-xs font-mono-code text-slate-400 flex flex-col items-center justify-center gap-2">
+          <i class="fa-solid fa-spinner fa-spin text-rose-500 text-2xl"></i>
+          <span>Menghubungkan ke server untuk mengambil item...</span>
+        </div>
+
+        <!-- ERROR STATE -->
+        <div id="playerInvError" class="hidden py-8 text-center text-xs font-mono-code text-rose-400 bg-rose-950/20 border border-rose-900/50 rounded-xl p-4">
+          <i class="fa-solid fa-circle-exclamation text-xl mb-1.5 block"></i>
+          <span id="playerInvErrorMessage">Karakter kamu sedang offline atau data inventori tidak ditemukan.</span>
+        </div>
+
+        <!-- INVENTORY CONTENT CONTAINER -->
+        <div id="playerInvContent" class="hidden space-y-4">
+          <!-- ARMOR & OFFHAND SECTION -->
+          <div class="bg-[#06080d] border border-slate-800/80 p-3.5 rounded-xl">
+            <p class="text-[10px] font-mono-code text-slate-400 uppercase mb-2.5 font-semibold tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-shield-halved text-amber-500"></i> Armor & Offhand
+            </p>
+            <div class="flex flex-wrap items-center justify-between sm:justify-start gap-2.5">
+              <!-- Helmet (103) -->
+              <div class="flex flex-col items-center gap-1">
+                <span class="text-[9px] font-mono-code text-slate-500 uppercase">Helm</span>
+                <div id="hud-slot-103" class="mc-slot"></div>
+              </div>
+              <!-- Chestplate (102) -->
+              <div class="flex flex-col items-center gap-1">
+                <span class="text-[9px] font-mono-code text-slate-500 uppercase">Chest</span>
+                <div id="hud-slot-102" class="mc-slot"></div>
+              </div>
+              <!-- Leggings (101) -->
+              <div class="flex flex-col items-center gap-1">
+                <span class="text-[9px] font-mono-code text-slate-500 uppercase">Legs</span>
+                <div id="hud-slot-101" class="mc-slot"></div>
+              </div>
+              <!-- Boots (100) -->
+              <div class="flex flex-col items-center gap-1">
+                <span class="text-[9px] font-mono-code text-slate-500 uppercase">Boots</span>
+                <div id="hud-slot-100" class="mc-slot"></div>
+              </div>
+
+              <!-- Separator -->
+              <div class="h-10 w-[1px] bg-slate-800 mx-1 hidden sm:block"></div>
+
+              <!-- Offhand (-106) -->
+              <div class="flex flex-col items-center gap-1">
+                <span class="text-[9px] font-mono-code text-amber-500/80 uppercase">Offhand</span>
+                <div id="hud-slot--106" class="mc-slot border-amber-500/40"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MAIN INVENTORY GRID (3 x 9) -->
+          <div class="bg-[#06080d] border border-slate-800/80 p-3.5 rounded-xl overflow-x-auto custom-scrollbar">
+            <p class="text-[10px] font-mono-code text-slate-400 uppercase mb-2.5 font-semibold tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-boxes-stacked text-rose-500"></i> Main Inventory (Slot 9 - 35)
+            </p>
+            <div id="hudMainGrid" class="grid grid-cols-9 gap-1.5 min-w-[340px] justify-items-center">
+              <!-- 27 slots generated dynamically -->
+            </div>
+          </div>
+
+          <!-- HOTBAR GRID (1 x 9) -->
+          <div class="bg-[#06080d] border border-slate-800/80 p-3.5 rounded-xl overflow-x-auto custom-scrollbar">
+            <p class="text-[10px] font-mono-code text-slate-400 uppercase mb-2.5 font-semibold tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-hand text-emerald-500"></i> Hotbar (Slot 0 - 8)
+            </p>
+            <div id="hudHotbarGrid" class="grid grid-cols-9 gap-1.5 min-w-[340px] justify-items-center">
+              <!-- 9 slots generated dynamically -->
+            </div>
+          </div>
         </div>
       </section>
 

@@ -1,9 +1,10 @@
 const SERVER_DOMAIN = "aetheria.raditnex.my.id";
+const WORKER_PROXY_URL = "https://aetheria-checkout.raditnur216531.workers.dev/";
+
+let currentHUDUsername = '';
 
 document.addEventListener('DOMContentLoaded', () => {
   checkPlayerSession();
-  fetchOnlinePlayers();
-  setInterval(fetchOnlinePlayers, 30000);
 });
 
 // EMBERS PARTICLE ENGINE
@@ -19,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     height = canvas.height = window.innerHeight;
   });
 
-  const embers = Array.from({ length: 50 }, () => ({
+  const embers = Array.from({ length: 30 }, () => ({
     x: Math.random() * width,
     y: Math.random() * height,
     r: Math.random() * 2 + 0.5,
@@ -70,7 +71,9 @@ function checkPlayerSession() {
 
   try {
     const playerData = JSON.parse(savedUser);
+    currentHUDUsername = playerData.username;
     showDashboardProfile(playerData);
+    fetchPlayerInventoryHUD(playerData.username);
   } catch (err) {
     localStorage.removeItem('aetheria_player_user');
     window.location.href = './login.html';
@@ -209,59 +212,228 @@ function renderRankBenefits(rankName) {
   `;
 }
 
-// FETCH ONLINE PLAYERS TABLE
-async function fetchOnlinePlayers() {
-  const dot = document.getElementById('player-tab-dot');
-  const countText = document.getElementById('player-tab-count');
-  const tableBody = document.getElementById('player-table-list');
+// FETCH LOGGED IN PLAYER INVENTORY HUD
+async function fetchPlayerInventoryHUD(usernameOverride) {
+  const username = usernameOverride || currentHUDUsername;
+  if (!username) return;
+
+  const statusEl = document.getElementById('player-inv-status');
+  const loadingEl = document.getElementById('playerInvLoading');
+  const errorEl = document.getElementById('playerInvError');
+  const errorMsgEl = document.getElementById('playerInvErrorMessage');
+  const contentEl = document.getElementById('playerInvContent');
+
+  if (statusEl) statusEl.innerText = `Menghubungkan ke server...`;
+  if (loadingEl) loadingEl.classList.remove('hidden');
+  if (errorEl) errorEl.classList.add('hidden');
+  if (contentEl) contentEl.classList.add('hidden');
 
   try {
-    const response = await fetch(`https://api.mcsrvstat.us/3/${SERVER_DOMAIN}`);
-    if (!response.ok) {
-      throw new Error(`MCSrvStat API error: ${response.status}`);
-    }
-    const data = await response.json();
+    const res = await fetch(`${WORKER_PROXY_URL}?action=get_inventory`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username })
+    });
 
-    if (data.online) {
-      dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
-      const online = data.players ? data.players.online : 0;
-      const max = data.players ? data.players.max : 0;
-      countText.innerText = `${online} / ${max} Ksatria Online In-Game`;
+    const json = await res.json().catch(() => null);
 
-      if (data.players && data.players.list && data.players.list.length > 0) {
-        tableBody.innerHTML = data.players.list.map(p => {
-          const name = typeof p === 'object' ? p.name : p;
-          const rank = typeof p === 'object' && p.group ? p.group : 'Member';
-          return `
-            <tr class="hover:bg-slate-900/60 transition">
-              <td class="p-3 w-12">
-                <img src="https://mc-heads.net/avatar/${escapeHTML(name)}/28" alt="${escapeHTML(name)}" class="w-7 h-7 rounded border border-slate-700">
-              </td>
-              <td class="p-3 font-semibold text-white">
-                ${escapeHTML(name)}
-              </td>
-              <td class="p-3">
-                ${renderRankBadge(rank)}
-              </td>
-              <td class="p-3 text-right">
-                <span class="inline-flex items-center gap-1.5 text-emerald-400 text-xs">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Active
-                </span>
-              </td>
-            </tr>
-          `;
-        }).join('');
-      } else {
-        tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-6 text-slate-500">Belum ada ksatria yang online saat ini.</td></tr>`;
-      }
+    if (res.ok && json && json.result === 'success' && Array.isArray(json.inventory)) {
+      renderPlayerHUDInventory(json.inventory);
+      if (statusEl) statusEl.innerHTML = `<span class="text-emerald-400 font-bold"><i class="fa-solid fa-circle text-[8px] mr-1"></i> Live Inventory (${json.inventory.length} item(s))</span>`;
+      if (loadingEl) loadingEl.classList.add('hidden');
+      if (contentEl) contentEl.classList.remove('hidden');
     } else {
-      dot.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
-      countText.innerText = "Server Offline / Maintenance";
-      tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-6 text-rose-400">Server Minecraft sedang offline.</td></tr>`;
+      const errorMsg = (json && json.message) || `Karakter "${username}" sedang offline atau data inventori tidak ditemukan. Masuk ke server in-game untuk melihat item.`;
+      if (statusEl) statusEl.innerText = `Status: Offline / Belum masuk server`;
+      if (errorMsgEl) errorMsgEl.innerText = errorMsg;
+      if (loadingEl) loadingEl.classList.add('hidden');
+      if (errorEl) errorEl.classList.remove('hidden');
     }
   } catch (err) {
-    dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
-    countText.innerText = "Gagal memuat status server";
-    tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-6 text-amber-500">Gagal mengambil data dari API server Minecraft.</td></tr>`;
+    console.error("Error HUD Inventory:", err);
+    if (statusEl) statusEl.innerText = `Status: Gagal memuat data`;
+    if (errorMsgEl) errorMsgEl.innerText = "Kesalahan jaringan saat mengambil item dari server.";
+    if (loadingEl) loadingEl.classList.add('hidden');
+    if (errorEl) errorEl.classList.remove('hidden');
   }
+}
+
+function renderPlayerHUDInventory(inventoryList) {
+  const itemMap = {};
+  if (Array.isArray(inventoryList)) {
+    inventoryList.forEach(item => {
+      if (item && typeof item.slot === 'number') {
+        itemMap[item.slot] = item;
+      }
+    });
+  }
+
+  // 1. Armor Slots (103: Helmet, 102: Chestplate, 101: Leggings, 100: Boots) & Offhand (-106)
+  const armorSlots = [
+    { slot: 103, elId: 'hud-slot-103', placeholder: '<i class="fa-solid fa-helmet-safety text-slate-700 text-xs"></i>', label: 'Helmet' },
+    { slot: 102, elId: 'hud-slot-102', placeholder: '<i class="fa-solid fa-shirt text-slate-700 text-xs"></i>', label: 'Chestplate' },
+    { slot: 101, elId: 'hud-slot-101', placeholder: '<i class="fa-solid fa-user text-slate-700 text-xs"></i>', label: 'Leggings' },
+    { slot: 100, elId: 'hud-slot-100', placeholder: '<i class="fa-solid fa-socks text-slate-700 text-xs"></i>', label: 'Boots' },
+    { slot: -106, elId: 'hud-slot--106', placeholder: '<i class="fa-solid fa-shield text-slate-700 text-xs"></i>', label: 'Offhand' }
+  ];
+
+  armorSlots.forEach(cfg => {
+    const el = document.getElementById(cfg.elId);
+    if (el) {
+      const item = itemMap[cfg.slot];
+      el.innerHTML = renderHUDSlotInnerHtml(cfg.slot, item, cfg.placeholder, cfg.label);
+    }
+  });
+
+  // 2. Main Inventory Grid (Slots 9 to 35)
+  const mainGrid = document.getElementById('hudMainGrid');
+  if (mainGrid) {
+    let mainHtml = '';
+    for (let s = 9; s <= 35; s++) {
+      const item = itemMap[s];
+      mainHtml += renderHUDSlotInnerHtml(s, item);
+    }
+    mainGrid.innerHTML = mainHtml;
+  }
+
+  // 3. Hotbar Grid (Slots 0 to 8)
+  const hotbarGrid = document.getElementById('hudHotbarGrid');
+  if (hotbarGrid) {
+    let hotbarHtml = '';
+    for (let s = 0; s <= 8; s++) {
+      const item = itemMap[s];
+      hotbarHtml += renderHUDSlotInnerHtml(s, item);
+    }
+    hotbarGrid.innerHTML = hotbarHtml;
+  }
+}
+
+function renderHUDSlotInnerHtml(slotNum, item, placeholderIcon = '', defaultLabel = '') {
+  if (item && item.id) {
+    const itemName = formatItemName(item.id);
+    const cleanId = item.id.toLowerCase().replace(/^minecraft:/, '').trim();
+    const primaryUrl = `https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.1/items/${cleanId}.png`;
+    const countBadge = item.count > 1 ? `<span class="mc-slot-count">${item.count}</span>` : '';
+
+    return `
+      <div class="mc-slot group relative" title="${escapeHTML(itemName)} (${item.count}) [Slot ${slotNum}]">
+        <img src="${primaryUrl}" 
+             alt="${escapeHTML(itemName)}" 
+             class="mc-slot-item-img"
+             data-step="0"
+             onerror="handleItemImgError(this, '${escapeHTML(cleanId)}')">
+        ${countBadge}
+        <div class="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 hidden group-hover:flex flex-col items-center pointer-events-none z-30">
+          <div class="bg-slate-950/95 border border-slate-700 text-slate-100 text-[10px] font-mono-code py-1 px-2 rounded shadow-2xl whitespace-nowrap">
+            <div class="font-bold text-rose-400">${escapeHTML(itemName)}</div>
+            <div class="text-[9px] text-slate-400">Jumlah: ${item.count} &bull; Slot: ${slotNum}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  const titleText = defaultLabel ? `${defaultLabel} (Kosong)` : `Kosong [Slot ${slotNum}]`;
+  return `
+    <div class="mc-slot mc-slot-empty" title="${escapeHTML(titleText)}">
+      ${placeholderIcon}
+    </div>
+  `;
+}
+
+const ITEM_ID_ALIASES = {
+  'cooked_beef': ['cooked_beef', 'beef_cooked'],
+  'cooked_porkchop': ['cooked_porkchop', 'porkchop_cooked'],
+  'cooked_chicken': ['cooked_chicken', 'chicken_cooked'],
+  'cooked_mutton': ['cooked_mutton', 'mutton_cooked'],
+  'cooked_cod': ['cooked_cod', 'fish_cooked', 'raw_fish'],
+  'cooked_salmon': ['cooked_salmon', 'salmon_cooked'],
+  'porkchop': ['porkchop', 'porkchop_raw'],
+  'beef': ['beef', 'beef_raw'],
+  'chicken': ['chicken', 'chicken_raw'],
+  'enchanted_book': ['enchanted_book', 'book_enchanted'],
+  'written_book': ['written_book', 'book_written'],
+  'writable_book': ['writable_book', 'book_writable'],
+  'glass_bottle': ['glass_bottle', 'potion_bottle_empty'],
+  'totem_of_undying': ['totem_of_undying', 'totem'],
+  'experience_bottle': ['experience_bottle', 'bottle_o_enchanting'],
+  'golden_sword': ['golden_sword', 'gold_sword'],
+  'golden_shovel': ['golden_shovel', 'gold_shovel'],
+  'golden_pickaxe': ['golden_pickaxe', 'gold_pickaxe'],
+  'golden_axe': ['golden_axe', 'gold_axe'],
+  'golden_hoe': ['golden_hoe', 'gold_hoe'],
+  'golden_helmet': ['golden_helmet', 'gold_helmet'],
+  'golden_chestplate': ['golden_chestplate', 'gold_chestplate'],
+  'golden_leggings': ['golden_leggings', 'gold_leggings'],
+  'golden_boots': ['golden_boots', 'gold_boots'],
+  'golden_apple': ['golden_apple', 'apple_golden'],
+  'enchanted_golden_apple': ['enchanted_golden_apple', 'apple_golden_enchanted', 'golden_apple'],
+  'wooden_sword': ['wooden_sword', 'wood_sword'],
+  'wooden_shovel': ['wooden_shovel', 'wood_shovel'],
+  'wooden_pickaxe': ['wooden_pickaxe', 'wood_pickaxe'],
+  'wooden_axe': ['wooden_axe', 'wood_axe'],
+  'wooden_hoe': ['wooden_hoe', 'wood_hoe'],
+  'redstone': ['redstone', 'redstone_dust'],
+  'repeater': ['repeater', 'diode'],
+  'comparator': ['comparator'],
+  'clock': ['clock', 'watch']
+};
+
+function getItemSourceUrls(cleanId) {
+  const safeId = String(cleanId || '').toLowerCase().replace(/["']/g, '').replace(/^minecraft:/, '').trim();
+  if (!safeId) return [];
+
+  const idVariants = [safeId];
+  if (ITEM_ID_ALIASES[safeId]) {
+    ITEM_ID_ALIASES[safeId].forEach(alias => {
+      if (!idVariants.includes(alias)) idVariants.push(alias);
+    });
+  }
+
+  const urls = [];
+  idVariants.forEach(id => {
+    urls.push(`https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.1/items/${id}.png`);
+    urls.push(`https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.1/blocks/${id}.png`);
+    urls.push(`https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.12.2/items/${id}.png`);
+    urls.push(`https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.12.2/blocks/${id}.png`);
+    urls.push(`https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/item/${id}.png`);
+    urls.push(`https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/block/${id}.png`);
+    urls.push(`https://mc-heads.net/item/${id}`);
+    urls.push(`https://minecraftitemids.com/item/128/${id}.png`);
+  });
+
+  return urls;
+}
+
+function handleItemImgError(img, cleanId) {
+  if (!img) return;
+  const currentStep = parseInt(img.dataset.step || '0', 10);
+  const nextStep = currentStep + 1;
+  img.dataset.step = String(nextStep);
+
+  const sources = getItemSourceUrls(cleanId);
+
+  if (nextStep < sources.length) {
+    img.src = sources[nextStep];
+  } else {
+    img.style.display = 'none';
+    const parent = img.parentElement;
+    if (parent && !parent.querySelector('.mc-fallback-badge')) {
+      const badge = document.createElement('span');
+      badge.className = 'mc-fallback-badge text-[10px] font-mono-code font-bold text-rose-300 truncate max-w-[34px] block text-center uppercase select-none';
+      badge.innerText = String(cleanId).replace(/_/g, '').substring(0, 3);
+      parent.appendChild(badge);
+    }
+  }
+}
+
+window.handleItemImgError = handleItemImgError;
+
+function formatItemName(id) {
+  if (!id) return '';
+  const clean = id.replace(/^minecraft:/, '');
+  return clean
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
 }
