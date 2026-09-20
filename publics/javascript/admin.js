@@ -136,12 +136,12 @@ function startAutoReloadAnimation() {
     }
   }, 100);
 
-  // Interval terpisah khusus console log agar tetap realtime (setiap 2 detik)
+  // Interval terpisah khusus console log agar tetap realtime ultra-fast (50ms)
   setInterval(() => {
     if (currentMainTab === 'systems') {
       fetchRealtimeConsoleLogs();
     }
-  }, 2000);
+  }, 50);
 }
 
 function unlockDashboard() {
@@ -749,10 +749,12 @@ async function executeAdminCommand(command, successMessage) {
 }
 
 let lastConsoleLogHash = '';
+let isFetchingConsole = false;
 
 async function fetchRealtimeConsoleLogs() {
   const terminal = document.getElementById('consoleTerminalWindow');
-  if (!terminal) return;
+  if (!terminal || isFetchingConsole) return;
+  isFetchingConsole = true;
 
   try {
     const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
