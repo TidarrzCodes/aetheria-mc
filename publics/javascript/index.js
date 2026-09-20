@@ -181,18 +181,62 @@ async function fetchOnlinePlayers() {
   const container = document.getElementById('player-list-container');
 
   try {
-    const response = await fetch(`https://api.mcsrvstat.us/3/${SERVER_DOMAIN}`);
-    const data = await response.json();
+    let isOnline = false;
+    let onlineCount = 0;
+    let maxCount = 20;
+    let playerList = [];
 
-    if (data.online) {
+    // Priority 1: Check Pterodactyl power status & online players via Worker Proxy Gateway
+    try {
+      const [statusRes, playersRes] = await Promise.all([
+        fetch(`${WORKER_PROXY_URL}?action=get_server_status`).catch(() => null),
+        fetch(`${WORKER_PROXY_URL}?action=get_online_players`, { method: "POST" }).catch(() => null)
+      ]);
+
+      let statusData = statusRes && statusRes.ok ? await statusRes.json().catch(() => null) : null;
+      let playersData = playersRes && playersRes.ok ? await playersRes.json().catch(() => null) : null;
+
+      if (statusData && statusData.result === "success") {
+        isOnline = !!statusData.online;
+      }
+
+      if (playersData && playersData.result === "success") {
+        onlineCount = playersData.online || 0;
+        maxCount = playersData.max || 20;
+        playerList = playersData.players || [];
+        // Jika get_online_players merespons dengan sukses tapi statusData tidak ada / fallback
+        if (playersRes && playersRes.ok && !statusData) {
+          isOnline = true;
+        }
+      }
+    } catch (e) {
+      console.warn("Worker fetch status/players failed:", e);
+    }
+
+    // Priority 2: Fallback to mcsrvstat API if Worker did not respond as online
+    if (!isOnline) {
+      try {
+        const response = await fetch(`https://api.mcsrvstat.us/3/${SERVER_DOMAIN}`);
+        const data = await response.json();
+
+        if (data && data.online) {
+          isOnline = true;
+          onlineCount = data.players ? data.players.online : 0;
+          maxCount = data.players ? data.players.max : 20;
+          playerList = (data.players && data.players.list) ? data.players.list : [];
+        }
+      } catch (e) {
+        console.warn("mcsrvstat fetch failed:", e);
+      }
+    }
+
+    if (isOnline) {
       if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
-      const onlineCount = data.players ? data.players.online : 0;
-      const maxCount = data.players ? data.players.max : 0;
       if (countText) countText.innerText = `${onlineCount} / ${maxCount} Warriors Online`;
 
       if (container) {
-        if (data.players && data.players.list && data.players.list.length > 0) {
-          container.innerHTML = data.players.list.map(player => {
+        if (playerList.length > 0) {
+          container.innerHTML = playerList.map(player => {
             const playerName = typeof player === 'object' ? player.name : player;
             const playerRank = typeof player === 'object' && player.group ? player.group : 'Member';
             const safeName = escapeHTML(playerName);

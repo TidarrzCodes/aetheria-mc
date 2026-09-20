@@ -836,6 +836,7 @@ function renderRankBadge(rankName) {
 
 async function fetchOnlinePlayers() {
   const dot = document.getElementById('player-tab-dot');
+  const headerDot = document.getElementById('header-status-dot');
   const countText = document.getElementById('player-tab-count');
   const tableBody = document.getElementById('player-table-list');
   const badgeCount = document.getElementById('nav-player-badge');
@@ -863,72 +864,77 @@ async function fetchOnlinePlayers() {
     const isOnline = pteroOnline || pteroState === 'running' || rconSuccess;
 
     if (isOnline) {
-      dot.className = "w-3 h-3 rounded-full bg-emerald-500 animate-pulse";
+      if (dot) dot.className = "w-3 h-3 rounded-full bg-emerald-500 animate-pulse";
+      if (headerDot) headerDot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
       
       let onlineList = (rconData && rconData.players) ? rconData.players : [];
       let onlineCount = (rconData && typeof rconData.online === 'number') ? rconData.online : onlineList.length;
       let maxCount = (rconData && rconData.max) ? rconData.max : 20;
 
-      countText.innerText = `${onlineCount} / ${maxCount} Player Online (ONLINE)`;
+      if (countText) countText.innerText = `${onlineCount} / ${maxCount} Player Online (ONLINE)`;
       if (badgeCount) badgeCount.innerText = onlineCount;
 
       if (onlineList.length > 0) {
-        tableBody.innerHTML = onlineList.map(p => {
-          const name = typeof p === 'object' ? p.name : p;
-          const rank = typeof p === 'object' && p.group ? p.group : 'Member';
-          const safeName = escapeHTML(name);
+        if (tableBody) {
+          tableBody.innerHTML = onlineList.map(p => {
+            const name = typeof p === 'object' ? p.name : p;
+            const rank = typeof p === 'object' && p.group ? p.group : 'Member';
+            const safeName = escapeHTML(name);
 
-          return `
-            <tr onclick="openPlayerDetailModal('${safeName}')" class="hover:bg-zinc-900/60 transition cursor-pointer group" title="Klik baris untuk melihat IP, Geolokasi, & Telemetry ${safeName}">
-              <td class="p-3.5 w-12">
-                <img src="https://mc-heads.net/avatar/${safeName}/28" alt="${safeName}" class="w-7 h-7 rounded border border-zinc-700 group-hover:border-rose-500 transition">
-              </td>
-              <td class="p-3.5 font-semibold text-white font-mono flex items-center gap-1.5">
-                <span>${safeName}</span>
-                <i class="fa-solid fa-circle-info text-[10px] text-zinc-600 group-hover:text-rose-400 transition"></i>
-              </td>
-              <td class="p-3.5">
-                ${renderRankBadge(rank)}
-              </td>
-              <td class="p-3.5">
-                <span class="text-zinc-500 font-mono text-[11px]">-</span>
-              </td>
-              <td class="p-3.5">
-                <span class="text-zinc-500 font-mono text-[11px]">-</span>
-              </td>
-              <td class="p-3.5 text-right font-mono" onclick="event.stopPropagation()">
-                <div class="inline-flex items-center gap-1.5 flex-wrap justify-end">
-                  <button onclick="event.stopPropagation(); invseePlayer('${safeName}')" class="bg-blue-950/80 hover:bg-blue-900 border border-blue-600/50 text-blue-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
-                    <i class="fa-solid fa-box-open text-[10px]"></i> Invsee
-                  </button>
-                  <button onclick="event.stopPropagation(); openEditPlayerModal('${safeName}')" class="bg-purple-950/80 hover:bg-purple-900 border border-purple-600/50 text-purple-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
-                    <i class="fa-solid fa-user-gear text-[10px]"></i> Edit Player
-                  </button>
-                  <button onclick="event.stopPropagation(); kickPlayer('${safeName}')" class="bg-amber-950/80 hover:bg-amber-900 border border-amber-600/50 text-amber-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
-                    <i class="fa-solid fa-user-minus text-[10px]"></i> Kick
-                  </button>
-                  <button onclick="event.stopPropagation(); banPlayer('${safeName}')" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
-                    <i class="fa-solid fa-gavel text-[10px]"></i> Ban
-                  </button>
-                </div>
-              </td>
-            </tr>
-          `;
-        }).join('');
+            return `
+              <tr onclick="openPlayerDetailModal('${safeName}')" class="hover:bg-zinc-900/60 transition cursor-pointer group" title="Klik baris untuk melihat IP, Geolokasi, & Telemetry ${safeName}">
+                <td class="p-3.5 w-12">
+                  <img src="https://mc-heads.net/avatar/${safeName}/28" alt="${safeName}" class="w-7 h-7 rounded border border-zinc-700 group-hover:border-rose-500 transition">
+                </td>
+                <td class="p-3.5 font-semibold text-white font-mono flex items-center gap-1.5">
+                  <span>${safeName}</span>
+                  <i class="fa-solid fa-circle-info text-[10px] text-zinc-600 group-hover:text-rose-400 transition"></i>
+                </td>
+                <td class="p-3.5">
+                  ${renderRankBadge(rank)}
+                </td>
+                <td class="p-3.5">
+                  <span class="text-zinc-500 font-mono text-[11px]">-</span>
+                </td>
+                <td class="p-3.5">
+                  <span class="text-zinc-500 font-mono text-[11px]">-</span>
+                </td>
+                <td class="p-3.5 text-right font-mono" onclick="event.stopPropagation()">
+                  <div class="inline-flex items-center gap-1.5 flex-wrap justify-end">
+                    <button onclick="event.stopPropagation(); invseePlayer('${safeName}')" class="bg-blue-950/80 hover:bg-blue-900 border border-blue-600/50 text-blue-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
+                      <i class="fa-solid fa-box-open text-[10px]"></i> Invsee
+                    </button>
+                    <button onclick="event.stopPropagation(); openEditPlayerModal('${safeName}')" class="bg-purple-950/80 hover:bg-purple-900 border border-purple-600/50 text-purple-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
+                      <i class="fa-solid fa-user-gear text-[10px]"></i> Edit Player
+                    </button>
+                    <button onclick="event.stopPropagation(); kickPlayer('${safeName}')" class="bg-amber-950/80 hover:bg-amber-900 border border-amber-600/50 text-amber-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
+                      <i class="fa-solid fa-user-minus text-[10px]"></i> Kick
+                    </button>
+                    <button onclick="event.stopPropagation(); banPlayer('${safeName}')" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
+                      <i class="fa-solid fa-gavel text-[10px]"></i> Ban
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
       } else {
-        tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-zinc-500 font-mono">Belum ada player yang sedang online di server.</td></tr>`;
+        if (tableBody) tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-zinc-500 font-mono">Belum ada player yang sedang online di server.</td></tr>`;
       }
     } else {
-      dot.className = "w-3 h-3 rounded-full bg-rose-500";
-      countText.innerText = "Server Offline (OFF)";
+      if (dot) dot.className = "w-3 h-3 rounded-full bg-rose-500";
+      if (headerDot) headerDot.className = "w-2 h-2 rounded-full bg-rose-500";
+      if (countText) countText.innerText = "Server Offline (OFF)";
       if (badgeCount) badgeCount.innerText = "0";
-      tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-rose-400 font-mono">Server Minecraft sedang offline. Tekan tombol ON untuk menyalakan server.</td></tr>`;
+      if (tableBody) tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-rose-400 font-mono">Server Minecraft sedang offline. Tekan tombol ON untuk menyalakan server.</td></tr>`;
     }
   } catch (err) {
-    dot.className = "w-3 h-3 rounded-full bg-amber-500";
-    countText.innerText = "Gagal memuat data server";
+    if (dot) dot.className = "w-3 h-3 rounded-full bg-amber-500";
+    if (headerDot) headerDot.className = "w-2 h-2 rounded-full bg-amber-500";
+    if (countText) countText.innerText = "Gagal memuat data server";
     if (badgeCount) badgeCount.innerText = "!";
-    tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-amber-500 font-mono">Gagal mengambil data dari API server Minecraft.</td></tr>`;
+    if (tableBody) tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-amber-500 font-mono">Gagal mengambil data dari API server Minecraft.</td></tr>`;
   }
 }
 
