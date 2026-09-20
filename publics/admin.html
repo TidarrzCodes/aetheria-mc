@@ -305,67 +305,6 @@
 
       <!-- VIEW ETC SECTION (WEBCHAT LOGS & SERVER UTILITIES) -->
       <section id="view-etc" class="space-y-6 hidden">
-        
-        <!-- MANAJEMEN CLAN SERVER (TAMBAH, HAPUS, & DAFTAR CLAN) -->
-        <div class="bg-[#121215] border border-zinc-800/80 rounded-xl p-4 sm:p-5 shadow-xl space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-3">
-            <div>
-              <h2 class="text-xs sm:text-sm font-bold text-white font-mono uppercase tracking-wider flex items-center gap-2">
-                <i class="fa-solid fa-shield-cat text-cyan-400"></i> Manajemen Clan Server (SimpleClans)
-              </h2>
-              <p class="text-[11px] text-zinc-400 font-mono mt-0.5">Tambah clan baru, lihat daftar clan, dan hapus/disband clan di server Minecraft</p>
-            </div>
-            <button onclick="fetchEtcClanList()" title="Refresh Daftar Clan" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5 shrink-0 self-start sm:self-auto">
-              <i class="fa-solid fa-rotate-right text-[11px]"></i> Refresh List
-            </button>
-          </div>
-
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 font-mono text-xs">
-            <!-- 1. FORM BUAT CLAN BARU -->
-            <div class="bg-[#09090b] border border-zinc-800 rounded-xl p-4 space-y-3 lg:col-span-1">
-              <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2 border-b border-zinc-800 pb-2">
-                <i class="fa-solid fa-square-plus text-cyan-400"></i> Tambah Clan Baru
-              </h3>
-              <div class="space-y-1">
-                <label class="text-[11px] text-zinc-400 font-semibold">TAG Clan (2 - 6 Karakter):</label>
-                <input type="text" id="createClanTagInput" placeholder="Contoh: ATH" class="w-full bg-[#121215] border border-zinc-800 text-white rounded-lg px-3 py-2 focus:outline-none focus:border-cyan-500 placeholder:text-zinc-600 uppercase">
-              </div>
-              <div class="space-y-1">
-                <label class="text-[11px] text-zinc-400 font-semibold">Nama Lengkap Clan:</label>
-                <input type="text" id="createClanNameInput" placeholder="Contoh: Aetheria Alliance" class="w-full bg-[#121215] border border-zinc-800 text-white rounded-lg px-3 py-2 focus:outline-none focus:border-cyan-500 placeholder:text-zinc-600">
-              </div>
-              <button onclick="submitCreateClan()" class="w-full bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-600/50 text-cyan-300 py-2.5 rounded-lg transition font-bold flex items-center justify-center gap-1.5 mt-2">
-                <i class="fa-solid fa-plus text-[11px]"></i> Buat Clan Baru
-              </button>
-            </div>
-
-            <!-- 2. TABEL DAFTAR & HAPUS CLAN -->
-            <div class="bg-[#09090b] border border-zinc-800 rounded-xl overflow-hidden lg:col-span-2 shadow-inner">
-              <div class="p-3 border-b border-zinc-800 bg-[#121215] flex items-center justify-between">
-                <span class="font-bold text-zinc-200 text-xs flex items-center gap-2">
-                  <i class="fa-solid fa-list-check text-emerald-400"></i> Daftar Clan Aktif di Server
-                </span>
-                <span id="etc-clan-count" class="text-[10px] text-zinc-500">0 Clan</span>
-              </div>
-              <div class="overflow-x-auto custom-scrollbar max-h-64">
-                <table class="w-full text-left text-xs min-w-[450px]">
-                  <thead class="bg-[#18181b] text-zinc-400 font-mono text-[10px] uppercase border-b border-zinc-800 sticky top-0 z-10">
-                    <tr>
-                      <th class="p-2.5 w-24">TAG Clan</th>
-                      <th class="p-2.5">Nama Clan</th>
-                      <th class="p-2.5 text-right w-28">Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody id="etc-clan-table-list" class="divide-y divide-zinc-800/60 font-mono text-zinc-300">
-                    <tr>
-                      <td colspan="3" class="text-center p-6 text-zinc-500">Memuat daftar clan...</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <!-- LIVE WEBCHAT LOGS -->
         <div class="bg-[#121215] border border-zinc-800/80 rounded-xl p-4 sm:p-5 shadow-xl space-y-4">
@@ -433,7 +372,7 @@
             <h3 class="text-sm font-mono font-bold text-zinc-100 flex items-center gap-2">
               <i class="fa-solid fa-user-gear text-purple-400"></i> Edit Player: <span id="editPlayerUsername" class="text-purple-400">Username</span>
             </h3>
-            <p class="text-[11px] font-mono text-zinc-500">Manajemen Rank, Economy, & Clan</p>
+            <p class="text-[11px] font-mono text-zinc-500">Manajemen Rank & Economy</p>
           </div>
         </div>
         <button onclick="closeEditPlayerModal()" class="text-zinc-400 hover:text-white text-xs font-mono bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 px-2.5 py-1 rounded-lg transition">
@@ -450,10 +389,6 @@
         <button id="editPlayerBtnTab-eco" onclick="switchEditPlayerTab('eco')"
           class="px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white transition text-[11px] font-mono flex items-center gap-1">
           <i class="fa-solid fa-coins text-amber-400"></i> Balance
-        </button>
-        <button id="editPlayerBtnTab-clan" onclick="switchEditPlayerTab('clan')"
-          class="px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white transition text-[11px] font-mono flex items-center gap-1">
-          <i class="fa-solid fa-flag text-emerald-400"></i> Clan
         </button>
       </div>
 
@@ -542,40 +477,6 @@
           <button onclick="submitEcoResetBalance()" class="bg-amber-950/80 hover:bg-amber-900 border border-amber-600/50 text-amber-300 px-3 py-1.5 rounded-lg transition text-[11px] flex items-center gap-1.5 font-bold">
             <i class="fa-solid fa-rotate-left text-amber-400"></i> Reset Balance to 0
           </button>
-        </div>
-      </div>
-
-      <!-- TAB 3: SIMPLECLANS (CLAN MANAGEMENT) -->
-      <div id="editPlayerTab-clan" class="space-y-4 font-mono text-xs hidden">
-        <!-- 1. SET PLAYER CLAN GROUP -->
-        <div class="bg-[#09090b] border border-zinc-800 p-3.5 rounded-lg space-y-3">
-          <div class="flex items-center justify-between">
-            <label class="text-[11px] text-zinc-400 font-semibold flex items-center gap-1.5">
-              <i class="fa-solid fa-users-gear text-emerald-400"></i> Set Clan Player
-            </label>
-            <button onclick="fetchAvailableClans()" title="Refresh Daftar Clan" class="text-zinc-500 hover:text-emerald-400 text-[10px] font-mono flex items-center gap-1 transition">
-              <i class="fa-solid fa-rotate-right"></i> Refresh Clan
-            </button>
-          </div>
-          
-          <div class="space-y-2">
-            <!-- DYNAMIC CLAN SELECTOR DROPDOWN -->
-            <select id="clanSelect" onchange="handleClanSelectChange()" class="w-full bg-[#121215] border border-zinc-800 text-zinc-200 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-500 text-xs">
-              <option value="">-- Pilih Clan yang Tersedia --</option>
-              <option value="custom">-- Tulis Custom Tag --</option>
-            </select>
-
-            <input type="text" id="clanTagInput" placeholder="Masukkan Custom Tag Clan (Contoh: ATH)..." class="w-full bg-[#121215] border border-zinc-800 text-white rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-500 placeholder:text-zinc-600 uppercase text-xs hidden">
-            
-            <div class="grid grid-cols-2 gap-2 pt-1">
-              <button onclick="submitClanSetGroup('force')" class="bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-600/50 text-emerald-300 py-2 rounded-lg transition font-bold flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-right-to-bracket text-[10px]"></i> Set / Join Clan
-              </button>
-              <button onclick="submitClanSetGroup('leave')" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 py-2 rounded-lg transition font-bold flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-user-xmark text-[10px]"></i> Keluar dari Clan
-              </button>
-            </div>
-          </div>
         </div>
       </div>
 

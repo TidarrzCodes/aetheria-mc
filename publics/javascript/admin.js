@@ -102,7 +102,6 @@ document.addEventListener('keydown', (e) => {
     closeImageModal();
     closeInvseeModal();
     closeEditPlayerModal();
-    closeEditClanModal();
   }
 });
 
@@ -370,22 +369,18 @@ function closeEditPlayerModal() {
 function switchEditPlayerTab(tabName) {
   const tabLp = document.getElementById('editPlayerTab-lp');
   const tabEco = document.getElementById('editPlayerTab-eco');
-  const tabClan = document.getElementById('editPlayerTab-clan');
 
   const btnLp = document.getElementById('editPlayerBtnTab-lp');
   const btnEco = document.getElementById('editPlayerBtnTab-eco');
-  const btnClan = document.getElementById('editPlayerBtnTab-clan');
 
   if (tabLp) tabLp.classList.add('hidden');
   if (tabEco) tabEco.classList.add('hidden');
-  if (tabClan) tabClan.classList.add('hidden');
 
   const inactiveBtnClass = "px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white transition text-[11px] font-mono flex items-center gap-1";
   const activeBtnClass = "px-2.5 py-1 rounded-lg bg-zinc-800 text-white font-medium transition text-[11px] font-mono flex items-center gap-1";
 
   if (btnLp) btnLp.className = inactiveBtnClass;
   if (btnEco) btnEco.className = inactiveBtnClass;
-  if (btnClan) btnClan.className = inactiveBtnClass;
 
   if (tabName === 'lp') {
     if (tabLp) tabLp.classList.remove('hidden');
@@ -393,10 +388,6 @@ function switchEditPlayerTab(tabName) {
   } else if (tabName === 'eco') {
     if (tabEco) tabEco.classList.remove('hidden');
     if (btnEco) btnEco.className = activeBtnClass;
-  } else if (tabName === 'clan') {
-    if (tabClan) tabClan.classList.remove('hidden');
-    if (btnClan) btnClan.className = activeBtnClass;
-    fetchAvailableClans();
   }
 }
 
@@ -512,262 +503,6 @@ async function submitEcoResetBalance() {
   await executeAdminCommand(command, `Balance ${currentTargetPlayer} telah di-reset ke 0.`);
 }
 
-// SIMPLECLANS HANDLERS
-let cachedClans = [];
-
-const CONSOLE_LOG_RESERVED_WORDS = [
-  'SERVER', 'THERE', 'OUT', 'OFFLINE', 'ONLINE', 'ISSUED', 'TYPE', 'FOR', 
-  'THREAD', 'INFO', 'WARN', 'ERROR', 'COMMAND', 'CONSOLE', 'CLANS', 'LIST', 
-  'NAME', 'TOTAL', 'PAGE', 'PLAYERS', 'PLAYER', 'SUCCESS', 'FAILED', 'UNKNOWN', 
-  'USAGE', 'DAA', 'AETHERIA', 'HELP', 'VERSION', 'MAXIMUM', 'LP', 'LUCKPERMS', 'ESSENTIALS', 'VAULT'
-];
-
-async function fetchAvailableClans() {
-  const select = document.getElementById('clanSelect');
-  if (!select) return;
-
-  try {
-    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
-    const res = await fetch(`${WORKER_PROXY_URL}?action=admin_command`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Admin-Token': adminToken
-      },
-      body: JSON.stringify({ command: 'clan list' })
-    });
-
-    const json = await res.json().catch(() => null);
-    if (res.ok && json && json.result === 'success' && json.output) {
-      const outputLines = json.output.split('\n');
-      outputLines.forEach(rawLine => {
-        const cleanLine = rawLine
-          .replace(/\[\d{2}:\d{2}:\d{2}[^\]]*\]/g, '')
-          .replace(/\[(INFO|WARN|ERROR|Console|Server thread\/[A-Z]+)[^\]]*\]/gi, '')
-          .trim();
-
-        const lower = cleanLine.toLowerCase();
-        if (!cleanLine || 
-            lower.includes('issued server command') || 
-            lower.includes('server thread') || 
-            lower.includes('there are') || 
-            lower.includes('total clans') ||
-            lower.includes('clan list') ||
-            lower.includes('players online')) {
-          return;
-        }
-
-        const match = cleanLine.match(/(?:^\s*[*•\-]?\s*\[([A-Z0-9]{2,6})\])/i) ||
-                      cleanLine.match(/(?:^\s*[*•\-]\s*([A-Z0-9]{2,6})\s*-)/i);
-
-        if (match && match[1]) {
-          const tag = match[1].toUpperCase();
-          if (!CONSOLE_LOG_RESERVED_WORDS.includes(tag) && !cachedClans.includes(tag)) {
-            cachedClans.push(tag);
-          }
-        }
-      });
-    }
-  } catch (e) {
-  } finally {
-    renderClanSelectorOptions();
-  }
-}
-
-function renderClanSelectorOptions() {
-  const select = document.getElementById('clanSelect');
-  if (!select) return;
-
-  const currentVal = select.value;
-  let html = `<option value="">-- Pilih Clan yang Tersedia --</option>`;
-
-  cachedClans.forEach(tag => {
-    html += `<option value="${escapeHTML(tag)}">[${escapeHTML(tag)}] Clan ${escapeHTML(tag)}</option>`;
-  });
-
-  html += `<option value="custom">-- Tulis Custom Tag --</option>`;
-  select.innerHTML = html;
-
-  if (currentVal && Array.from(select.options).some(o => o.value === currentVal)) {
-    select.value = currentVal;
-  }
-}
-
-function handleClanSelectChange() {
-  const select = document.getElementById('clanSelect');
-  const input = document.getElementById('clanTagInput');
-  if (!select || !input) return;
-
-  if (select.value === 'custom') {
-    input.classList.remove('hidden');
-    input.focus();
-  } else {
-    input.classList.add('hidden');
-    input.value = select.value;
-  }
-}
-
-async function submitClanSetGroup(mode = 'force') {
-  if (!currentTargetPlayer) return;
-
-  if (mode === 'leave') {
-    if (!confirm(`Keluarkan ${currentTargetPlayer} dari clan mereka saat ini?`)) return;
-    const command = `clan kick ${currentTargetPlayer}`;
-    await executeAdminCommand(command, `Player ${currentTargetPlayer} telah dikeluarkan dari clan.`);
-    return;
-  }
-
-  const select = document.getElementById('clanSelect');
-  const input = document.getElementById('clanTagInput');
-
-  let tag = '';
-  if (select && select.value && select.value !== 'custom') {
-    tag = select.value.trim().toUpperCase();
-  } else if (input) {
-    tag = input.value.trim().toUpperCase();
-  }
-
-  if (!tag) {
-    showToast("Pilih atau masukkan TAG clan!", "warning");
-    return;
-  }
-
-  const command = `clan forcejoin ${currentTargetPlayer} ${tag}`;
-  await executeAdminCommand(command, `Player ${currentTargetPlayer} berhasil dimasukkan ke Clan [${tag}]!`);
-  if (input) input.value = '';
-}
-
-async function submitCreateClan() {
-  const tagInput = document.getElementById('createClanTagInput');
-  const nameInput = document.getElementById('createClanNameInput');
-
-  const tag = tagInput ? tagInput.value.trim().toUpperCase() : '';
-  const name = nameInput ? nameInput.value.trim() : '';
-
-  if (!tag || !name) {
-    showToast("Masukkan TAG dan Nama Clan!", "warning");
-    return;
-  }
-
-  const command = `clan create ${tag} ${name}`;
-  await executeAdminCommand(command, `Clan Baru [${tag}] "${name}" berhasil dibuat!`);
-
-  if (!cachedClans.includes(tag)) {
-    cachedClans.push(tag);
-    renderClanSelectorOptions();
-  }
-
-  if (tagInput) tagInput.value = '';
-  if (nameInput) nameInput.value = '';
-
-  fetchEtcClanList();
-}
-
-async function fetchEtcClanList() {
-  const tableBody = document.getElementById('etc-clan-table-list');
-  const countBadge = document.getElementById('etc-clan-count');
-  if (!tableBody) return;
-
-  try {
-    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
-    const res = await fetch(`${WORKER_PROXY_URL}?action=admin_command`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Admin-Token': adminToken
-      },
-      body: JSON.stringify({ command: 'clan list' })
-    });
-
-    const json = await res.json().catch(() => null);
-    if (res.ok && json && json.result === 'success' && json.output) {
-      const outputLines = json.output.split('\n');
-      const parsedClans = [];
-
-      outputLines.forEach(rawLine => {
-        const cleanLine = rawLine
-          .replace(/\[\d{2}:\d{2}:\d{2}[^\]]*\]/g, '')
-          .replace(/\[(INFO|WARN|ERROR|Console|Server thread\/[A-Z]+)[^\]]*\]/gi, '')
-          .trim();
-
-        const lower = cleanLine.toLowerCase();
-        if (!cleanLine || 
-            lower.includes('issued server command') || 
-            lower.includes('server thread') || 
-            lower.includes('there are') || 
-            lower.includes('total clans') ||
-            lower.includes('clan list') ||
-            lower.includes('players online')) {
-          return;
-        }
-
-        const match = cleanLine.match(/(?:^\s*[*•\-]?\s*\[([A-Z0-9]{2,6})\])/i) ||
-                      cleanLine.match(/(?:^\s*[*•\-]\s*([A-Z0-9]{2,6})\s*-)/i);
-
-        if (match && match[1]) {
-          const tag = match[1].toUpperCase();
-          if (!CONSOLE_LOG_RESERVED_WORDS.includes(tag) && !parsedClans.some(c => c.tag === tag)) {
-            let cleanName = cleanLine.replace(/[*\[\]]/g, '').trim();
-            parsedClans.push({ tag, name: cleanName });
-            if (!cachedClans.includes(tag)) cachedClans.push(tag);
-          }
-        }
-      });
-
-      if (countBadge) countBadge.innerText = `${parsedClans.length} Clan`;
-
-      if (parsedClans.length > 0) {
-        tableBody.innerHTML = parsedClans.map(clan => `
-          <tr class="hover:bg-zinc-900/50 transition">
-            <td class="p-2.5 font-bold text-emerald-400 font-mono">
-              [${escapeHTML(clan.tag)}]
-            </td>
-            <td class="p-2.5 text-zinc-200">
-              ${escapeHTML(clan.name)}
-            </td>
-            <td class="p-2.5 text-right">
-              <button onclick="disbandClan('${escapeHTML(clan.tag)}')" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 px-2 py-1 rounded text-[11px] transition font-bold flex items-center gap-1 ml-auto">
-                <i class="fa-solid fa-trash-can text-[10px]"></i> Hapus
-              </button>
-            </td>
-          </tr>
-        `).join('');
-      } else if (cachedClans.length > 0) {
-        if (countBadge) countBadge.innerText = `${cachedClans.length} Clan`;
-        tableBody.innerHTML = cachedClans.map(tag => `
-          <tr class="hover:bg-zinc-900/50 transition">
-            <td class="p-2.5 font-bold text-emerald-400 font-mono">[${escapeHTML(tag)}]</td>
-            <td class="p-2.5 text-zinc-300">Clan ${escapeHTML(tag)}</td>
-            <td class="p-2.5 text-right">
-              <button onclick="disbandClan('${escapeHTML(tag)}')" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 px-2 py-1 rounded text-[11px] transition font-bold flex items-center gap-1 ml-auto">
-                <i class="fa-solid fa-trash-can text-[10px]"></i> Hapus
-              </button>
-            </td>
-          </tr>
-        `).join('');
-      } else {
-        tableBody.innerHTML = `<tr><td colspan="3" class="text-center p-6 text-zinc-500 font-mono">Belum ada clan yang terdaftar di server.</td></tr>`;
-      }
-      renderClanSelectorOptions();
-    } else {
-      tableBody.innerHTML = `<tr><td colspan="3" class="text-center p-6 text-rose-400 font-mono">Gagal mengambil data clan dari server.</td></tr>`;
-    }
-  } catch (err) {
-    tableBody.innerHTML = `<tr><td colspan="3" class="text-center p-6 text-rose-500 font-mono">Kesalahan koneksi saat menghubungi server.</td></tr>`;
-  }
-}
-
-async function disbandClan(tag) {
-  if (!tag) return;
-  if (!confirm(`Apakah Anda YAKIN ingin menghapus/disband Clan [${tag}] secara permanen dari server?`)) return;
-
-  const command = `clan disband ${tag}`;
-  await executeAdminCommand(command, `Clan [${tag}] berhasil dibubarkan/dihapus!`);
-
-  cachedClans = cachedClans.filter(c => c !== tag);
-  fetchEtcClanList();
-}
-
 window.openEditPlayerModal = openEditPlayerModal;
 window.closeEditPlayerModal = closeEditPlayerModal;
 window.switchEditPlayerTab = switchEditPlayerTab;
@@ -781,13 +516,6 @@ window.submitEcoSetBalance = submitEcoSetBalance;
 window.submitEcoGiveMoney = submitEcoGiveMoney;
 window.submitEcoTakeMoney = submitEcoTakeMoney;
 window.submitEcoResetBalance = submitEcoResetBalance;
-
-window.fetchAvailableClans = fetchAvailableClans;
-window.handleClanSelectChange = handleClanSelectChange;
-window.submitClanSetGroup = submitClanSetGroup;
-window.submitCreateClan = submitCreateClan;
-window.fetchEtcClanList = fetchEtcClanList;
-window.disbandClan = disbandClan;
 
 function renderPlayerInventory(inventoryList) {
   const itemMap = {};
