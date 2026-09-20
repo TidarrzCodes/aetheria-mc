@@ -592,6 +592,43 @@ function toggleWebChatPopup() {
 window.toggleWebChatPopup = toggleWebChatPopup;
 
 // =========================================================================
+function formatPlaytimeString(rawStat) {
+  if (!rawStat) return '0j 0h';
+  const str = String(rawStat).trim();
+
+  // If already in human format like "342 Jam" or "10d 5h"
+  if (str.includes('Jam')) {
+    const hours = parseInt(str.replace(/[^0-9]/g, ''), 10) || 0;
+    const days = Math.floor(hours / 24);
+    const remHours = hours % 24;
+    return days > 0 ? `${days}h ${remHours}j` : `${remHours}j`;
+  }
+
+  // Parse strings like "5d 2h 22m", "10d 4h", "20h 15m", "45m"
+  const dayMatch = str.match(/(\d+)\s*d(?:ays?)?/i);
+  const hourMatch = str.match(/(\d+)\s*h(?:ours?)?/i);
+  const minMatch = str.match(/(\d+)\s*m(?:in(?:utes?)?)?/i);
+
+  let days = dayMatch ? parseInt(dayMatch[1], 10) : 0;
+  let hours = hourMatch ? parseInt(hourMatch[1], 10) : 0;
+  let mins = minMatch ? parseInt(minMatch[1], 10) : 0;
+
+  if (days === 0 && hours === 0 && mins === 0) {
+    const pureNum = parseInt(str.replace(/[^0-9]/g, ''), 10);
+    if (!isNaN(pureNum) && pureNum > 0) {
+      days = Math.floor(pureNum / 24);
+      hours = pureNum % 24;
+    }
+  }
+
+  const parts = [];
+  if (days > 0) parts.push(`${days}h`);
+  if (hours > 0 || days > 0) parts.push(`${hours}j`);
+  if (mins > 0 || parts.length === 0) parts.push(`${mins}m`);
+
+  return parts.join(' ');
+}
+
 // 3D MINECRAFT SKIN LEADERBOARD SYSTEM (TOP KILLS, PLAYTIME, DONATORS)
 // =========================================================================
 const LEADERBOARD_DATA = {
@@ -606,14 +643,14 @@ const LEADERBOARD_DATA = {
     { rank: 8, username: 'Phantom_X', stat: '29 Kills', title: 'Executioner' }
   ],
   playtime: [
-    { rank: 1, username: 'Darrzz', stat: '342 Jam', title: 'Veteran Realm' },
-    { rank: 2, username: 'AytidarG_', stat: '285 Jam', title: 'Sentinel Guard' },
-    { rank: 3, username: 'Radit_Dev', stat: '210 Jam', title: 'Ancient Wanderer' },
-    { rank: 4, username: 'CraftMaster_ID', stat: '176 Jam', title: 'Guild Keeper' },
-    { rank: 5, username: 'DragonRider', stat: '145 Jam', title: 'Dragon Tamer' },
-    { rank: 6, username: 'Shadow_Walker', stat: '128 Jam', title: 'Explorer' },
-    { rank: 7, username: 'MinerFortyNine', stat: '98 Jam', title: 'Deep Miner' },
-    { rank: 8, username: 'Aether_Hero', stat: '74 Jam', title: 'Adventurer' }
+    { rank: 1, username: 'Darrzz', stat: '14h 6j', title: 'Veteran Realm' },
+    { rank: 2, username: 'AytidarG_', stat: '11h 21j', title: 'Sentinel Guard' },
+    { rank: 3, username: 'Radit_Dev', stat: '8h 18j', title: 'Ancient Wanderer' },
+    { rank: 4, username: 'CraftMaster_ID', stat: '7h 8j', title: 'Guild Keeper' },
+    { rank: 5, username: 'DragonRider', stat: '6h 1j', title: 'Dragon Tamer' },
+    { rank: 6, username: 'Shadow_Walker', stat: '5h 8j', title: 'Explorer' },
+    { rank: 7, username: 'MinerFortyNine', stat: '4h 2j', title: 'Deep Miner' },
+    { rank: 8, username: 'Aether_Hero', stat: '3h 2j', title: 'Adventurer' }
   ],
   donators: [
     { rank: 1, username: 'Darrzz', stat: 'Rp 450.000', title: 'Sultan Realm' },
@@ -660,7 +697,14 @@ async function fetchCustomLeaderboardData() {
     if (res.ok && json && json.result === 'success' && json.data && typeof json.data === 'object') {
       ['kills', 'playtime', 'donators', 'baltop'].forEach(cat => {
         if (Array.isArray(json.data[cat]) && json.data[cat].length > 0) {
-          LEADERBOARD_DATA[cat] = json.data[cat];
+          if (cat === 'playtime') {
+            LEADERBOARD_DATA[cat] = json.data[cat].map(item => ({
+              ...item,
+              stat: formatPlaytimeString(item.stat)
+            }));
+          } else {
+            LEADERBOARD_DATA[cat] = json.data[cat];
+          }
         }
       });
       renderLeaderboard(currentLbCategory);
