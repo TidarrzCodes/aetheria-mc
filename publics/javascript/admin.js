@@ -3,7 +3,7 @@ const SERVER_DOMAIN = "aetheria.raditnex.my.id";
 
 let ordersData = [];
 let currentFilter = 'ALL';
-let currentMainTab = 'orders';
+let currentMainTab = 'systems';
 
 // ==========================================
 // UTILS: COOKIE HELPER
@@ -138,7 +138,7 @@ function startAutoReloadAnimation() {
 
   // Interval terpisah khusus console log agar tetap realtime (setiap 2 detik)
   setInterval(() => {
-    if (currentMainTab === 'players') {
+    if (currentMainTab === 'systems') {
       fetchRealtimeConsoleLogs();
     }
   }, 2000);

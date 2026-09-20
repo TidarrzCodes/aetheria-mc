@@ -72,8 +72,13 @@
         <div class="w-full sm:w-auto flex items-center justify-between gap-2 min-w-0">
           <!-- NAV TABS -->
           <nav class="flex-1 sm:flex-initial flex items-center gap-1 bg-[#121215] p-1 rounded-xl border border-zinc-800 text-xs font-mono shrink-0">
-            <button onclick="switchMainTab('orders')" id="main-tab-orders"
+            <button onclick="switchMainTab('systems')" id="main-tab-systems"
               class="flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition flex items-center justify-center gap-1.5 text-xs">
+              <i class="fa-solid fa-terminal text-[11px]"></i>
+              <span>Systems</span>
+            </button>
+            <button onclick="switchMainTab('orders')" id="main-tab-orders"
+              class="flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5 text-xs">
               <i class="fa-solid fa-receipt text-[11px]"></i>
               <span>Orders</span>
             </button>
@@ -82,11 +87,6 @@
               <i class="fa-solid fa-users text-[11px]"></i>
               <span>Players</span>
               <span id="nav-player-badge" class="bg-zinc-800 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded font-bold">0</span>
-            </button>
-            <button onclick="switchMainTab('systems')" id="main-tab-systems"
-              class="flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5 text-xs">
-              <i class="fa-solid fa-terminal text-[11px]"></i>
-              <span>Systems</span>
             </button>
             <button onclick="switchMainTab('etc')" id="main-tab-etc"
               class="flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5 text-xs">
@@ -127,8 +127,76 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6 w-full flex-1">
+      <!-- VIEW SYSTEMS SECTION (CONSOLE TERMINAL, POWER CONTROLS, & SERVER LOGS) -->
+      <section id="view-systems" class="space-y-4 sm:space-y-6">
+        <!-- SERVER STATUS BAR & POWER CONTROLS -->
+        <div
+          class="flex flex-col md:flex-row justify-between items-start md:items-center p-3.5 sm:p-4 bg-[#121215] border border-zinc-800/80 rounded-xl gap-3 shadow-xl">
+          <div class="flex items-center gap-3">
+            <span id="player-tab-dot" class="w-3 h-3 rounded-full bg-zinc-600"></span>
+            <div>
+              <h2 class="text-xs sm:text-sm font-semibold text-white font-mono">SERVER STATUS</h2>
+              <p id="player-tab-count" class="text-xs text-zinc-400 font-mono">Checking online players...</p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2 font-mono text-xs w-full md:w-auto justify-between md:justify-end">
+            <!-- IP DOMAIN DISPLAY -->
+            <div class="text-[11px] sm:text-xs text-zinc-400 bg-[#09090b] px-3 py-1.5 rounded-lg border border-zinc-800">
+              IP: <strong class="text-white">aetheria.raditnex.my.id</strong>
+            </div>
+
+            <!-- POWER CONTROL BUTTONS -->
+            <div class="inline-flex items-center gap-1.5">
+              <button onclick="controlServerPower('start')" id="btnPowerStart" title="Nyalakan Server"
+                class="bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-600/50 text-emerald-300 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5 font-bold shadow-md">
+                <i class="fa-solid fa-power-off text-[11px] text-emerald-400"></i>
+                <span>ON</span>
+              </button>
+              <button onclick="controlServerPower('restart')" id="btnPowerRestart" title="Reboot / Restart Server"
+                class="bg-amber-950/80 hover:bg-amber-900 border border-amber-600/50 text-amber-300 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5 font-bold shadow-md">
+                <i class="fa-solid fa-rotate-right text-[11px] text-amber-400"></i>
+                <span>Restart</span>
+              </button>
+              <button onclick="controlServerPower('stop')" id="btnPowerStop" title="Matikan Server"
+                class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5 font-bold shadow-md">
+                <i class="fa-solid fa-stop text-[11px] text-rose-400"></i>
+                <span>OFF</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONSOLE TERMINAL WIDGET -->
+        <div class="bg-[#121215] border border-zinc-800/80 rounded-xl overflow-hidden shadow-xl font-mono text-xs">
+          <!-- CONSOLE TERMINAL HEADER -->
+          <div class="flex items-center justify-between bg-[#18181b] px-4 py-2.5 border-b border-zinc-800">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-terminal text-rose-500 text-xs"></i>
+              <h2 class="text-xs font-bold text-white font-mono uppercase tracking-wider">Server Console Terminal</h2>
+            </div>
+            <span class="text-[10px] text-zinc-500 font-mono">Realtime RCON / Pterodactyl Logs</span>
+          </div>
+
+          <!-- CONSOLE LOG BOX -->
+          <div id="consoleTerminalWindow" class="bg-[#0b0c0e] p-3 sm:p-4 text-zinc-300 min-h-[350px] max-h-[500px] overflow-y-auto custom-scrollbar font-mono text-xs leading-relaxed space-y-1">
+            <div class="text-zinc-600">// Server Console Window</div>
+          </div>
+
+          <!-- BOTTOM COMMAND INPUT -->
+          <form onsubmit="sendConsoleCommand(event)" class="flex items-center border-t border-zinc-800 bg-[#07080a] px-3 py-2.5">
+            <span class="text-rose-500 font-bold mr-2 text-xs select-none">&gt;&gt;</span>
+            <input type="text" id="consoleCommandInput" placeholder="Type a command (e.g. say Hello, op Steve, help)..." autocomplete="off"
+              class="flex-1 bg-transparent text-white focus:outline-none font-mono text-xs placeholder:text-zinc-600">
+            <button type="submit" id="btnSendConsole" class="text-xs text-rose-400 hover:text-rose-300 font-bold px-3 py-1 transition font-mono uppercase bg-rose-950/60 border border-rose-600/40 rounded-lg">
+              Send
+            </button>
+          </form>
+        </div>
+      </section>
+
       <!-- VIEW ORDERS SECTION -->
-      <section id="view-orders" class="space-y-4 sm:space-y-6">
+      <section id="view-orders" class="hidden space-y-4 sm:space-y-6">
         <!-- STATS CARDS -->
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
           <div class="bg-[#121215] border border-zinc-800/80 p-3.5 sm:p-4 rounded-xl">
@@ -287,35 +355,6 @@
               </tbody>
             </table>
           </div>
-        </div>
-      </section>
-
-      <!-- VIEW SYSTEMS SECTION (CONSOLE TERMINAL & SERVER LOGS) -->
-      <section id="view-systems" class="hidden space-y-4 sm:space-y-6">
-        <div class="bg-[#121215] border border-zinc-800/80 rounded-xl overflow-hidden shadow-xl font-mono text-xs">
-          <!-- CONSOLE TERMINAL HEADER -->
-          <div class="flex items-center justify-between bg-[#18181b] px-4 py-2.5 border-b border-zinc-800">
-            <div class="flex items-center gap-2">
-              <i class="fa-solid fa-terminal text-rose-500 text-xs"></i>
-              <h2 class="text-xs font-bold text-white font-mono uppercase tracking-wider">Server Console Terminal</h2>
-            </div>
-            <span class="text-[10px] text-zinc-500 font-mono">Realtime RCON / Pterodactyl Logs</span>
-          </div>
-
-          <!-- CONSOLE LOG BOX -->
-          <div id="consoleTerminalWindow" class="bg-[#0b0c0e] p-3 sm:p-4 text-zinc-300 min-h-[350px] max-h-[500px] overflow-y-auto custom-scrollbar font-mono text-xs leading-relaxed space-y-1">
-            <div class="text-zinc-600">// Server Console Window</div>
-          </div>
-
-          <!-- BOTTOM COMMAND INPUT -->
-          <form onsubmit="sendConsoleCommand(event)" class="flex items-center border-t border-zinc-800 bg-[#07080a] px-3 py-2.5">
-            <span class="text-rose-500 font-bold mr-2 text-xs select-none">&gt;&gt;</span>
-            <input type="text" id="consoleCommandInput" placeholder="Type a command (e.g. say Hello, op Steve, help)..." autocomplete="off"
-              class="flex-1 bg-transparent text-white focus:outline-none font-mono text-xs placeholder:text-zinc-600">
-            <button type="submit" id="btnSendConsole" class="text-xs text-rose-400 hover:text-rose-300 font-bold px-3 py-1 transition font-mono uppercase bg-rose-950/60 border border-rose-600/40 rounded-lg">
-              Send
-            </button>
-          </form>
         </div>
       </section>
 
