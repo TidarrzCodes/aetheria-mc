@@ -227,31 +227,42 @@ function switchMainTab(tabName) {
 
   const viewOrders = document.getElementById('view-orders');
   const viewPlayers = document.getElementById('view-players');
+  const viewSystems = document.getElementById('view-systems');
   const viewEtc = document.getElementById('view-etc');
+
   const btnOrders = document.getElementById('main-tab-orders');
   const btnPlayers = document.getElementById('main-tab-players');
+  const btnSystems = document.getElementById('main-tab-systems');
   const btnEtc = document.getElementById('main-tab-etc');
 
   if (viewOrders) viewOrders.classList.add('hidden');
   if (viewPlayers) viewPlayers.classList.add('hidden');
+  if (viewSystems) viewSystems.classList.add('hidden');
   if (viewEtc) viewEtc.classList.add('hidden');
 
-  if (btnOrders) btnOrders.className = "px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center gap-1.5 text-xs";
-  if (btnPlayers) btnPlayers.className = "px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center gap-1.5 text-xs";
-  if (btnEtc) btnEtc.className = "px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center gap-1.5 text-xs";
+  const inactiveBtnClass = "px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5 text-xs";
+  const activeBtnClass = "px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition flex items-center justify-center gap-1.5 text-xs";
+
+  if (btnOrders) btnOrders.className = inactiveBtnClass;
+  if (btnPlayers) btnPlayers.className = inactiveBtnClass;
+  if (btnSystems) btnSystems.className = inactiveBtnClass;
+  if (btnEtc) btnEtc.className = inactiveBtnClass;
 
   if (tabName === 'orders') {
     if (viewOrders) viewOrders.classList.remove('hidden');
-    if (btnOrders) btnOrders.className = "px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition flex items-center gap-1.5 text-xs";
+    if (btnOrders) btnOrders.className = activeBtnClass;
     fetchOrders();
   } else if (tabName === 'players') {
     if (viewPlayers) viewPlayers.classList.remove('hidden');
-    if (btnPlayers) btnPlayers.className = "px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition flex items-center gap-1.5 text-xs";
+    if (btnPlayers) btnPlayers.className = activeBtnClass;
     fetchOnlinePlayers();
+  } else if (tabName === 'systems') {
+    if (viewSystems) viewSystems.classList.remove('hidden');
+    if (btnSystems) btnSystems.className = activeBtnClass;
     fetchRealtimeConsoleLogs();
   } else if (tabName === 'etc') {
     if (viewEtc) viewEtc.classList.remove('hidden');
-    if (btnEtc) btnEtc.className = "px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition flex items-center gap-1.5 text-xs";
+    if (btnEtc) btnEtc.className = activeBtnClass;
     fetchWebChatLogs();
   }
 }
@@ -261,6 +272,8 @@ function syncCurrentTab() {
     fetchOrders();
   } else if (currentMainTab === 'players') {
     fetchOnlinePlayers();
+  } else if (currentMainTab === 'systems') {
+    fetchRealtimeConsoleLogs();
   } else if (currentMainTab === 'etc') {
     fetchWebChatLogs();
   }

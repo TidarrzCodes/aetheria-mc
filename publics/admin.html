@@ -83,6 +83,11 @@
               <span>Players</span>
               <span id="nav-player-badge" class="bg-zinc-800 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded font-bold">0</span>
             </button>
+            <button onclick="switchMainTab('systems')" id="main-tab-systems"
+              class="flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5 text-xs">
+              <i class="fa-solid fa-terminal text-[11px]"></i>
+              <span>Systems</span>
+            </button>
             <button onclick="switchMainTab('etc')" id="main-tab-etc"
               class="flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5 text-xs">
               <i class="fa-solid fa-sliders text-[11px]"></i>
@@ -223,24 +228,6 @@
 
       <!-- VIEW PLAYERS SECTION -->
       <section id="view-players" class="hidden space-y-4 sm:space-y-6">
-        <!-- CONSOLE TERMINAL WIDGET (CLEAN & SIMPLE LIKE PTERODACTYL) -->
-        <div class="bg-[#121215] border border-zinc-800/80 rounded-xl overflow-hidden shadow-xl font-mono text-xs">
-          <!-- CONSOLE LOG BOX -->
-          <div id="consoleTerminalWindow" class="bg-[#0b0c0e] p-3 sm:p-4 text-zinc-300 min-h-[160px] max-h-72 overflow-y-auto custom-scrollbar font-mono text-xs leading-relaxed space-y-1">
-            <div class="text-zinc-600">// Server Console Window</div>
-          </div>
-
-          <!-- BOTTOM COMMAND INPUT -->
-          <form onsubmit="sendConsoleCommand(event)" class="flex items-center border-t border-zinc-800 bg-[#07080a] px-3 py-2">
-            <span class="text-rose-500 font-bold mr-2 text-xs select-none">&gt;&gt;</span>
-            <input type="text" id="consoleCommandInput" placeholder="Type a command..." autocomplete="off"
-              class="flex-1 bg-transparent text-white focus:outline-none font-mono text-xs placeholder:text-zinc-600">
-            <button type="submit" id="btnSendConsole" class="text-xs text-rose-400 hover:text-rose-300 font-bold px-2 py-1 transition font-mono uppercase">
-              Send
-            </button>
-          </form>
-        </div>
-
         <!-- SERVER STATUS BAR & POWER CONTROLS -->
         <div
           class="flex flex-col md:flex-row justify-between items-start md:items-center p-3.5 sm:p-4 bg-[#121215] border border-zinc-800/80 rounded-xl gap-3 shadow-xl">
@@ -300,6 +287,35 @@
               </tbody>
             </table>
           </div>
+        </div>
+      </section>
+
+      <!-- VIEW SYSTEMS SECTION (CONSOLE TERMINAL & SERVER LOGS) -->
+      <section id="view-systems" class="hidden space-y-4 sm:space-y-6">
+        <div class="bg-[#121215] border border-zinc-800/80 rounded-xl overflow-hidden shadow-xl font-mono text-xs">
+          <!-- CONSOLE TERMINAL HEADER -->
+          <div class="flex items-center justify-between bg-[#18181b] px-4 py-2.5 border-b border-zinc-800">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-terminal text-rose-500 text-xs"></i>
+              <h2 class="text-xs font-bold text-white font-mono uppercase tracking-wider">Server Console Terminal</h2>
+            </div>
+            <span class="text-[10px] text-zinc-500 font-mono">Realtime RCON / Pterodactyl Logs</span>
+          </div>
+
+          <!-- CONSOLE LOG BOX -->
+          <div id="consoleTerminalWindow" class="bg-[#0b0c0e] p-3 sm:p-4 text-zinc-300 min-h-[350px] max-h-[500px] overflow-y-auto custom-scrollbar font-mono text-xs leading-relaxed space-y-1">
+            <div class="text-zinc-600">// Server Console Window</div>
+          </div>
+
+          <!-- BOTTOM COMMAND INPUT -->
+          <form onsubmit="sendConsoleCommand(event)" class="flex items-center border-t border-zinc-800 bg-[#07080a] px-3 py-2.5">
+            <span class="text-rose-500 font-bold mr-2 text-xs select-none">&gt;&gt;</span>
+            <input type="text" id="consoleCommandInput" placeholder="Type a command (e.g. say Hello, op Steve, help)..." autocomplete="off"
+              class="flex-1 bg-transparent text-white focus:outline-none font-mono text-xs placeholder:text-zinc-600">
+            <button type="submit" id="btnSendConsole" class="text-xs text-rose-400 hover:text-rose-300 font-bold px-3 py-1 transition font-mono uppercase bg-rose-950/60 border border-rose-600/40 rounded-lg">
+              Send
+            </button>
+          </form>
         </div>
       </section>
 
