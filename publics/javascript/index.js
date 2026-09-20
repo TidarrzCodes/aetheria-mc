@@ -720,8 +720,12 @@ function renderSkinViewer(canvasId, fallbackId, imgId, username) {
   const img = document.getElementById(imgId);
   if (!canvas) return;
 
-  const skinTextureUrl = `https://mc-heads.net/skin/${encodeURIComponent(username)}`;
-  const renderFallbackUrl = `https://mc-heads.net/body/${encodeURIComponent(username)}/right`;
+  const encodedUser = encodeURIComponent(username);
+  const mcHeadsUrl = `https://mc-heads.net/skin/${encodedUser}`;
+  const crafatarUrl = `https://crafatar.com/skins/${encodedUser}`;
+  const elyByUrl = `https://ely.by/services/skins-buffer/skins/${encodedUser}.png`;
+  const defaultSteveUrl = `https://mc-heads.net/skin/Steve`;
+  const renderFallbackUrl = `https://mc-heads.net/body/${encodedUser}/right`;
 
   if (skinViewers[canvasId]) {
     try { skinViewers[canvasId].dispose(); } catch (e) {}
@@ -740,7 +744,7 @@ function renderSkinViewer(canvasId, fallbackId, imgId, username) {
         canvas: canvas,
         width: width || 200,
         height: height || 250,
-        skin: skinTextureUrl
+        skin: mcHeadsUrl
       });
 
       viewer.fov = 70;
@@ -753,6 +757,15 @@ function renderSkinViewer(canvasId, fallbackId, imgId, username) {
         viewer.animation.speed = 0.5;
       }
 
+      // Fallback skin loader jika mc-heads melempar error (404/Steve default)
+      viewer.playerObject.skin.image.onerror = () => {
+        viewer.loadSkin(elyByUrl).catch(() => {
+          viewer.loadSkin(crafatarUrl).catch(() => {
+            viewer.loadSkin(defaultSteveUrl).catch(() => {});
+          });
+        });
+      };
+
       skinViewers[canvasId] = viewer;
       return;
     } catch (err) {
@@ -764,6 +777,12 @@ function renderSkinViewer(canvasId, fallbackId, imgId, username) {
   canvas.classList.add('hidden');
   if (fallback && img) {
     img.src = renderFallbackUrl;
+    img.onerror = () => {
+      img.src = `https://ely.by/services/skins-buffer/skins/${encodedUser}.png`;
+      img.onerror = () => {
+        img.src = `https://mc-heads.net/body/Steve/right`;
+      };
+    };
     fallback.classList.remove('hidden');
   }
 }
