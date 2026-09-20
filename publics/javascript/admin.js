@@ -136,12 +136,12 @@ function startAutoReloadAnimation() {
     }
   }, 100);
 
-  // Interval terpisah khusus console log agar tetap realtime ultra-fast (50ms)
+  // Interval terpisah khusus console log agar tetap realtime cepat (500ms)
   setInterval(() => {
     if (currentMainTab === 'systems') {
       fetchRealtimeConsoleLogs();
     }
-  }, 50);
+  }, 500);
 }
 
 function unlockDashboard() {
@@ -808,25 +808,7 @@ async function fetchRealtimeConsoleLogs() {
 }
 
 function appendConsoleOutput(command, output, isError = false) {
-  const terminal = document.getElementById('consoleTerminalWindow');
-  if (!terminal) return;
-
-  const cmdLine = document.createElement('div');
-  cmdLine.className = "text-white font-medium font-mono pt-1";
-  cmdLine.innerText = `>> ${command}`;
-  terminal.appendChild(cmdLine);
-
-  if (output && output.trim()) {
-    const outLine = document.createElement('pre');
-    outLine.className = isError 
-      ? "text-rose-400 whitespace-pre-wrap font-mono leading-relaxed text-xs" 
-      : "text-zinc-300 whitespace-pre-wrap font-mono leading-relaxed text-xs";
-    outLine.innerText = output.trim();
-    terminal.appendChild(outLine);
-  }
-
-  terminal.scrollTop = terminal.scrollHeight;
-  setTimeout(fetchRealtimeConsoleLogs, 1000);
+  setTimeout(fetchRealtimeConsoleLogs, 300);
 }
 
 function renderRankBadge(rankName) {
