@@ -949,9 +949,10 @@ async function fetchOnlinePlayers() {
     const mcOnline = data ? !!data.online : false;
     const pteroState = (pteroData && pteroData.result === 'success') ? pteroData.state : null;
     const pteroOnline = (pteroData && pteroData.result === 'success') ? pteroData.online : false;
+    const rconSuccess = rconData && rconData.result === 'success';
 
-    // Server dinyatakan ONLINE jika SALAH SATU API mengonfirmasi online!
-    const isOnline = mcOnline || pteroOnline || pteroState === 'running';
+    // Server dinyatakan ONLINE jika SALAH SATU API (termasuk RCON) mengonfirmasi online!
+    const isOnline = mcOnline || pteroOnline || pteroState === 'running' || rconSuccess;
 
     if (isOnline) {
       dot.className = "w-3 h-3 rounded-full bg-emerald-500 animate-pulse";
@@ -1527,8 +1528,12 @@ async function fetchPodiumLeaderboard() {
   try {
     const res = await fetch(`${WORKER_PROXY_URL}?action=get_leaderboard`);
     const json = await res.json().catch(() => null);
-    if (res.ok && json && json.result === 'success' && json.leaderboard) {
-      podiumDataStore = json.leaderboard;
+    const lbData = json ? (json.leaderboard || json.data) : null;
+    if (res.ok && lbData) {
+      if (lbData.baltop && Array.isArray(lbData.baltop) && lbData.baltop.length > 0) podiumDataStore.baltop = lbData.baltop;
+      if (lbData.kills && Array.isArray(lbData.kills) && lbData.kills.length > 0) podiumDataStore.kills = lbData.kills;
+      if (lbData.playtime && Array.isArray(lbData.playtime) && lbData.playtime.length > 0) podiumDataStore.playtime = lbData.playtime;
+      if (lbData.donators && Array.isArray(lbData.donators) && lbData.donators.length > 0) podiumDataStore.donators = lbData.donators;
     }
   } catch (err) {
     console.error("Gagal mengambil leaderboard backend:", err);
