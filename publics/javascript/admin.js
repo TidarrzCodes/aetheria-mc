@@ -801,7 +801,10 @@ async function fetchRealtimeConsoleLogs() {
         terminal.scrollTop = terminal.scrollHeight;
       }
     }
-  } catch (err) { }
+  } catch (err) { 
+  } finally {
+    isFetchingConsole = false;
+  }
 }
 
 function appendConsoleOutput(command, output, isError = false) {
