@@ -197,17 +197,11 @@ async function fetchOnlinePlayers() {
       let playersData = playersRes && playersRes.ok ? await playersRes.json().catch(() => null) : null;
 
       if (statusData && statusData.result === "success") {
-        isOnline = !!statusData.online;
+        isOnline = !!statusData.online && statusData.state === "running";
       }
 
-      if (playersData && playersData.result === "success") {
-        onlineCount = playersData.online || 0;
-        maxCount = playersData.max || 20;
-        playerList = playersData.players || [];
-        // Jika get_online_players merespons dengan sukses tapi statusData tidak ada / fallback
-        if (playersRes && playersRes.ok && !statusData) {
-          isOnline = true;
-        }
+      if (!isOnline && playersData && playersData.result === "success" && playersData.online > 0) {
+        isOnline = true;
       }
     } catch (e) {
       console.warn("Worker fetch status/players failed:", e);

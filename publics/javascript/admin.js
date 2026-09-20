@@ -861,7 +861,13 @@ async function fetchOnlinePlayers() {
     const pteroOnline = (pteroData && pteroData.result === 'success') ? pteroData.online : false;
     const rconSuccess = rconData && rconData.result === 'success';
 
-    const isOnline = pteroOnline || pteroState === 'running' || rconSuccess;
+    // Strict evaluation: If Pterodactyl explicit status is returned, strictly respect state ('running' vs 'offline'/'stopped')
+    let isOnline = false;
+    if (pteroData && pteroData.result === 'success') {
+      isOnline = pteroOnline && (pteroState === 'running');
+    } else {
+      isOnline = rconSuccess;
+    }
 
     if (isOnline) {
       if (dot) dot.className = "w-3 h-3 rounded-full bg-emerald-500 animate-pulse";
