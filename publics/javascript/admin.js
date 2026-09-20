@@ -34,7 +34,7 @@ function eraseCookie(name) {
 }
 
 // ==========================================
-// TOAST NOTIFICATION SYSTEM (POJOK KANAN ATAS)
+// TOAST NOTIFICATION SYSTEM
 // ==========================================
 function showToast(message, type = 'success') {
   const container = document.getElementById('toast-container');
@@ -83,10 +83,9 @@ function escapeHTML(str) {
 }
 
 // ==========================================
-// INITIALIZATION & COOKIE VERIFICATION
+// INITIALIZATION & TIMERS
 // ==========================================
 window.addEventListener('DOMContentLoaded', () => {
-  // Cek otentikasi dari Cookie atau Session Storage
   const adminCookie = getCookie('aetheria_admin_token');
   const sessionAuth = sessionStorage.getItem('aetheria_admin_auth');
 
@@ -107,7 +106,7 @@ document.addEventListener('keydown', (e) => {
 
 let autoReloadElapsed = 0;
 let autoReloadTimer = null;
-const AUTO_REFRESH_INTERVAL = 3000;
+const AUTO_REFRESH_INTERVAL = 10000; // Interval tabel pemain (10 detik)
 
 function startAutoReloadAnimation() {
   if (autoReloadTimer) clearInterval(autoReloadTimer);
@@ -136,15 +135,20 @@ function startAutoReloadAnimation() {
       syncCurrentTab();
     }
   }, 100);
+
+  // Interval terpisah khusus console log agar tetap realtime (setiap 2 detik)
+  setInterval(() => {
+    if (currentMainTab === 'players') {
+      fetchRealtimeConsoleLogs();
+    }
+  }, 2000);
 }
 
 function unlockDashboard() {
   const dash = document.getElementById('dashboardContent');
   if (dash) dash.classList.remove('hidden');
 
-  // Load and render logged-in Staff Profile Badge
   renderStaffProfileBadge();
-
   syncCurrentTab();
   startAutoReloadAnimation();
 }
@@ -174,7 +178,6 @@ async function renderStaffProfileBadge() {
     }
   } catch (e) { }
 
-  // Fallback if worker heartbeat offline
   renderActiveStaffList([{ username: savedUser, rank: savedRank }]);
 }
 
@@ -250,7 +253,6 @@ function switchMainTab(tabName) {
     if (viewEtc) viewEtc.classList.remove('hidden');
     if (btnEtc) btnEtc.className = "px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition flex items-center gap-1.5 text-xs";
     fetchWebChatLogs();
-    fetchEtcClanList();
   }
 }
 
@@ -259,14 +261,14 @@ function syncCurrentTab() {
     fetchOrders();
   } else if (currentMainTab === 'players') {
     fetchOnlinePlayers();
-    fetchRealtimeConsoleLogs();
   } else if (currentMainTab === 'etc') {
     fetchWebChatLogs();
-    fetchEtcClanList();
   }
 }
 
-// MODERASI PLAYER: KICK, BAN, INVSEE, & CUSTOM COMMAND
+// ==========================================
+// MODERASI PEMAIN & KONSOL
+// ==========================================
 async function kickPlayer(username) {
   const reason = prompt(`Masukkan alasan kick untuk ${username}:`, "Dikeluarkan oleh Admin");
   if (reason === null) return;
@@ -340,9 +342,6 @@ function closeInvseeModal() {
   if (modal) modal.classList.add('hidden');
 }
 
-// ==========================================
-// MODERASI PLAYER: UNIFIED EDIT PLAYER (LUCKPERMS, BALANCE, & SIMPLECLANS)
-// ==========================================
 let currentTargetPlayer = '';
 
 function openEditPlayerModal(username) {
@@ -369,7 +368,6 @@ function closeEditPlayerModal() {
 function switchEditPlayerTab(tabName) {
   const tabLp = document.getElementById('editPlayerTab-lp');
   const tabEco = document.getElementById('editPlayerTab-eco');
-
   const btnLp = document.getElementById('editPlayerBtnTab-lp');
   const btnEco = document.getElementById('editPlayerBtnTab-eco');
 
@@ -391,7 +389,6 @@ function switchEditPlayerTab(tabName) {
   }
 }
 
-// LUCKPERMS HANDLERS
 async function submitLpSetGroup() {
   if (!currentTargetPlayer) return;
   const select = document.getElementById('lpGroupSelect');
@@ -449,7 +446,6 @@ async function submitLpClearParent() {
   fetchOnlinePlayers();
 }
 
-// ECONOMY BALANCE HANDLERS
 async function submitEcoSetBalance() {
   if (!currentTargetPlayer) return;
   const input = document.getElementById('ecoAmountInput');
@@ -511,7 +507,6 @@ window.submitLpAddPermission = submitLpAddPermission;
 window.submitLpUnsetPermission = submitLpUnsetPermission;
 window.submitLpCheckInfo = submitLpCheckInfo;
 window.submitLpClearParent = submitLpClearParent;
-
 window.submitEcoSetBalance = submitEcoSetBalance;
 window.submitEcoGiveMoney = submitEcoGiveMoney;
 window.submitEcoTakeMoney = submitEcoTakeMoney;
@@ -527,7 +522,6 @@ function renderPlayerInventory(inventoryList) {
     });
   }
 
-  // 1. Armor Slots (103: Helmet, 102: Chestplate, 101: Leggings, 100: Boots) & Offhand (-106)
   const armorSlots = [
     { slot: 103, elId: 'invsee-slot-103', placeholder: '<i class="fa-solid fa-helmet-safety text-zinc-700 text-xs"></i>', label: 'Helmet' },
     { slot: 102, elId: 'invsee-slot-102', placeholder: '<i class="fa-solid fa-shirt text-zinc-700 text-xs"></i>', label: 'Chestplate' },
@@ -544,7 +538,6 @@ function renderPlayerInventory(inventoryList) {
     }
   });
 
-  // 2. Main Inventory Grid (Slots 9 to 35)
   const mainGrid = document.getElementById('mainInventoryGrid');
   if (mainGrid) {
     let mainHtml = '';
@@ -555,7 +548,6 @@ function renderPlayerInventory(inventoryList) {
     mainGrid.innerHTML = mainHtml;
   }
 
-  // 3. Hotbar Grid (Slots 0 to 8)
   const hotbarGrid = document.getElementById('hotbarGrid');
   if (hotbarGrid) {
     let hotbarHtml = '';
@@ -600,91 +592,23 @@ function renderSlotInnerHtml(slotNum, item, placeholderIcon = '', defaultLabel =
   `;
 }
 
-const ITEM_ID_ALIASES = {
-  // Food & Cooked items
-  'cooked_beef': ['cooked_beef', 'beef_cooked'],
-  'cooked_porkchop': ['cooked_porkchop', 'porkchop_cooked'],
-  'cooked_chicken': ['cooked_chicken', 'chicken_cooked'],
-  'cooked_mutton': ['cooked_mutton', 'mutton_cooked'],
-  'cooked_cod': ['cooked_cod', 'fish_cooked', 'raw_fish'],
-  'cooked_salmon': ['cooked_salmon', 'salmon_cooked'],
-  'porkchop': ['porkchop', 'porkchop_raw'],
-  'beef': ['beef', 'beef_raw'],
-  'chicken': ['chicken', 'chicken_raw'],
-
-  // Books & Potions & Special items
-  'enchanted_book': ['enchanted_book', 'book_enchanted'],
-  'written_book': ['written_book', 'book_written'],
-  'writable_book': ['writable_book', 'book_writable'],
-  'glass_bottle': ['glass_bottle', 'potion_bottle_empty'],
-  'totem_of_undying': ['totem_of_undying', 'totem'],
-  'experience_bottle': ['experience_bottle', 'bottle_o_enchanting'],
-
-  // Gold tools & armor
-  'golden_sword': ['golden_sword', 'gold_sword'],
-  'golden_shovel': ['golden_shovel', 'gold_shovel'],
-  'golden_pickaxe': ['golden_pickaxe', 'gold_pickaxe'],
-  'golden_axe': ['golden_axe', 'gold_axe'],
-  'golden_hoe': ['golden_hoe', 'gold_hoe'],
-  'golden_helmet': ['golden_helmet', 'gold_helmet'],
-  'golden_chestplate': ['golden_chestplate', 'gold_chestplate'],
-  'golden_leggings': ['golden_leggings', 'gold_leggings'],
-  'golden_boots': ['golden_boots', 'gold_boots'],
-  'golden_apple': ['golden_apple', 'apple_golden'],
-  'enchanted_golden_apple': ['enchanted_golden_apple', 'apple_golden_enchanted', 'golden_apple'],
-
-  // Wooden tools
-  'wooden_sword': ['wooden_sword', 'wood_sword'],
-  'wooden_shovel': ['wooden_shovel', 'wood_shovel'],
-  'wooden_pickaxe': ['wooden_pickaxe', 'wood_pickaxe'],
-  'wooden_axe': ['wooden_axe', 'wood_axe'],
-  'wooden_hoe': ['wooden_hoe', 'wood_hoe'],
-
-  // Redstone & utility
-  'redstone': ['redstone', 'redstone_dust'],
-  'repeater': ['repeater', 'diode'],
-  'comparator': ['comparator'],
-  'clock': ['clock', 'watch']
-};
-
-function getItemSourceUrls(cleanId) {
-  const safeId = String(cleanId || '').toLowerCase().replace(/["']/g, '').replace(/^minecraft:/, '').trim();
-  if (!safeId) return [];
-
-  const idVariants = [safeId];
-  if (ITEM_ID_ALIASES[safeId]) {
-    ITEM_ID_ALIASES[safeId].forEach(alias => {
-      if (!idVariants.includes(alias)) idVariants.push(alias);
-    });
-  }
-
-  const urls = [];
-  idVariants.forEach(id => {
-    urls.push(`https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.1/items/${id}.png`);
-    urls.push(`https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.1/blocks/${id}.png`);
-    urls.push(`https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.12.2/items/${id}.png`);
-    urls.push(`https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.12.2/blocks/${id}.png`);
-    urls.push(`https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/item/${id}.png`);
-    urls.push(`https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/block/${id}.png`);
-    urls.push(`https://mc-heads.net/item/${id}`);
-    urls.push(`https://minecraftitemids.com/item/128/${id}.png`);
-  });
-
-  return urls;
-}
-
 function handleItemImgError(img, cleanId) {
   if (!img) return;
   const currentStep = parseInt(img.dataset.step || '0', 10);
   const nextStep = currentStep + 1;
   img.dataset.step = String(nextStep);
 
-  const sources = getItemSourceUrls(cleanId);
+  const sources = [
+    `https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.1/items/${cleanId}.png`,
+    `https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.1/blocks/${cleanId}.png`,
+    `https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/item/${cleanId}.png`,
+    `https://assets.mcasset.cloud/1.20.1/assets/minecraft/textures/block/${cleanId}.png`,
+    `https://mc-heads.net/item/${cleanId}`
+  ];
 
   if (nextStep < sources.length) {
     img.src = sources[nextStep];
   } else {
-    // Hide broken img & display text badge if all CDNs fail
     img.style.display = 'none';
     const parent = img.parentElement;
     if (parent && !parent.querySelector('.mc-fallback-badge')) {
@@ -806,7 +730,7 @@ async function executeAdminCommand(command, successMessage) {
   } finally {
     if (btn) {
       btn.disabled = false;
-      btn.innerHTML = `<i class="fa-solid fa-paper-plane text-[11px]"></i> Kirim Command`;
+      btn.innerHTML = `Send`;
     }
   }
 }
@@ -834,7 +758,6 @@ async function fetchRealtimeConsoleLogs() {
       if (logsStr === lastConsoleLogHash) return;
       lastConsoleLogHash = logsStr;
 
-      // Clean ANSI color codes & Minecraft formatting symbols, filter out automatic background polling spam (/list, data get entity)
       const cleanLogs = json.logs
         .filter(line => {
           const lower = line.toLowerCase();
@@ -863,9 +786,7 @@ async function fetchRealtimeConsoleLogs() {
         terminal.scrollTop = terminal.scrollHeight;
       }
     }
-  } catch (err) {
-    // Silent fail for background console log polling
-  }
+  } catch (err) { }
 }
 
 function appendConsoleOutput(command, output, isError = false) {
@@ -888,13 +809,6 @@ function appendConsoleOutput(command, output, isError = false) {
 
   terminal.scrollTop = terminal.scrollHeight;
   setTimeout(fetchRealtimeConsoleLogs, 1000);
-}
-
-function clearConsoleLog() {
-  const terminal = document.getElementById('consoleTerminalWindow');
-  if (terminal) {
-    terminal.innerHTML = `<div class="text-zinc-500 text-[11px]">// Live Console Terminal Ready. Type command below...</div>`;
-  }
 }
 
 function renderRankBadge(rankName) {
@@ -920,8 +834,6 @@ function renderRankBadge(rankName) {
   return `<span class="bg-zinc-800 text-zinc-400 border border-zinc-700 px-2 py-0.5 rounded text-[10px] font-mono font-semibold">PLAYER</span>`;
 }
 
-let cachedOnlinePlayersList = null;
-
 async function fetchOnlinePlayers() {
   const dot = document.getElementById('player-tab-dot');
   const countText = document.getElementById('player-tab-count');
@@ -930,9 +842,8 @@ async function fetchOnlinePlayers() {
 
   try {
     const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
-    const [pteroRes, mcsrvRes, rconPlayersRes] = await Promise.all([
+    const [pteroRes, rconPlayersRes] = await Promise.all([
       fetch(`${WORKER_PROXY_URL}?action=get_server_status`).catch(() => null),
-      fetch(`https://api.mcsrvstat.us/3/${SERVER_DOMAIN}`).catch(() => null),
       fetch(`${WORKER_PROXY_URL}?action=get_online_players`, {
         method: 'POST',
         headers: { 
@@ -943,63 +854,29 @@ async function fetchOnlinePlayers() {
     ]);
 
     const pteroData = pteroRes ? await pteroRes.json().catch(() => null) : null;
-    const data = mcsrvRes ? await mcsrvRes.json().catch(() => null) : null;
     const rconData = rconPlayersRes ? await rconPlayersRes.json().catch(() => null) : null;
 
-    const mcOnline = data ? !!data.online : false;
     const pteroState = (pteroData && pteroData.result === 'success') ? pteroData.state : null;
     const pteroOnline = (pteroData && pteroData.result === 'success') ? pteroData.online : false;
     const rconSuccess = rconData && rconData.result === 'success';
 
-    // Server dinyatakan ONLINE jika SALAH SATU API (termasuk RCON) mengonfirmasi online!
-    const isOnline = mcOnline || pteroOnline || pteroState === 'running' || rconSuccess;
+    const isOnline = pteroOnline || pteroState === 'running' || rconSuccess;
 
     if (isOnline) {
       dot.className = "w-3 h-3 rounded-full bg-emerald-500 animate-pulse";
       
-      // Utamakan realtime RCON player list jika tersedia, fallback ke mcsrvstat / cache
-      let onlineList = [];
-      let onlineCount = 0;
-      let maxCount = 20;
-
-      if (rconData && rconData.result === 'success') {
-        onlineList = rconData.players || [];
-        onlineCount = typeof rconData.online === 'number' ? rconData.online : onlineList.length;
-        maxCount = rconData.max || 20;
-        cachedOnlinePlayersList = onlineList;
-      } else if (data && data.players) {
-        onlineList = data.players.list || [];
-        onlineCount = data.players.online || 0;
-        maxCount = data.players.max || 20;
-        if (onlineList.length > 0) cachedOnlinePlayersList = onlineList;
-      } else if (cachedOnlinePlayersList !== null && cachedOnlinePlayersList.length > 0) {
-        onlineList = cachedOnlinePlayersList;
-        onlineCount = onlineList.length;
-      }
-
-      if (onlineList.length > onlineCount) {
-        onlineCount = onlineList.length;
-      }
+      let onlineList = (rconData && rconData.players) ? rconData.players : [];
+      let onlineCount = (rconData && typeof rconData.online === 'number') ? rconData.online : onlineList.length;
+      let maxCount = (rconData && rconData.max) ? rconData.max : 20;
 
       countText.innerText = `${onlineCount} / ${maxCount} Player Online (ONLINE)`;
-      badgeCount.innerText = onlineCount;
+      if (badgeCount) badgeCount.innerText = onlineCount;
 
       if (onlineList.length > 0) {
         tableBody.innerHTML = onlineList.map(p => {
           const name = typeof p === 'object' ? p.name : p;
           const rank = typeof p === 'object' && p.group ? p.group : 'Member';
-          const clanTag = typeof p === 'object' && p.clan ? p.clan : (p.clanTag || '');
-          const balanceVal = typeof p === 'object' && p.balance !== undefined ? p.balance : (p.ecoBalance || null);
-
           const safeName = escapeHTML(name);
-
-          const clanHtml = clanTag 
-            ? `<span class="bg-cyan-950/90 text-cyan-300 border border-cyan-700/50 px-2 py-0.5 rounded text-[11px] font-mono font-bold inline-flex items-center gap-1 shadow-sm"><i class="fa-solid fa-shield-cat text-[10px]"></i> [${escapeHTML(clanTag)}]</span>`
-            : `<span class="text-zinc-500 font-mono text-[11px]">-</span>`;
-
-          const balanceHtml = (balanceVal !== null && balanceVal !== undefined)
-            ? `<span class="text-emerald-400 font-mono font-bold text-xs inline-flex items-center gap-1"><i class="fa-solid fa-coins text-[10px] text-amber-400"></i> ${escapeHTML(String(balanceVal))}</span>`
-            : `<span class="text-zinc-500 font-mono text-[11px]">-</span>`;
 
           return `
             <tr onclick="openPlayerDetailModal('${safeName}')" class="hover:bg-zinc-900/60 transition cursor-pointer group" title="Klik baris untuk melihat IP, Geolokasi, & Telemetry ${safeName}">
@@ -1014,10 +891,10 @@ async function fetchOnlinePlayers() {
                 ${renderRankBadge(rank)}
               </td>
               <td class="p-3.5">
-                ${clanHtml}
+                <span class="text-zinc-500 font-mono text-[11px]">-</span>
               </td>
               <td class="p-3.5">
-                ${balanceHtml}
+                <span class="text-zinc-500 font-mono text-[11px]">-</span>
               </td>
               <td class="p-3.5 text-right font-mono" onclick="event.stopPropagation()">
                 <div class="inline-flex items-center gap-1.5 flex-wrap justify-end">
@@ -1041,26 +918,16 @@ async function fetchOnlinePlayers() {
       } else {
         tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-zinc-500 font-mono">Belum ada player yang sedang online di server.</td></tr>`;
       }
-    } else if (pteroState === 'starting') {
-      dot.className = "w-3 h-3 rounded-full bg-amber-500 animate-pulse";
-      countText.innerText = "Server Sedang Starting...";
-      badgeCount.innerText = "0";
-      tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-amber-400 font-mono"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Server Minecraft sedang dalam proses Startup...</td></tr>`;
-    } else if (pteroState === 'stopping') {
-      dot.className = "w-3 h-3 rounded-full bg-rose-400 animate-pulse";
-      countText.innerText = "Server Sedang Stopping...";
-      badgeCount.innerText = "0";
-      tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-rose-400 font-mono"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Server Minecraft sedang mematikan sistem...</td></tr>`;
     } else {
       dot.className = "w-3 h-3 rounded-full bg-rose-500";
       countText.innerText = "Server Offline (OFF)";
-      badgeCount.innerText = "0";
+      if (badgeCount) badgeCount.innerText = "0";
       tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-rose-400 font-mono">Server Minecraft sedang offline. Tekan tombol ON untuk menyalakan server.</td></tr>`;
     }
   } catch (err) {
     dot.className = "w-3 h-3 rounded-full bg-amber-500";
     countText.innerText = "Gagal memuat data server";
-    badgeCount.innerText = "!";
+    if (badgeCount) badgeCount.innerText = "!";
     tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-amber-500 font-mono">Gagal mengambil data dari API server Minecraft.</td></tr>`;
   }
 }
@@ -1120,7 +987,6 @@ function resetOrderFilters() {
 
 function parseOrderDate(dateStr) {
   if (!dateStr) return 0;
-  // Parse format "19/9/2026, 07.44.08" atau ISO date
   const parts = String(dateStr).split(',');
   if (parts.length >= 1) {
     const dParts = parts[0].trim().split('/');
@@ -1175,10 +1041,8 @@ function renderOrders() {
   const endTime = endDateVal ? new Date(endDateVal + 'T23:59:59').getTime() : null;
 
   let filtered = ordersData.filter(o => {
-    // Filter status tab
     if (currentFilter !== 'ALL' && o.status !== currentFilter) return false;
 
-    // Filter Pencarian Teks (ID, Username, Item Name, Category)
     if (searchQuery) {
       const matchId = String(o.id || '').toLowerCase().includes(searchQuery);
       const matchUser = String(o.username || '').toLowerCase().includes(searchQuery);
@@ -1187,7 +1051,6 @@ function renderOrders() {
       if (!matchId && !matchUser && !matchItem && !matchCat) return false;
     }
 
-    // Filter Rentang Tanggal
     if (startTime || endTime) {
       const ordTime = parseOrderDate(o.timestamp);
       if (startTime && ordTime < startTime) return false;
@@ -1197,7 +1060,6 @@ function renderOrders() {
     return true;
   });
 
-  // Urutkan Tanggal
   filtered.sort((a, b) => {
     const timeA = parseOrderDate(a.timestamp);
     const timeB = parseOrderDate(b.timestamp);
@@ -1277,11 +1139,9 @@ async function updateStatus(id, newStatus, username, itemName) {
 
   if (!confirm(confirmMsg)) return;
 
-  // Simpan status lama untuk rollback jika error
   const targetIndex = ordersData.findIndex(o => String(o.id) === String(id));
   const oldStatus = targetIndex !== -1 ? ordersData[targetIndex].status : null;
 
-  // Optimistic UI Update: Langsung ubah status di tampilan lokal
   if (targetIndex !== -1) {
     ordersData[targetIndex].status = newStatus;
     renderOrders();
@@ -1309,7 +1169,6 @@ async function updateStatus(id, newStatus, username, itemName) {
       showToast(`Status berhasil diperbarui ke ${newStatus}!`, "success");
       fetchOrders();
     } else {
-      // Rollback jika server return error
       if (targetIndex !== -1 && oldStatus) {
         ordersData[targetIndex].status = oldStatus;
         renderOrders();
@@ -1346,7 +1205,6 @@ function viewImage(url) {
   const modalLoading = document.getElementById('modalLoading');
   const modalImgLink = document.getElementById('modalImgLink');
 
-  // Reset display
   if (modalImg) modalImg.classList.add('hidden');
   if (modalIframe) modalIframe.classList.add('hidden');
   if (modalLoading) modalLoading.classList.remove('hidden');
@@ -1357,7 +1215,6 @@ function viewImage(url) {
 
   const fileId = extractGDriveFileId(rawUrl);
 
-  // CASE 1: Base64 Image Data (Misal TTD Canvas Signature Pad)
   if (rawUrl.startsWith('data:image')) {
     if (modalImg) {
       modalImg.src = rawUrl;
@@ -1369,7 +1226,6 @@ function viewImage(url) {
     return;
   }
 
-  // CASE 2: Google Drive File URL (Gunakan GDrive Embedded Preview iFrame)
   if (fileId) {
     const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
     if (modalIframe) {
@@ -1382,7 +1238,6 @@ function viewImage(url) {
     return;
   }
 
-  // CASE 3: Standard Image URL Direct Link
   if (modalImg) {
     modalImg.src = rawUrl;
     modalImg.onload = () => {
@@ -1407,52 +1262,9 @@ function closeImageModal() {
 }
 
 // ==========================================
-// ETC TAB: WEBCHAT LOGS & PODIUM LEADERBOARD
+// ETC TAB: WEBCHAT LOGS
 // ==========================================
 let allWebChatLogs = [];
-let currentPodiumCategory = 'kills';
-let podiumDataStore = {
-  kills: [
-    { rank: 1, username: 'AytidarG_', stat: '154 Kills', title: 'Supreme Warlord' },
-    { rank: 2, username: 'Darrzz', stat: '112 Kills', title: 'Shadow Blade' },
-    { rank: 3, username: 'Radit_Dev', stat: '87 Kills', title: 'Dragon Slayer' },
-    { rank: 4, username: 'Vortex_Hunter', stat: '64 Kills', title: 'Vanguard' },
-    { rank: 5, username: 'EnderKnight99', stat: '51 Kills', title: 'Berserker' },
-    { rank: 6, username: 'Nico_Blade', stat: '43 Kills', title: 'Gladiator' },
-    { rank: 7, username: 'SlayerZero', stat: '38 Kills', title: 'Assassin' },
-    { rank: 8, username: 'Phantom_X', stat: '29 Kills', title: 'Executioner' }
-  ],
-  playtime: [
-    { rank: 1, username: 'Darrzz', stat: '342 Jam', title: 'Veteran Realm' },
-    { rank: 2, username: 'AytidarG_', stat: '285 Jam', title: 'Sentinel Guard' },
-    { rank: 3, username: 'Radit_Dev', stat: '210 Jam', title: 'Ancient Wanderer' },
-    { rank: 4, username: 'CraftMaster_ID', stat: '176 Jam', title: 'Guild Keeper' },
-    { rank: 5, username: 'DragonRider', stat: '145 Jam', title: 'Dragon Tamer' },
-    { rank: 6, username: 'Shadow_Walker', stat: '128 Jam', title: 'Explorer' },
-    { rank: 7, username: 'MinerFortyNine', stat: '98 Jam', title: 'Deep Miner' },
-    { rank: 8, username: 'Aether_Hero', stat: '74 Jam', title: 'Adventurer' }
-  ],
-  donators: [
-    { rank: 1, username: 'Darrzz', stat: 'Rp 450.000', title: 'Sultan Realm' },
-    { rank: 2, username: 'AytidarG_', stat: 'Rp 325.000', title: 'Royal Patron' },
-    { rank: 3, username: 'Radit_Dev', stat: 'Rp 200.000', title: 'Crown Sponsor' },
-    { rank: 4, username: 'EnderKnight99', stat: 'Rp 150.000', title: 'Mythic Supporter' },
-    { rank: 5, username: 'Vortex_Hunter', stat: 'Rp 100.000', title: 'Dragon Benefactor' },
-    { rank: 6, username: 'SlayerZero', stat: 'Rp 75.000', title: 'Guild Founder' },
-    { rank: 7, username: 'Nico_Blade', stat: 'Rp 50.000', title: 'Honorary Knight' },
-    { rank: 8, username: 'Phantom_X', stat: 'Rp 25.000', title: 'VIP Supporter' }
-  ],
-  baltop: [
-    { rank: 1, username: 'Darrzz', stat: '5.450.000 Coins', title: 'Sultan Ekonomi' },
-    { rank: 2, username: 'AytidarG_', stat: '3.820.000 Coins', title: 'Banker Realm' },
-    { rank: 3, username: 'Radit_Dev', stat: '2.150.000 Coins', title: 'Merchant King' },
-    { rank: 4, username: 'EnderKnight99', stat: '1.400.000 Coins', title: 'Rich Tycoon' },
-    { rank: 5, username: 'Vortex_Hunter', stat: '950.000 Coins', title: 'Gold Hoarder' },
-    { rank: 6, username: 'SlayerZero', stat: '620.000 Coins', title: 'Coin Collector' },
-    { rank: 7, username: 'Nico_Blade', stat: '450.000 Coins', title: 'Trader' },
-    { rank: 8, username: 'Phantom_X', stat: '300.000 Coins', title: 'Saver' }
-  ]
-};
 
 async function fetchWebChatLogs() {
   const tableBody = document.getElementById('webchat-table-list');
@@ -1524,104 +1336,8 @@ function filterWebChatLogs() {
   renderWebChatLogs(filtered);
 }
 
-async function fetchPodiumLeaderboard() {
-  try {
-    const res = await fetch(`${WORKER_PROXY_URL}?action=get_leaderboard`);
-    const json = await res.json().catch(() => null);
-    const lbData = json ? (json.leaderboard || json.data) : null;
-    if (res.ok && lbData) {
-      if (lbData.baltop && Array.isArray(lbData.baltop) && lbData.baltop.length > 0) podiumDataStore.baltop = lbData.baltop;
-      if (lbData.kills && Array.isArray(lbData.kills) && lbData.kills.length > 0) podiumDataStore.kills = lbData.kills;
-      if (lbData.playtime && Array.isArray(lbData.playtime) && lbData.playtime.length > 0) podiumDataStore.playtime = lbData.playtime;
-      if (lbData.donators && Array.isArray(lbData.donators) && lbData.donators.length > 0) podiumDataStore.donators = lbData.donators;
-    }
-  } catch (err) {
-    console.error("Gagal mengambil leaderboard backend:", err);
-  }
-  populatePodiumForm(currentPodiumCategory);
-}
-
-function switchPodiumCategory(category) {
-  currentPodiumCategory = category;
-  ['kills', 'playtime', 'donators', 'baltop'].forEach(cat => {
-    const btn = document.getElementById(`podium-cat-${cat}`);
-    if (btn) {
-      if (cat === category) {
-        btn.className = cat === 'kills' ? "px-3 py-1.5 rounded-md bg-rose-600 text-white font-semibold transition shrink-0" :
-                        cat === 'playtime' ? "px-3 py-1.5 rounded-md bg-indigo-600 text-white font-semibold transition shrink-0" :
-                        cat === 'donators' ? "px-3 py-1.5 rounded-md bg-purple-600 text-white font-semibold transition shrink-0" :
-                        "px-3 py-1.5 rounded-md bg-amber-600 text-white font-semibold transition shrink-0";
-      } else {
-        btn.className = "px-3 py-1.5 rounded-md text-zinc-400 hover:text-white transition shrink-0";
-      }
-    }
-  });
-
-  populatePodiumForm(category);
-}
-
-function populatePodiumForm(category) {
-  const list = podiumDataStore[category] || [];
-  for (let r = 1; r <= 8; r++) {
-    const item = list.find(x => Number(x.rank) === r) || { username: '', title: '', stat: '' };
-    const elUser = document.getElementById(`podium-r${r}-username`);
-    const elTitle = document.getElementById(`podium-r${r}-title`);
-    const elStat = document.getElementById(`podium-r${r}-stat`);
-
-    if (elUser) elUser.value = item.username || '';
-    if (elTitle) elTitle.value = item.title || '';
-    if (elStat) elStat.value = item.stat || '';
-  }
-}
-
-async function savePodiumData(e) {
-  e.preventDefault();
-  const btn = document.getElementById('btnSavePodium');
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
-  }
-
-  const newCategoryData = [];
-  for (let r = 1; r <= 8; r++) {
-    const username = document.getElementById(`podium-r${r}-username`)?.value.trim() || '';
-    const title = document.getElementById(`podium-r${r}-title`)?.value.trim() || '';
-    const stat = document.getElementById(`podium-r${r}-stat`)?.value.trim() || '';
-    newCategoryData.push({ rank: r, username, title, stat });
-  }
-
-  podiumDataStore[currentPodiumCategory] = newCategoryData;
-
-  try {
-    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
-    const res = await fetch(`${WORKER_PROXY_URL}?action=update_leaderboard`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Admin-Token': adminToken
-      },
-      body: JSON.stringify({ leaderboard: podiumDataStore })
-    });
-
-    const json = await res.json().catch(() => null);
-    if (res.ok && json && json.result === 'success') {
-      showToast(`Podium leaderboard (${currentPodiumCategory.toUpperCase()}) berhasil diperbarui & disimpan!`, "success");
-    } else {
-      showToast("Gagal menyimpan podium: " + (json?.message || "Error server"), "error");
-    }
-  } catch (err) {
-    console.error(err);
-    showToast("Kesalahan koneksi saat menyimpan podium leaderboard.", "error");
-  } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan & Update Podium`;
-    }
-  }
-}
-
 // ==========================================
-// PLAYER TELEMETRY & GEOLOCATION MODAL (IP, LAT/LONG, ISP)
+// PLAYER TELEMETRY MODAL
 // ==========================================
 let currentDetailIpValue = '';
 
@@ -1645,7 +1361,7 @@ async function openPlayerDetailModal(username) {
     const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
     const res = await fetch(`${WORKER_PROXY_URL}?action=get_player_geo`, {
       method: 'POST',
-      headers: {
+      headers: { 
         'Content-Type': 'application/json',
         'X-Admin-Token': adminToken
       },
@@ -1684,7 +1400,6 @@ async function openPlayerDetailModal(username) {
         if (mapLinkEl) mapLinkEl.classList.add('hidden');
       }
 
-      // Pre-fill in-game summary from cached player list if available
       const rankEl = document.getElementById('detailRank');
       const clanEl = document.getElementById('detailClan');
       const balEl = document.getElementById('detailBalance');
