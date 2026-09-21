@@ -1,5 +1,6 @@
 # Ignore Cloudflare Worker file containing API credentials/keys
 worker.js
+kode.gs
 
 # OS & IDE junk
 .DS_Store
