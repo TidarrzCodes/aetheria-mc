@@ -729,13 +729,29 @@ async function fetchCustomLeaderboardData() {
   }
 }
 
+function isEmptyOrZero(item) {
+  if (!item) return true;
+  const user = (item.username || '').trim().toUpperCase();
+  if (!user || user === 'NONE' || user === '-') return true;
+
+  const statStr = String(item.stat || '').trim();
+  if (!statStr || statStr === '-' || statStr === '0') return true;
+
+  const num = parseInt(statStr.replace(/[^0-9]/g, ''), 10);
+  if (isNaN(num) || num === 0) return true;
+
+  return false;
+}
+
 function renderSkinViewer(canvasId, fallbackId, imgId, username) {
   const canvas = document.getElementById(canvasId);
   const fallback = document.getElementById(fallbackId);
   const img = document.getElementById(imgId);
   if (!canvas) return;
 
-  const encodedUser = encodeURIComponent(username);
+  const isNone = !username || username.toUpperCase() === 'NONE' || username === '-';
+  const skinUser = isNone ? 'Steve' : username;
+  const encodedUser = encodeURIComponent(skinUser);
   const skinSources = [
     `https://mc-heads.net/skin/${encodedUser}`,
     `https://crafatar.com/skins/${encodedUser}`,
@@ -836,41 +852,53 @@ function renderLeaderboard(cat) {
     else if (cat === 'baltop') tableTitle.innerText = "Total Uang (Coins)";
   }
 
-  const r1 = data[0] || { username: 'None', stat: '-', title: '-' };
-  const r2 = data[1] || { username: 'None', stat: '-', title: '-' };
-  const r3 = data[2] || { username: 'None', stat: '-', title: '-' };
+  const getRankDisplay = (item, defaultTitle) => {
+    if (isEmptyOrZero(item)) {
+      return { username: 'NONE', stat: '-', title: defaultTitle, skinUser: 'Steve' };
+    }
+    return {
+      username: item.username,
+      stat: item.stat,
+      title: item.title || defaultTitle,
+      skinUser: item.username
+    };
+  };
+
+  const d1 = getRankDisplay(data[0], 'Champion');
+  const d2 = getRankDisplay(data[1], 'Silver Knight');
+  const d3 = getRankDisplay(data[2], 'Bronze Knight');
 
   // Set Rank 1 (Gold)
   const elName1 = document.getElementById('nameRank1');
   const elStat1 = document.getElementById('statRank1');
   const elBadge1 = document.getElementById('badgeRank1');
-  if (elName1) elName1.innerText = r1.username;
-  if (elStat1) elStat1.innerText = r1.stat;
-  if (elBadge1) elBadge1.innerText = r1.title || 'Champion';
-  renderSkinViewer('skinCanvasRank1', 'fallbackRank1', 'imgRank1', r1.username);
+  if (elName1) elName1.innerText = d1.username;
+  if (elStat1) elStat1.innerText = d1.stat;
+  if (elBadge1) elBadge1.innerText = d1.title;
+  renderSkinViewer('skinCanvasRank1', 'fallbackRank1', 'imgRank1', d1.skinUser);
 
   // Set Rank 2 (Silver)
   const elName2 = document.getElementById('nameRank2');
   const elStat2 = document.getElementById('statRank2');
   const elBadge2 = document.getElementById('badgeRank2');
-  if (elName2) elName2.innerText = r2.username;
-  if (elStat2) elStat2.innerText = r2.stat;
-  if (elBadge2) elBadge2.innerText = r2.title || 'Silver Knight';
-  renderSkinViewer('skinCanvasRank2', 'fallbackRank2', 'imgRank2', r2.username);
+  if (elName2) elName2.innerText = d2.username;
+  if (elStat2) elStat2.innerText = d2.stat;
+  if (elBadge2) elBadge2.innerText = d2.title;
+  renderSkinViewer('skinCanvasRank2', 'fallbackRank2', 'imgRank2', d2.skinUser);
 
   // Set Rank 3 (Bronze)
   const elName3 = document.getElementById('nameRank3');
   const elStat3 = document.getElementById('statRank3');
   const elBadge3 = document.getElementById('badgeRank3');
-  if (elName3) elName3.innerText = r3.username;
-  if (elStat3) elStat3.innerText = r3.stat;
-  if (elBadge3) elBadge3.innerText = r3.title || 'Bronze Knight';
-  renderSkinViewer('skinCanvasRank3', 'fallbackRank3', 'imgRank3', r3.username);
+  if (elName3) elName3.innerText = d3.username;
+  if (elStat3) elStat3.innerText = d3.stat;
+  if (elBadge3) elBadge3.innerText = d3.title;
+  renderSkinViewer('skinCanvasRank3', 'fallbackRank3', 'imgRank3', d3.skinUser);
 
   // Set Table (#4 - #10)
   const tableBody = document.getElementById('leaderboardListTable');
   if (tableBody) {
-    const others = data.slice(3);
+    const others = data.slice(3).filter(item => !isEmptyOrZero(item));
     if (others.length === 0) {
       tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-slate-500 italic font-mono-code">Belum ada data ksatria lain.</td></tr>`;
     } else {
