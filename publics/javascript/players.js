@@ -97,19 +97,40 @@ async function showDashboardProfile(playerData) {
   let isOnline = false;
 
   try {
-    const res = await fetch(`https://api.mcsrvstat.us/3/${SERVER_DOMAIN}`);
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.online && data.players && data.players.list) {
-        const match = data.players.list.find(p => {
-          const name = typeof p === 'object' ? p.name : p;
-          return name.toLowerCase() === playerData.username.toLowerCase();
-        });
+    // 1. Cek langsung via Cloudflare Worker Proxy (RCON)
+    const workerRes = await fetch(`${WORKER_PROXY_URL}?action=get_online_players`, { method: "POST" }).catch(() => null);
+    const workerData = workerRes && workerRes.ok ? await workerRes.json().catch(() => null) : null;
 
-        if (match) {
-          isOnline = true;
-          if (typeof match === 'object' && match.group) {
-            currentRank = match.group;
+    if (workerData && workerData.result === "success" && Array.isArray(workerData.players)) {
+      const match = workerData.players.find(p => {
+        const name = typeof p === 'object' ? p.name : p;
+        return name.toLowerCase() === playerData.username.toLowerCase();
+      });
+
+      if (match) {
+        isOnline = true;
+        if (typeof match === 'object' && match.group) {
+          currentRank = match.group;
+        }
+      }
+    }
+
+    // 2. Fallback ke mcsrvstat jika belum terdeteksi online
+    if (!isOnline) {
+      const res = await fetch(`https://api.mcsrvstat.us/3/${SERVER_DOMAIN}`).catch(() => null);
+      if (res && res.ok) {
+        const data = await res.json().catch(() => null);
+        if (data && data.online && data.players && data.players.list) {
+          const match = data.players.list.find(p => {
+            const name = typeof p === 'object' ? p.name : p;
+            return name.toLowerCase() === playerData.username.toLowerCase();
+          });
+
+          if (match) {
+            isOnline = true;
+            if (typeof match === 'object' && match.group) {
+              currentRank = match.group;
+            }
           }
         }
       }

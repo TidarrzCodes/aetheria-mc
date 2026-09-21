@@ -200,24 +200,39 @@ async function fetchOnlinePlayers() {
         isOnline = !!statusData.online && statusData.state === "running";
       }
 
-      if (!isOnline && playersData && playersData.result === "success" && playersData.online > 0) {
-        isOnline = true;
+      if (playersData && playersData.result === "success") {
+        if (Array.isArray(playersData.players)) {
+          playerList = playersData.players;
+        }
+        if (typeof playersData.online === 'number') {
+          onlineCount = playersData.online;
+        } else {
+          onlineCount = playerList.length;
+        }
+        if (typeof playersData.max === 'number') {
+          maxCount = playersData.max;
+        }
+        if (!isOnline && onlineCount > 0) {
+          isOnline = true;
+        }
       }
     } catch (e) {
       console.warn("Worker fetch status/players failed:", e);
     }
 
-    // Priority 2: Fallback to mcsrvstat API if Worker did not respond as online
-    if (!isOnline) {
+    // Priority 2: Fallback to mcsrvstat API if Worker did not respond with players or status
+    if (!isOnline || playerList.length === 0) {
       try {
         const response = await fetch(`https://api.mcsrvstat.us/3/${SERVER_DOMAIN}`);
         const data = await response.json();
 
         if (data && data.online) {
           isOnline = true;
-          onlineCount = data.players ? data.players.online : 0;
-          maxCount = data.players ? data.players.max : 20;
-          playerList = (data.players && data.players.list) ? data.players.list : [];
+          if (onlineCount === 0 && data.players) {
+            onlineCount = data.players.online || 0;
+            maxCount = data.players.max || 20;
+            playerList = (data.players && data.players.list) ? data.players.list : [];
+          }
         }
       } catch (e) {
         console.warn("mcsrvstat fetch failed:", e);
