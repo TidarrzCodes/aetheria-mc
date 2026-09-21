@@ -1,5 +1,6 @@
 /* =========================================================================
    AETHERIA THEME SYSTEM (DARK & LIGHT MODE)
+   Fully Optimized for High Contrast & Complete Element Coverage
    ========================================================================= */
 
 :root {
@@ -24,13 +25,13 @@
 }
 
 html.light {
-  --bg-main: #f3f5fa;
-  --bg-card: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(246, 248, 252, 0.98));
+  --bg-main: #f1f5f9;
+  --bg-card: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
   --bg-card-hover: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(241, 245, 249, 1));
   --bg-subtle: #ffffff;
-  --bg-header: rgba(255, 255, 255, 0.95);
-  --border-card: rgba(244, 63, 94, 0.22);
-  --border-subtle: #e2e8f0;
+  --bg-header: rgba(255, 255, 255, 0.96);
+  --border-card: rgba(226, 232, 240, 0.95);
+  --border-subtle: #cbd5e1;
   --text-title: #0f172a;
   --text-main: #1e293b;
   --text-muted: #475569;
@@ -39,26 +40,38 @@ html.light {
   --input-border: #cbd5e1;
   --input-text: #0f172a;
   --shadow-card: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
-  --slot-bg: #e2e8f0;
+  --slot-bg: #f1f5f9;
   --slot-border: #cbd5e1;
-  --terminal-bg: #181b24;
+  --terminal-bg: #0b0c0e;
 }
 
-/* Base Body Styles */
+/* =========================================================================
+   1. BASE STYLES & LAYOUT
+   ========================================================================= */
+
 body {
   background-color: var(--bg-main) !important;
   color: var(--text-main) !important;
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
+html.light body,
+html.light [class*="bg-[#020305]"]:not(header) {
+  background-color: var(--bg-main) !important;
+}
+
 /* Header Navbar */
-header {
+header,
+html.light header,
+html.light header[class*="bg-[#020305]"],
+html.light header[class*="bg-[#09090b]"] {
   background-color: var(--bg-header) !important;
-  border-color: var(--border-card) !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
   transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
-/* Supreme Glass Cards */
+/* Supreme Glass Cards & Panels */
 .supreme-card, .glass-panel {
   background: var(--bg-card) !important;
   border-color: var(--border-card) !important;
@@ -66,47 +79,18 @@ header {
   transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* Inputs & Form Elements */
+/* Inputs & Form Elements Default */
 .input-box, input[type="text"], input[type="password"], input[type="email"], input[type="number"], select, textarea {
   background-color: var(--input-bg) !important;
   border-color: var(--input-border) !important;
   color: var(--input-text) !important;
 }
 
-/* Light Theme Overrides */
-html.light h1:not(.dragon-title), 
-html.light h2, 
-html.light h3, 
-html.light h4, 
-html.light strong.text-white {
-  color: var(--text-title);
-}
+/* =========================================================================
+   2. LIGHT THEME - CARD, MODAL & SURFACE OVERRIDES
+   ========================================================================= */
 
-/* Pastikan teks putih di dalam card/container menjadi gelap & terbaca jelas di Light Mode */
-html.light .text-white:not([class*="bg-rose"]):not([class*="bg-emerald"]):not([class*="bg-indigo"]):not([class*="bg-cyan"]):not([class*="bg-amber"]):not([class*="bg-purple"]):not([class*="bg-blue"]):not(.btn-keep-white):not(.lang-toggle-badge) {
-  color: var(--text-title) !important;
-}
-
-html.light .text-slate-300,
-html.light .text-slate-200,
-html.light .text-zinc-100,
-html.light .text-zinc-200,
-html.light .text-zinc-300 {
-  color: var(--text-main) !important;
-}
-
-html.light .text-slate-400,
-html.light .text-zinc-400 {
-  color: var(--text-muted) !important;
-}
-
-html.light .text-slate-500,
-html.light .text-zinc-500 {
-  color: var(--text-subtle) !important;
-}
-
-/* Background Card & Panel di Light Mode */
-html.light .bg-slate-900,
+/* Main Surface Cards (e.g. #121215, .supreme-card) */
 html.light [class*="bg-[#121215]"] {
   background-color: #ffffff !important;
   border-color: #e2e8f0 !important;
@@ -114,37 +98,177 @@ html.light [class*="bg-[#121215]"] {
   box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
 }
 
-html.light [class*="bg-[#18181b]"] {
-  background-color: #f1f5f9 !important;
-  border-color: #e2e8f0 !important;
-  color: #334155 !important;
-}
-
-html.light [class*="bg-[#09090b]"] {
+/* Inner Panels & Secondary Containers */
+html.light [class*="bg-[#09090b]"],
+html.light [class*="bg-[#06080d]"],
+html.light [class*="bg-[#07080a]"],
+html.light [class*="bg-[#0b0c0e]"]:not(#consoleTerminalWindow),
+html.light [class*="bg-slate-950"],
+html.light [class*="bg-zinc-950"] {
   background-color: #f8fafc !important;
   border-color: #e2e8f0 !important;
   color: var(--text-main) !important;
 }
 
-html.light .bg-slate-950,
-html.light [class*="bg-[#07080a]"] {
-  background-color: #f8fafc !important;
+/* Interactive Rows, Tab Bars, Inset Highlights */
+html.light [class*="bg-[#18181b]"],
+html.light [class*="bg-slate-900"],
+html.light [class*="bg-zinc-900"] {
+  background-color: #f1f5f9 !important;
   border-color: #e2e8f0 !important;
+  color: var(--text-main) !important;
 }
 
-/* Border System di Light Mode */
-html.light .border-slate-800,
-html.light .border-zinc-800,
+/* Active Tabs & Button Highlights */
+html.light [class*="bg-zinc-800"],
+html.light [class*="bg-slate-800"] {
+  background-color: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+/* Inline Code Elements */
+html.light code[class*="bg-slate"],
+html.light code[class*="bg-zinc"] {
+  background-color: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+/* =========================================================================
+   3. LIGHT THEME - BORDER SYSTEM
+   ========================================================================= */
+
 html.light [class*="border-zinc-800"],
+html.light [class*="border-zinc-700"],
+html.light [class*="border-zinc-600"],
 html.light [class*="border-slate-800"],
+html.light [class*="border-slate-700"],
+html.light [class*="border-slate-900"],
+html.light [class*="border-slate-950"],
 html.light [class*="border-rose-950"] {
   border-color: #e2e8f0 !important;
 }
 
-/* Form Inputs di Light Mode */
-html.light input,
+/* =========================================================================
+   4. LIGHT THEME - ACTION BUTTONS & BADGES (COLOR-CODED)
+   ========================================================================= */
+
+/* Emerald Actions (Approve, ON, Give Money) */
+html.light [class*="bg-emerald-950"] {
+  background-color: #dcfce7 !important;
+  border-color: #86efac !important;
+  color: #15803d !important;
+}
+html.light [class*="bg-emerald-950"]:hover {
+  background-color: #bbf7d0 !important;
+}
+
+/* Rose Actions (Reject, OFF, Ban, Logout, Delete) */
+html.light [class*="bg-rose-950"] {
+  background-color: #ffe4e6 !important;
+  border-color: #fca5a5 !important;
+  color: #be123c !important;
+}
+html.light [class*="bg-rose-950"]:hover {
+  background-color: #fecdd3 !important;
+}
+
+/* Amber Actions (Restart, Kick, Reset) */
+html.light [class*="bg-amber-950"] {
+  background-color: #fef3c7 !important;
+  border-color: #fcd34d !important;
+  color: #b45309 !important;
+}
+html.light [class*="bg-amber-950"]:hover {
+  background-color: #fde68a !important;
+}
+
+/* Purple Actions (Edit, Rank Management) */
+html.light [class*="bg-purple-950"] {
+  background-color: #f3e8ff !important;
+  border-color: #d8b4fe !important;
+  color: #7e22ce !important;
+}
+html.light [class*="bg-purple-950"]:hover {
+  background-color: #e9d5ff !important;
+}
+
+/* Blue Actions (Invsee, Info, Set Balance, GoPay Box) */
+html.light [class*="bg-blue-950"] {
+  background-color: #dbeafe !important;
+  border-color: #93c5fd !important;
+  color: #1d4ed8 !important;
+}
+html.light [class*="bg-blue-950"]:hover {
+  background-color: #bfdbfe !important;
+}
+
+/* Neutral Buttons (e.g. Home, View Proof, Sig) */
+html.light button[class*="bg-zinc-900"],
+html.light a[class*="bg-zinc-900"],
+html.light button[class*="bg-slate-900"],
+html.light a[class*="bg-slate-900"] {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #1e293b !important;
+}
+
+html.light button[class*="bg-zinc-900"]:hover,
+html.light a[class*="bg-zinc-900"]:hover,
+html.light button[class*="bg-slate-900"]:hover,
+html.light a[class*="bg-slate-900"]:hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+/* =========================================================================
+   5. LIGHT THEME - TYPOGRAPHY & CONTRAST
+   ========================================================================= */
+
+html.light h1:not(.dragon-title),
+html.light h2, 
+html.light h3, 
+html.light h4, 
+html.light strong.text-white {
+  color: var(--text-title);
+}
+
+/* Teks putih generik di dalam card/container diubah agar terbaca jelas di Light Mode */
+html.light .text-white:not([class*="bg-rose"]):not([class*="bg-emerald"]):not([class*="bg-indigo"]):not([class*="bg-cyan"]):not([class*="bg-amber"]):not([class*="bg-purple"]):not([class*="bg-blue"]):not(.btn-keep-white):not(.lang-toggle-badge) {
+  color: var(--text-title) !important;
+}
+
+/* Slate & Zinc Text Hierarchies */
+html.light [class*="text-slate-100"],
+html.light [class*="text-slate-200"],
+html.light [class*="text-slate-300"],
+html.light [class*="text-zinc-100"],
+html.light [class*="text-zinc-200"],
+html.light [class*="text-zinc-300"] {
+  color: var(--text-main) !important;
+}
+
+html.light [class*="text-slate-400"],
+html.light [class*="text-zinc-400"] {
+  color: var(--text-muted) !important;
+}
+
+html.light [class*="text-slate-500"],
+html.light [class*="text-zinc-500"],
+html.light [class*="text-slate-600"],
+html.light [class*="text-zinc-600"] {
+  color: var(--text-subtle) !important;
+}
+
+/* =========================================================================
+   6. LIGHT THEME - FORM INPUTS & CONTROLS
+   ========================================================================= */
+
+html.light input:not([type="submit"]):not([type="button"]),
 html.light select,
-html.light textarea {
+html.light textarea,
+html.light .input-box {
   background-color: #ffffff !important;
   border-color: #cbd5e1 !important;
   color: #0f172a !important;
@@ -155,39 +279,82 @@ html.light textarea::placeholder {
   color: #94a3b8 !important;
 }
 
-/* Tab & Buttons Active di Light Mode */
-html.light .bg-zinc-800 {
+html.light input[type="date"] {
+  color-scheme: light !important;
+  color: #1e293b !important;
+}
+
+html.light input[type="file"]::file-selector-button {
   background-color: #e2e8f0 !important;
+  color: #1e293b !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+html.light input[type="file"]::file-selector-button:hover {
+  background-color: #cbd5e1 !important;
   color: #0f172a !important;
 }
 
-html.light .bg-zinc-900 {
-  background-color: #f1f5f9 !important;
-  color: #1e293b !important;
-  border-color: #cbd5e1 !important;
-}
+/* =========================================================================
+   7. LIGHT THEME - TABLES & LISTS
+   ========================================================================= */
 
-/* Tabel di Light Mode */
-html.light thead {
+html.light thead,
+html.light [class*="thead"] {
   background-color: #f1f5f9 !important;
   color: #475569 !important;
+  border-color: #e2e8f0 !important;
 }
 
+html.light tr[class*="hover:bg-zinc-900"]:hover,
+html.light tr[class*="hover:bg-slate-900"]:hover,
 html.light tr:hover {
-  background-color: rgba(241, 245, 249, 0.8) !important;
+  background-color: #f8fafc !important;
 }
 
-/* Terminal Konsol Server: Tetap Gelap dengan Kontras Tajam */
+/* =========================================================================
+   8. LIGHT THEME - MODALS & BACKDROPS
+   ========================================================================= */
+
+html.light [class*="bg-black"],
+html.light [class*="bg-black/85"],
+html.light [class*="bg-black/90"] {
+  background-color: rgba(15, 23, 42, 0.65) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+/* =========================================================================
+   9. TERMINAL CONSOLE & MINECRAFT INVENTORY SLOTS
+   ========================================================================= */
+
+/* Console Terminal Window (Tetap Gelap dengan Kontras Tajam Seperti Terminal Nyata) */
 html.light #consoleTerminalWindow {
   background-color: #0b0c0e !important;
   color: #cbd5e1 !important;
+  border-color: #1e293b !important;
 }
 
-/* WebChat Popup di Light Mode */
+/* Minecraft Inventory Slots */
+html.light .mc-slot {
+  background-color: var(--slot-bg) !important;
+  border-color: var(--slot-border) !important;
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+html.light .mc-slot:hover {
+  border-color: #f43f5e !important;
+  background-color: #e2e8f0 !important;
+}
+
+/* =========================================================================
+   10. LIGHT THEME - WEBCHAT & TOAST NOTIFICATIONS
+   ========================================================================= */
+
 html.light #webChatPopup {
   background-color: rgba(255, 255, 255, 0.98) !important;
   border-color: #cbd5e1 !important;
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.12) !important;
 }
 
 html.light #webChatLog {
@@ -195,17 +362,26 @@ html.light #webChatLog {
   border-color: #e2e8f0 !important;
 }
 
-/* Minecraft Inventory Slots di Light Mode */
-html.light .mc-slot {
-  background-color: var(--slot-bg) !important;
-  border-color: var(--slot-border) !important;
-  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.15);
+html.light #webChatLog span[class*="text-slate-200"] {
+  color: #1e293b !important;
 }
 
-html.light .mc-slot:hover {
-  border-color: #f43f5e !important;
-  background-color: #cbd5e1 !important;
+html.light #webChatLog [class*="border-slate-900"] {
+  border-color: #e2e8f0 !important;
 }
+
+html.light #toast-container > div {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12) !important;
+}
+
+html.light #toast-container > div span {
+  color: #0f172a !important;
+}
+
+/* =========================================================================
+   11. LIGHT THEME - FOOTER
+   ========================================================================= */
 
 html.light footer {
   background-color: #f8fafc !important;
@@ -213,7 +389,10 @@ html.light footer {
   color: #64748b !important;
 }
 
-/* Controls (Buttons & Switchers) */
+/* =========================================================================
+   12. CONTROLS (BUTTONS & SWITCHERS)
+   ========================================================================= */
+
 .theme-toggle-btn, .lang-toggle-btn {
   display: inline-flex;
   align-items: center;
