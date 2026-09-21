@@ -246,8 +246,8 @@ function switchMainTab(tabName) {
   if (viewSystems) viewSystems.classList.add('hidden');
   if (viewEtc) viewEtc.classList.add('hidden');
 
-  const inactiveBtnClass = "px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5 text-xs";
-  const activeBtnClass = "px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition flex items-center justify-center gap-1.5 text-xs";
+  const inactiveBtnClass = "flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5 text-xs";
+  const activeBtnClass = "flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition flex items-center justify-center gap-1.5 text-xs";
 
   if (btnOrders) btnOrders.className = inactiveBtnClass;
   if (btnPlayers) btnPlayers.className = inactiveBtnClass;

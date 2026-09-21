@@ -99,7 +99,9 @@ const AETHERIA_TRANSLATIONS = {
     "checkout.proof_label": "Upload Bukti Transfer *",
     "checkout.sig_label": "Tanda Tangan Pemesan *",
     "checkout.sig_clear": "Hapus TTD",
+    "checkout.btn_clear": "Bersihkan Tanda Tangan",
     "checkout.submit": "Kirim Bukti Pembayaran",
+    "checkout.btn_submit": "Kirim Bukti Pembayaran",
 
     // Live WebChat
     "chat.title": "LIVE CHAT IN-GAME",
@@ -112,6 +114,15 @@ const AETHERIA_TRANSLATIONS = {
     "chat.hint": "Pesan yang kamu kirim akan langsung muncul di chat pemain Minecraft in-game.",
     "chat.placeholder": "Tulis pesan...",
     "chat.send": "Kirim",
+    "webchat.title": "Live WebChat In-Game",
+    "webchat.sender_label": "Identitas Pengirim:",
+    "webchat.user_label": "Username Minecraft *",
+    "webchat.input_user": "Username kamu...",
+    "webchat.enter_user": "Masukkan username & email untuk mulai chat ke server Minecraft:",
+    "webchat.btn_start": "Mulai Chat",
+    "webchat.btn_change": "Ganti",
+    "webchat.in_game_desc": "Pesan yang kamu kirim akan langsung muncul di chat pemain Minecraft in-game.",
+    "webchat.input_msg": "Tulis pesan...",
 
     // Player Dashboard
     "player.hud_title": "PLAYER PROFILE & REALM HUB",
@@ -265,7 +276,9 @@ const AETHERIA_TRANSLATIONS = {
     "checkout.proof_label": "Upload Transfer Receipt *",
     "checkout.sig_label": "Customer Signature *",
     "checkout.sig_clear": "Clear Signature",
+    "checkout.btn_clear": "Clear Signature",
     "checkout.submit": "Submit Payment Receipt",
+    "checkout.btn_submit": "Submit Payment Receipt",
 
     // Live WebChat
     "chat.title": "IN-GAME LIVE CHAT",
@@ -278,6 +291,15 @@ const AETHERIA_TRANSLATIONS = {
     "chat.hint": "Messages sent will immediately appear in-game for Minecraft players.",
     "chat.placeholder": "Type message...",
     "chat.send": "Send",
+    "webchat.title": "Live In-Game WebChat",
+    "webchat.sender_label": "Sender Identity:",
+    "webchat.user_label": "Minecraft Username *",
+    "webchat.input_user": "Your username...",
+    "webchat.enter_user": "Enter your username & email to start chatting to the Minecraft server:",
+    "webchat.btn_start": "Start Chat",
+    "webchat.btn_change": "Change",
+    "webchat.in_game_desc": "Messages you send will appear directly in Minecraft in-game player chat.",
+    "webchat.input_msg": "Type a message...",
 
     // Player Dashboard
     "player.hud_title": "PLAYER PROFILE & REALM HUB",

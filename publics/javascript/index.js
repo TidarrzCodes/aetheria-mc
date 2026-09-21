@@ -350,6 +350,7 @@ function checkAuthNavState() {
 
 window.addEventListener('languageChanged', () => {
   try { checkAuthNavState(); } catch (e) { }
+  try { if (typeof currentLbCategory !== 'undefined' && currentLbCategory) renderLeaderboard(currentLbCategory); } catch (e) { }
 });
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -853,10 +854,11 @@ function renderLeaderboard(cat) {
 
   const tableTitle = document.getElementById('lb-table-stat-title');
   if (tableTitle) {
-    if (cat === 'kills') tableTitle.innerText = "Total Kills";
-    else if (cat === 'playtime') tableTitle.innerText = "Jam Bermain";
-    else if (cat === 'donators') tableTitle.innerText = "Total Donasi";
-    else if (cat === 'baltop') tableTitle.innerText = "Total Uang (Coins)";
+    const isEn = (localStorage.getItem('aetheria_lang') === 'en');
+    if (cat === 'kills') tableTitle.innerText = isEn ? "Total Kills" : "Total Kills";
+    else if (cat === 'playtime') tableTitle.innerText = isEn ? "Playtime Hours" : "Jam Bermain";
+    else if (cat === 'donators') tableTitle.innerText = isEn ? "Total Donations" : "Total Donasi";
+    else if (cat === 'baltop') tableTitle.innerText = isEn ? "Total Wealth (Coins)" : "Total Uang (Coins)";
   }
 
   const getRankDisplay = (item, defaultTitle) => {
