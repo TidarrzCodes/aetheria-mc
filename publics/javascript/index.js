@@ -678,14 +678,14 @@ const LEADERBOARD_DATA = {
     { rank: 8, username: 'NONE', stat: 'Rp 0', title: 'VIP Supporter' }
   ],
   baltop: [
-    { rank: 1, username: 'Darrzz', stat: '5.450.000 Coins', title: 'Sultan Ekonomi' },
-    { rank: 2, username: 'AytidarG_', stat: '3.820.000 Coins', title: 'Banker Realm' },
-    { rank: 3, username: 'Radit_Dev', stat: '2.150.000 Coins', title: 'Merchant King' },
-    { rank: 4, username: 'EnderKnight99', stat: '1.400.000 Coins', title: 'Rich Tycoon' },
-    { rank: 5, username: 'Vortex_Hunter', stat: '950.000 Coins', title: 'Gold Hoarder' },
-    { rank: 6, username: 'SlayerZero', stat: '620.000 Coins', title: 'Coin Collector' },
-    { rank: 7, username: 'Nico_Blade', stat: '450.000 Coins', title: 'Trader' },
-    { rank: 8, username: 'Phantom_X', stat: '300.000 Coins', title: 'Saver' }
+    { rank: 1, username: 'NONE', stat: '0 Coins', title: 'Sultan Ekonomi' },
+    { rank: 2, username: 'NONE', stat: '0 Coins', title: 'Banker Realm' },
+    { rank: 3, username: 'NONE', stat: '0 Coins', title: 'Merchant King' },
+    { rank: 4, username: 'NONE', stat: '0 Coins', title: 'Rich Tycoon' },
+    { rank: 5, username: 'NONE', stat: '0 Coins', title: 'Gold Hoarder' },
+    { rank: 6, username: 'NONE', stat: '0 Coins', title: 'Coin Collector' },
+    { rank: 7, username: 'NONE', stat: '0 Coins', title: 'Trader' },
+    { rank: 8, username: 'NONE', stat: '0 Coins', title: 'Saver' }
   ]
 };
 
