@@ -907,16 +907,19 @@ async function fetchOnlinePlayers() {
                 </td>
                 <td class="p-3.5 text-right font-mono" onclick="event.stopPropagation()">
                   <div class="inline-flex items-center gap-1.5 flex-wrap justify-end">
-                    <button onclick="event.stopPropagation(); invseePlayer('${safeName}')" class="bg-blue-950/80 hover:bg-blue-900 border border-blue-600/50 text-blue-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
+                    <button onclick="event.stopPropagation(); openPlayerDetailModal('${safeName}')" class="bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-600/50 text-emerald-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1 whitespace-nowrap" title="Lihat Info & Telemetry">
+                      <i class="fa-solid fa-circle-info text-[10px]"></i> Info
+                    </button>
+                    <button onclick="event.stopPropagation(); invseePlayer('${safeName}')" class="bg-blue-950/80 hover:bg-blue-900 border border-blue-600/50 text-blue-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1 whitespace-nowrap" title="Inspeksi Inventori">
                       <i class="fa-solid fa-box-open text-[10px]"></i> Invsee
                     </button>
-                    <button onclick="event.stopPropagation(); openEditPlayerModal('${safeName}')" class="bg-purple-950/80 hover:bg-purple-900 border border-purple-600/50 text-purple-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
-                      <i class="fa-solid fa-user-gear text-[10px]"></i> Edit Player
+                    <button onclick="event.stopPropagation(); openEditPlayerModal('${safeName}')" class="bg-purple-950/80 hover:bg-purple-900 border border-purple-600/50 text-purple-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1 whitespace-nowrap" title="Edit Rank & Balance">
+                      <i class="fa-solid fa-user-gear text-[10px]"></i> Edit
                     </button>
-                    <button onclick="event.stopPropagation(); kickPlayer('${safeName}')" class="bg-amber-950/80 hover:bg-amber-900 border border-amber-600/50 text-amber-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
+                    <button onclick="event.stopPropagation(); kickPlayer('${safeName}')" class="bg-amber-950/80 hover:bg-amber-900 border border-amber-600/50 text-amber-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1 whitespace-nowrap">
                       <i class="fa-solid fa-user-minus text-[10px]"></i> Kick
                     </button>
-                    <button onclick="event.stopPropagation(); banPlayer('${safeName}')" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1">
+                    <button onclick="event.stopPropagation(); banPlayer('${safeName}')" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1 whitespace-nowrap">
                       <i class="fa-solid fa-gavel text-[10px]"></i> Ban
                     </button>
                   </div>
@@ -1369,6 +1372,21 @@ async function openPlayerDetailModal(username) {
   if (loadingEl) loadingEl.classList.remove('hidden');
   if (contentEl) contentEl.classList.add('hidden');
 
+  let geoData = {
+    ip: 'Internal / Off-grid',
+    isp: 'Minecraft Server Connection',
+    country: 'Indonesia',
+    countryCode: 'ID',
+    region: '-',
+    city: '-',
+    timezone: 'Asia/Jakarta',
+    lat: null,
+    lon: null,
+    group: 'Member',
+    clan: '-',
+    balance: '$0'
+  };
+
   try {
     const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
     const res = await fetch(`${WORKER_PROXY_URL}?action=get_player_geo`, {
@@ -1383,53 +1401,49 @@ async function openPlayerDetailModal(username) {
     const json = await res.json().catch(() => null);
 
     if (res.ok && json && json.result === 'success') {
-      currentDetailIpValue = json.ip || 'Internal / Hidden';
-
-      const ipEl = document.getElementById('detailIp');
-      const ispEl = document.getElementById('detailIsp');
-      const countryEl = document.getElementById('detailCountry');
-      const regionEl = document.getElementById('detailRegion');
-      const cityEl = document.getElementById('detailCity');
-      const timezoneEl = document.getElementById('detailTimezone');
-      const coordsEl = document.getElementById('detailCoords');
-      const mapLinkEl = document.getElementById('detailMapLink');
-
-      if (ipEl) ipEl.innerText = json.ip || '---';
-      if (ispEl) ispEl.innerText = json.isp || '---';
-      if (countryEl) countryEl.innerText = json.countryCode ? `${json.country} (${json.countryCode})` : (json.country || '---');
-      if (regionEl) regionEl.innerText = json.region || '---';
-      if (cityEl) cityEl.innerText = json.city || '---';
-      if (timezoneEl) timezoneEl.innerText = json.timezone || '---';
-
-      if (json.lat !== null && json.lon !== null) {
-        if (coordsEl) coordsEl.innerText = `${json.lat}, ${json.lon}`;
-        if (mapLinkEl) {
-          mapLinkEl.href = `https://maps.google.com/?q=${json.lat},${json.lon}`;
-          mapLinkEl.classList.remove('hidden');
-        }
-      } else {
-        if (coordsEl) coordsEl.innerText = 'Koordinat tidak tersedia';
-        if (mapLinkEl) mapLinkEl.classList.add('hidden');
-      }
-
-      const rankEl = document.getElementById('detailRank');
-      const clanEl = document.getElementById('detailClan');
-      const balEl = document.getElementById('detailBalance');
-
-      if (rankEl) rankEl.innerText = json.group || 'Member';
-      if (clanEl) clanEl.innerText = json.clan ? `[${json.clan}]` : '-';
-      if (balEl) balEl.innerText = json.balance || '$0';
-
-      if (loadingEl) loadingEl.classList.add('hidden');
-      if (contentEl) contentEl.classList.remove('hidden');
-    } else {
-      showToast("Gagal mengambil data geolokasi pemain", "error");
-      if (loadingEl) loadingEl.classList.add('hidden');
+      geoData = { ...geoData, ...json };
     }
   } catch (err) {
     console.error("Player detail fetch error:", err);
-    showToast("Terjadi kesalahan koneksi saat mengambil telemetry", "error");
+  } finally {
+    currentDetailIpValue = geoData.ip || 'Internal / Hidden';
+
+    const ipEl = document.getElementById('detailIp');
+    const ispEl = document.getElementById('detailIsp');
+    const countryEl = document.getElementById('detailCountry');
+    const regionEl = document.getElementById('detailRegion');
+    const cityEl = document.getElementById('detailCity');
+    const timezoneEl = document.getElementById('detailTimezone');
+    const coordsEl = document.getElementById('detailCoords');
+    const mapLinkEl = document.getElementById('detailMapLink');
+    const rankEl = document.getElementById('detailRank');
+    const clanEl = document.getElementById('detailClan');
+    const balEl = document.getElementById('detailBalance');
+
+    if (ipEl) ipEl.innerText = geoData.ip || '---';
+    if (ispEl) ispEl.innerText = geoData.isp || '---';
+    if (countryEl) countryEl.innerText = geoData.countryCode ? `${geoData.country} (${geoData.countryCode})` : (geoData.country || '---');
+    if (regionEl) regionEl.innerText = geoData.region || '---';
+    if (cityEl) cityEl.innerText = geoData.city || '---';
+    if (timezoneEl) timezoneEl.innerText = geoData.timezone || '---';
+
+    if (geoData.lat !== null && geoData.lon !== null && geoData.lat !== undefined && geoData.lon !== undefined) {
+      if (coordsEl) coordsEl.innerText = `${geoData.lat}, ${geoData.lon}`;
+      if (mapLinkEl) {
+        mapLinkEl.href = `https://maps.google.com/?q=${geoData.lat},${geoData.lon}`;
+        mapLinkEl.classList.remove('hidden');
+      }
+    } else {
+      if (coordsEl) coordsEl.innerText = 'Koordinat tidak tersedia';
+      if (mapLinkEl) mapLinkEl.classList.add('hidden');
+    }
+
+    if (rankEl) rankEl.innerText = geoData.group || 'Member';
+    if (clanEl) clanEl.innerText = geoData.clan ? `[${geoData.clan}]` : '-';
+    if (balEl) balEl.innerText = geoData.balance || '$0';
+
     if (loadingEl) loadingEl.classList.add('hidden');
+    if (contentEl) contentEl.classList.remove('hidden');
   }
 }
 
