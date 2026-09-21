@@ -95,27 +95,26 @@ html.light .text-zinc-400 {
 }
 
 html.light .bg-slate-900,
-html.light .bg-[#09090b],
-html.light .bg-[#121215] {
+html.light [class*="bg-[#09090b]"],
+html.light [class*="bg-[#121215]"] {
   background-color: #ffffff !important;
   border-color: #e2e8f0 !important;
   color: var(--text-main) !important;
 }
 
 html.light .bg-slate-950,
-html.light .bg-[#07080a] {
+html.light [class*="bg-[#07080a]"] {
   background-color: #f8fafc !important;
   border-color: #e2e8f0 !important;
 }
 
 html.light .border-slate-800,
 html.light .border-zinc-800,
-html.light .border-zinc-800\/80,
-html.light .border-slate-800\/80 {
+html.light [class*="border-zinc-800"],
+html.light [class*="border-slate-800"] {
   border-color: #e2e8f0 !important;
 }
 
-html.light thead.bg-\[\#18181b\],
 html.light thead {
   background-color: #f1f5f9 !important;
   color: #475569 !important;
