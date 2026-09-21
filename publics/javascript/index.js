@@ -648,34 +648,34 @@ function formatPlaytimeString(rawStat) {
 // =========================================================================
 const LEADERBOARD_DATA = {
   kills: [
-    { rank: 1, username: 'AytidarG_', stat: '154 Kills', title: 'Supreme Warlord' },
-    { rank: 2, username: 'Darrzz', stat: '112 Kills', title: 'Shadow Blade' },
-    { rank: 3, username: 'Radit_Dev', stat: '87 Kills', title: 'Dragon Slayer' },
-    { rank: 4, username: 'Vortex_Hunter', stat: '64 Kills', title: 'Vanguard' },
-    { rank: 5, username: 'EnderKnight99', stat: '51 Kills', title: 'Berserker' },
-    { rank: 6, username: 'Nico_Blade', stat: '43 Kills', title: 'Gladiator' },
-    { rank: 7, username: 'SlayerZero', stat: '38 Kills', title: 'Assassin' },
-    { rank: 8, username: 'Phantom_X', stat: '29 Kills', title: 'Executioner' }
+    { rank: 1, username: 'NONE', stat: '0 Kills', title: 'Supreme Warlord' },
+    { rank: 2, username: 'NONE', stat: '0 Kills', title: 'Shadow Blade' },
+    { rank: 3, username: 'NONE', stat: '0 Kills', title: 'Dragon Slayer' },
+    { rank: 4, username: 'NONE', stat: '0 Kills', title: 'Vanguard' },
+    { rank: 5, username: 'NONE', stat: '0 Kills', title: 'Berserker' },
+    { rank: 6, username: 'NONE', stat: '0 Kills', title: 'Gladiator' },
+    { rank: 7, username: 'NONE', stat: '0 Kills', title: 'Assassin' },
+    { rank: 8, username: 'NONE', stat: '0 Kills', title: 'Executioner' }
   ],
   playtime: [
-    { rank: 1, username: 'Darrzz', stat: '14h 6j', title: 'Veteran Realm' },
-    { rank: 2, username: 'AytidarG_', stat: '11h 21j', title: 'Sentinel Guard' },
-    { rank: 3, username: 'Radit_Dev', stat: '8h 18j', title: 'Ancient Wanderer' },
-    { rank: 4, username: 'CraftMaster_ID', stat: '7h 8j', title: 'Guild Keeper' },
-    { rank: 5, username: 'DragonRider', stat: '6h 1j', title: 'Dragon Tamer' },
-    { rank: 6, username: 'Shadow_Walker', stat: '5h 8j', title: 'Explorer' },
-    { rank: 7, username: 'MinerFortyNine', stat: '4h 2j', title: 'Deep Miner' },
-    { rank: 8, username: 'Aether_Hero', stat: '3h 2j', title: 'Adventurer' }
+    { rank: 1, username: 'NONE', stat: '0h 0j', title: 'Veteran Realm' },
+    { rank: 2, username: 'NONE', stat: '0h 0j', title: 'Sentinel Guard' },
+    { rank: 3, username: 'NONE', stat: '0h 0j', title: 'Ancient Wanderer' },
+    { rank: 4, username: 'NONE', stat: '0h 0j', title: 'Guild Keeper' },
+    { rank: 5, username: 'NONE', stat: '0h 0j', title: 'Dragon Tamer' },
+    { rank: 6, username: 'NONE', stat: '0h 0j', title: 'Explorer' },
+    { rank: 7, username: 'NONE', stat: '0h 0j', title: 'Deep Miner' },
+    { rank: 8, username: 'NONE', stat: '0h 0j', title: 'Adventurer' }
   ],
   donators: [
-    { rank: 1, username: 'Darrzz', stat: 'Rp 450.000', title: 'Sultan Realm' },
-    { rank: 2, username: 'AytidarG_', stat: 'Rp 325.000', title: 'Royal Patron' },
-    { rank: 3, username: 'Radit_Dev', stat: 'Rp 200.000', title: 'Crown Sponsor' },
-    { rank: 4, username: 'EnderKnight99', stat: 'Rp 150.000', title: 'Mythic Supporter' },
-    { rank: 5, username: 'Vortex_Hunter', stat: 'Rp 100.000', title: 'Dragon Benefactor' },
-    { rank: 6, username: 'SlayerZero', stat: 'Rp 75.000', title: 'Guild Founder' },
-    { rank: 7, username: 'Nico_Blade', stat: 'Rp 50.000', title: 'Honorary Knight' },
-    { rank: 8, username: 'Phantom_X', stat: 'Rp 25.000', title: 'VIP Supporter' }
+    { rank: 1, username: 'NONE', stat: 'Rp 0', title: 'Sultan Realm' },
+    { rank: 2, username: 'NONE', stat: 'Rp 0', title: 'Royal Patron' },
+    { rank: 3, username: 'NONE', stat: 'Rp 0', title: 'Crown Sponsor' },
+    { rank: 4, username: 'NONE', stat: 'Rp 0', title: 'Mythic Supporter' },
+    { rank: 5, username: 'NONE', stat: 'Rp 0', title: 'Dragon Benefactor' },
+    { rank: 6, username: 'NONE', stat: 'Rp 0', title: 'Guild Founder' },
+    { rank: 7, username: 'NONE', stat: 'Rp 0', title: 'Honorary Knight' },
+    { rank: 8, username: 'NONE', stat: 'Rp 0', title: 'VIP Supporter' }
   ],
   baltop: [
     { rank: 1, username: 'Darrzz', stat: '5.450.000 Coins', title: 'Sultan Ekonomi' },

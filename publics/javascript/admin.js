@@ -45,13 +45,13 @@ function showToast(message, type = 'success') {
   const isError = type === 'error';
 
   const bgColor = isSuccess ? 'bg-zinc-900 border-emerald-500/50 text-emerald-400' :
-                  isError ? 'bg-zinc-900 border-rose-500/50 text-rose-400' :
-                  'bg-zinc-900 border-amber-500/50 text-amber-400';
+    isError ? 'bg-zinc-900 border-rose-500/50 text-rose-400' :
+      'bg-zinc-900 border-amber-500/50 text-amber-400';
 
   const icon = isSuccess ? 'fa-circle-check' : isError ? 'fa-circle-xmark' : 'fa-circle-info';
 
   toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl border ${bgColor} shadow-2xl font-mono text-xs transition-all duration-300 opacity-0 transform translate-y-[-10px] min-w-[260px] max-w-sm`;
-  
+
   toast.innerHTML = `
     <i class="fa-solid ${icon} text-base shrink-0"></i>
     <span class="flex-1 font-medium text-white leading-snug">${message}</span>
@@ -323,7 +323,7 @@ async function invseePlayer(username) {
     const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
     const res = await fetch(`${WORKER_PROXY_URL}?action=get_inventory`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'X-Admin-Token': adminToken
       },
@@ -668,7 +668,7 @@ async function controlServerPower(signal) {
     const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
     const res = await fetch(`${WORKER_PROXY_URL}?action=server_power`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'X-Admin-Token': adminToken
       },
@@ -719,7 +719,7 @@ async function executeAdminCommand(command, successMessage) {
     const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
     const res = await fetch(`${WORKER_PROXY_URL}?action=admin_command`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'X-Admin-Token': adminToken
       },
@@ -760,7 +760,7 @@ async function fetchRealtimeConsoleLogs() {
     const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
     const res = await fetch(`${WORKER_PROXY_URL}?action=get_console_logs`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'X-Admin-Token': adminToken
       }
@@ -776,10 +776,10 @@ async function fetchRealtimeConsoleLogs() {
       const cleanLogs = json.logs
         .filter(line => {
           const lower = line.toLowerCase();
-          return !lower.includes('issued server command: /list') && 
-                 !lower.includes('issued server command: /data get entity') && 
-                 !lower.includes('there are 0 out of maximum') && 
-                 !lower.includes('players online');
+          return !lower.includes('issued server command: /list') &&
+            !lower.includes('issued server command: /data get entity') &&
+            !lower.includes('there are 0 out of maximum') &&
+            !lower.includes('players online');
         })
         .map(line => {
           return line
@@ -801,7 +801,7 @@ async function fetchRealtimeConsoleLogs() {
         terminal.scrollTop = terminal.scrollHeight;
       }
     }
-  } catch (err) { 
+  } catch (err) {
   } finally {
     isFetchingConsole = false;
   }
@@ -847,7 +847,7 @@ async function fetchOnlinePlayers() {
       fetch(`${WORKER_PROXY_URL}?action=get_server_status`).catch(() => null),
       fetch(`${WORKER_PROXY_URL}?action=get_online_players`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'X-Admin-Token': adminToken
         }
@@ -872,7 +872,7 @@ async function fetchOnlinePlayers() {
     if (isOnline) {
       if (dot) dot.className = "w-3 h-3 rounded-full bg-emerald-500 animate-pulse";
       if (headerDot) headerDot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
-      
+
       let onlineList = (rconData && rconData.players) ? rconData.players : [];
       let onlineCount = (rconData && typeof rconData.online === 'number') ? rconData.online : onlineList.length;
       let maxCount = (rconData && rconData.max) ? rconData.max : 20;
@@ -907,9 +907,6 @@ async function fetchOnlinePlayers() {
                 </td>
                 <td class="p-3.5 text-right font-mono" onclick="event.stopPropagation()">
                   <div class="inline-flex items-center gap-1.5 flex-wrap justify-end">
-                    <button onclick="event.stopPropagation(); openPlayerDetailModal('${safeName}')" class="bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-600/50 text-emerald-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1 whitespace-nowrap" title="Lihat Info & Telemetry">
-                      <i class="fa-solid fa-circle-info text-[10px]"></i> Info
-                    </button>
                     <button onclick="event.stopPropagation(); invseePlayer('${safeName}')" class="bg-blue-950/80 hover:bg-blue-900 border border-blue-600/50 text-blue-300 px-2 py-1 rounded text-[11px] transition flex items-center gap-1 whitespace-nowrap" title="Inspeksi Inventori">
                       <i class="fa-solid fa-box-open text-[10px]"></i> Invsee
                     </button>
@@ -1009,7 +1006,7 @@ function parseOrderDate(dateStr) {
       const day = parseInt(dParts[0], 10);
       const month = parseInt(dParts[1], 10) - 1;
       const year = parseInt(dParts[2], 10);
-      
+
       let hour = 0, min = 0, sec = 0;
       if (parts[1]) {
         const tParts = parts[1].trim().split('.');
@@ -1148,7 +1145,7 @@ function getStatusBadge(status) {
 }
 
 async function updateStatus(id, newStatus, username, itemName) {
-  const confirmMsg = newStatus === 'APPROVED' 
+  const confirmMsg = newStatus === 'APPROVED'
     ? `Setujui pesanan ${id} untuk ${username} (${itemName}) & kirim rank/coins ke server?`
     : `Tolak pesanan ${id}?`;
 
@@ -1166,7 +1163,7 @@ async function updateStatus(id, newStatus, username, itemName) {
     const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
     const res = await fetch(`${WORKER_PROXY_URL}?action=update_status`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'X-Admin-Token': adminToken
       },
@@ -1342,7 +1339,7 @@ function filterWebChatLogs() {
     return;
   }
 
-  const filtered = allWebChatLogs.filter(log => 
+  const filtered = allWebChatLogs.filter(log =>
     (log.username || '').toLowerCase().includes(query) ||
     (log.email || '').toLowerCase().includes(query) ||
     (log.message || '').toLowerCase().includes(query)
@@ -1391,7 +1388,7 @@ async function openPlayerDetailModal(username) {
     const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
     const res = await fetch(`${WORKER_PROXY_URL}?action=get_player_geo`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'X-Admin-Token': adminToken
       },
@@ -1401,7 +1398,43 @@ async function openPlayerDetailModal(username) {
     const json = await res.json().catch(() => null);
 
     if (res.ok && json && json.result === 'success') {
-      geoData = { ...geoData, ...json };
+      const data = json.data || json;
+      geoData = {
+        ...geoData,
+        ...data,
+        ip: data.ip || data.query || geoData.ip,
+        isp: data.isp || data.org || data.network || geoData.isp,
+        region: data.regionName || data.region || geoData.region,
+        city: data.city || geoData.city,
+        country: data.country_name || data.countryName || data.country || geoData.country,
+        countryCode: data.countryCode || data.country_code || geoData.countryCode,
+        lat: data.lat !== undefined && data.lat !== null ? data.lat : (data.latitude !== undefined ? data.latitude : geoData.lat),
+        lon: data.lon !== undefined && data.lon !== null ? data.lon : (data.longitude !== undefined ? data.longitude : geoData.lon),
+        timezone: data.timezone || geoData.timezone,
+        group: data.group || data.rank || data.role || geoData.group,
+        clan: data.clan || data.guild || data.faction || data.tag || geoData.clan,
+        balance: data.balance || data.money || data.eco || data.cash || data.saldo || geoData.balance
+      };
+
+      // Fallback: Jika koordinat tidak tersedia atau ISP unknown, fetch via IP-API publik
+      if (geoData.ip && !geoData.ip.includes('Internal') && !geoData.lat) {
+        try {
+          const extRes = await fetch(`http://ip-api.com/json/${geoData.ip}`);
+          const extData = await extRes.json();
+          if (extData && extData.status === 'success') {
+            geoData.isp = extData.isp || extData.org || geoData.isp;
+            geoData.country = extData.country || geoData.country;
+            geoData.countryCode = extData.countryCode || geoData.countryCode;
+            geoData.region = extData.regionName || geoData.region;
+            geoData.city = extData.city || geoData.city;
+            geoData.timezone = extData.timezone || geoData.timezone;
+            geoData.lat = extData.lat;
+            geoData.lon = extData.lon;
+          }
+        } catch (e) {
+          console.error("IP-API fallback failed", e);
+        }
+      }
     }
   } catch (err) {
     console.error("Player detail fetch error:", err);
@@ -1420,8 +1453,41 @@ async function openPlayerDetailModal(username) {
     const clanEl = document.getElementById('detailClan');
     const balEl = document.getElementById('detailBalance');
 
+    const ispLogoEl = document.getElementById('detailIspLogo');
+
     if (ipEl) ipEl.innerText = geoData.ip || '---';
     if (ispEl) ispEl.innerText = geoData.isp || '---';
+    
+    if (ispLogoEl && geoData.isp) {
+      const ispLower = geoData.isp.toLowerCase();
+      let domain = '';
+      if (ispLower.includes('myrepublic')) domain = 'myrepublic.co.id';
+      else if (ispLower.includes('telkom') || ispLower.includes('indihome') || ispLower.includes('astinet')) domain = 'telkom.co.id';
+      else if (ispLower.includes('biznet')) domain = 'biznetnetworks.com';
+      else if (ispLower.includes('first media') || ispLower.includes('firstmedia')) domain = 'firstmedia.com';
+      else if (ispLower.includes('mnc') || ispLower.includes('play')) domain = 'mncplay.id';
+      else if (ispLower.includes('xl') || ispLower.includes('axiata')) domain = 'xl.co.id';
+      else if (ispLower.includes('indosat') || ispLower.includes('ooredoo')) domain = 'ioh.co.id';
+      else if (ispLower.includes('tri ') || ispLower.includes('hutchison')) domain = 'tri.co.id';
+      else if (ispLower.includes('smartfren')) domain = 'smartfren.com';
+      else if (ispLower.includes('cbn')) domain = 'cbn.id';
+      else if (ispLower.includes('oxygen')) domain = 'oxygen.id';
+      else if (ispLower.includes('iconnet') || ispLower.includes('icon plus') || ispLower.includes('pln')) domain = 'iconnet.id';
+      else if (ispLower.includes('balifiber') || ispLower.includes('bali fiber')) domain = 'balifiber.id';
+      else if (ispLower.includes('moratelindo') || ispLower.includes('mora telematika')) domain = 'moratelindo.co.id';
+
+      if (domain) {
+        ispLogoEl.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+        ispLogoEl.classList.remove('hidden');
+      } else {
+        ispLogoEl.classList.add('hidden');
+        ispLogoEl.src = '';
+      }
+    } else if (ispLogoEl) {
+      ispLogoEl.classList.add('hidden');
+      ispLogoEl.src = '';
+    }
+
     if (countryEl) countryEl.innerText = geoData.countryCode ? `${geoData.country} (${geoData.countryCode})` : (geoData.country || '---');
     if (regionEl) regionEl.innerText = geoData.region || '---';
     if (cityEl) cityEl.innerText = geoData.city || '---';
