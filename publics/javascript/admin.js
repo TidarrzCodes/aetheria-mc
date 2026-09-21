@@ -1536,3 +1536,7 @@ function copyDetailIp() {
 window.openPlayerDetailModal = openPlayerDetailModal;
 window.closePlayerDetailModal = closePlayerDetailModal;
 window.copyDetailIp = copyDetailIp;
+
+window.addEventListener('languageChanged', () => {
+  try { syncCurrentTab(); } catch (e) { }
+});

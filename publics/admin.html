@@ -32,8 +32,10 @@
     }
   </script>
 
-  <!-- EXTERNAL CSS -->
+  <!-- EXTERNAL CSS & THEME -->
   <link rel="stylesheet" href="./style/admin.css">
+  <link rel="stylesheet" href="./style/theme.css">
+  <script src="./javascript/theme.js"></script>
 </head>
 
 <body class="min-h-screen antialiased flex flex-col justify-between relative bg-[#09090b] text-zinc-100">
@@ -59,11 +61,19 @@
           </div>
 
           <div class="flex sm:hidden items-center gap-1.5">
+            <!-- MOBILE THEME TOGGLE BUTTON -->
+            <button type="button" onclick="toggleTheme()" class="theme-toggle-btn text-[11px] py-1 px-2" title="Toggle Theme">
+              <i class="fa-solid fa-sun text-amber-400"></i>
+            </button>
+            <!-- MOBILE LANGUAGE TOGGLE BUTTON -->
+            <button type="button" onclick="toggleLanguage()" class="lang-toggle-btn text-[11px] py-1 px-2" title="Toggle Language">
+              <span class="lang-toggle-badge bg-emerald-600 text-white">ID</span>
+            </button>
             <a href="./index.html" class="bg-zinc-900 border border-zinc-800 text-zinc-300 px-2 py-1 rounded-lg text-[11px] font-mono transition flex items-center gap-1">
-              <i class="fa-solid fa-house text-[10px]"></i> Home
+              <i class="fa-solid fa-house text-[10px]"></i> <span data-i18n="nav.home">Home</span>
             </a>
             <button onclick="handleLogout()" class="bg-rose-950/60 border border-rose-600/40 text-rose-300 px-2 py-1 rounded-lg text-[11px] font-mono transition flex items-center gap-1">
-              <i class="fa-solid fa-right-from-bracket text-[10px]"></i> Logout
+              <i class="fa-solid fa-right-from-bracket text-[10px]"></i> <span data-i18n="nav.logout">Logout</span>
             </button>
           </div>
         </div>
@@ -75,28 +85,40 @@
             <button onclick="switchMainTab('systems')" id="main-tab-systems"
               class="flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition flex items-center justify-center gap-1.5 text-xs">
               <i class="fa-solid fa-terminal text-[11px]"></i>
-              <span>Systems</span>
+              <span data-i18n="admin.nav_systems">Systems</span>
             </button>
             <button onclick="switchMainTab('orders')" id="main-tab-orders"
               class="flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5 text-xs">
               <i class="fa-solid fa-receipt text-[11px]"></i>
-              <span>Orders</span>
+              <span data-i18n="admin.nav_orders">Orders</span>
             </button>
             <button onclick="switchMainTab('players')" id="main-tab-players"
               class="flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5 text-xs">
               <i class="fa-solid fa-users text-[11px]"></i>
-              <span>Players</span>
+              <span data-i18n="admin.nav_players">Players</span>
               <span id="nav-player-badge" class="bg-zinc-800 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded font-bold">0</span>
             </button>
             <button onclick="switchMainTab('etc')" id="main-tab-etc"
               class="flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5 text-xs">
               <i class="fa-solid fa-sliders text-[11px]"></i>
-              <span>ETC</span>
+              <span data-i18n="admin.nav_etc">ETC</span>
             </button>
           </nav>
 
           <!-- HEADER RIGHT ACTIONS (DESKTOP & LIVE SYNC) -->
           <div class="flex items-center gap-1.5 shrink-0">
+            <!-- THEME TOGGLE BUTTON -->
+            <button type="button" id="themeToggleBtn" onclick="toggleTheme()" class="theme-toggle-btn" title="Toggle Theme">
+              <i class="fa-solid fa-sun text-amber-400"></i>
+              <span class="hidden md:inline ml-1 text-xs">Light</span>
+            </button>
+
+            <!-- LANGUAGE TOGGLE BUTTON -->
+            <button type="button" id="langToggleBtn" onclick="toggleLanguage()" class="lang-toggle-btn" title="Toggle Language">
+              <span class="lang-toggle-badge bg-emerald-600 text-white">ID</span>
+              <span class="hidden md:inline ml-1 text-xs text-slate-300">ID</span>
+            </button>
+
             <!-- AUTO RELOAD INDICATOR BADGE -->
             <div id="autoReloadBadge" class="flex items-center gap-1.5 bg-[#121215] border border-zinc-800/90 px-2 py-1 rounded-lg text-[10px] font-mono text-zinc-400 select-none shadow-sm" title="Auto Reload Synchronizer (3s)">
               <i id="autoReloadSpinner" class="fa-solid fa-arrows-rotate text-rose-500 text-[10px]"></i>
@@ -112,12 +134,12 @@
             <a href="./index.html"
               class="hidden sm:flex bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 px-3 py-1.5 rounded-lg text-xs font-mono transition items-center gap-1.5">
               <i class="fa-solid fa-house text-[10px]"></i>
-              <span>Home</span>
+              <span data-i18n="nav.home">Home</span>
             </a>
             <button onclick="handleLogout()"
               class="hidden sm:flex bg-rose-950/60 hover:bg-rose-900/80 border border-rose-600/40 text-rose-300 px-3 py-1.5 rounded-lg text-xs font-mono transition items-center gap-1.5">
               <i class="fa-solid fa-right-from-bracket text-[10px]"></i>
-              <span>Logout</span>
+              <span data-i18n="nav.logout">Logout</span>
             </button>
           </div>
 
@@ -128,14 +150,13 @@
 
     <main class="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6 w-full flex-1">
       <!-- VIEW SYSTEMS SECTION (CONSOLE TERMINAL, POWER CONTROLS, & SERVER LOGS) -->
-      <section id="view-systems" class="space-y-4 sm:space-y-6">
-        <!-- SERVER STATUS BAR & POWER CONTROLS -->
+      <section id="view-systems" class="space-y-4 sm:space-y-6">        <!-- SERVER STATUS BAR & POWER CONTROLS -->
         <div
           class="flex flex-col md:flex-row justify-between items-start md:items-center p-3.5 sm:p-4 bg-[#121215] border border-zinc-800/80 rounded-xl gap-3 shadow-xl">
           <div class="flex items-center gap-3">
             <span id="player-tab-dot" class="w-3 h-3 rounded-full bg-zinc-600"></span>
             <div>
-              <h2 class="text-xs sm:text-sm font-semibold text-white font-mono">SERVER STATUS</h2>
+              <h2 class="text-xs sm:text-sm font-semibold text-white font-mono" data-i18n="admin.server_status">SERVER STATUS</h2>
               <p id="player-tab-count" class="text-xs text-zinc-400 font-mono">Checking online players...</p>
             </div>
           </div>
@@ -151,17 +172,17 @@
               <button onclick="controlServerPower('start')" id="btnPowerStart" title="Nyalakan Server"
                 class="bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-600/50 text-emerald-300 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5 font-bold shadow-md">
                 <i class="fa-solid fa-power-off text-[11px] text-emerald-400"></i>
-                <span>ON</span>
+                <span data-i18n="admin.btn_on">ON</span>
               </button>
               <button onclick="controlServerPower('restart')" id="btnPowerRestart" title="Reboot / Restart Server"
                 class="bg-amber-950/80 hover:bg-amber-900 border border-amber-600/50 text-amber-300 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5 font-bold shadow-md">
                 <i class="fa-solid fa-rotate-right text-[11px] text-amber-400"></i>
-                <span>Restart</span>
+                <span data-i18n="admin.btn_restart">Restart</span>
               </button>
               <button onclick="controlServerPower('stop')" id="btnPowerStop" title="Matikan Server"
                 class="bg-rose-950/80 hover:bg-rose-900 border border-rose-600/50 text-rose-300 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5 font-bold shadow-md">
                 <i class="fa-solid fa-stop text-[11px] text-rose-400"></i>
-                <span>OFF</span>
+                <span data-i18n="admin.btn_off">OFF</span>
               </button>
             </div>
           </div>
@@ -173,7 +194,7 @@
           <div class="flex items-center justify-between bg-[#18181b] px-4 py-2.5 border-b border-zinc-800">
             <div class="flex items-center gap-2">
               <i class="fa-solid fa-terminal text-rose-500 text-xs"></i>
-              <h2 class="text-xs font-bold text-white font-mono uppercase tracking-wider">Server Console Terminal</h2>
+              <h2 class="text-xs font-bold text-white font-mono uppercase tracking-wider" data-i18n="admin.console_title">Server Console Terminal</h2>
             </div>
             <span class="text-[10px] text-zinc-500 font-mono">Realtime RCON / Pterodactyl Logs</span>
           </div>
@@ -218,7 +239,7 @@
           <!-- SEARCH INPUT -->
           <div class="relative flex-1">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"></i>
-            <input type="text" id="orderSearchInput" oninput="handleFilterChange()" placeholder="Cari ID, Username, atau Item..."
+            <input type="text" id="orderSearchInput" oninput="handleFilterChange()" placeholder="Cari ID, Username, atau Item..." data-i18n-placeholder="admin.search_orders"
               class="w-full bg-[#09090b] border border-zinc-800 rounded-lg pl-9 pr-3 py-2 text-white placeholder:text-zinc-600 focus:outline-none focus:border-rose-500/60 transition">
           </div>
 
@@ -226,14 +247,14 @@
           <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
             <!-- TANGGAL MULAI -->
             <div class="flex items-center gap-1.5 bg-[#09090b] border border-zinc-800 px-2.5 py-1.5 rounded-lg col-span-1">
-              <span class="text-zinc-500 text-[10px] sm:text-[11px] shrink-0">Dari:</span>
+              <span class="text-zinc-500 text-[10px] sm:text-[11px] shrink-0" data-i18n="admin.date_from">Dari:</span>
               <input type="date" id="startDateInput" onchange="handleFilterChange()"
                 class="bg-transparent text-zinc-200 focus:outline-none text-[11px] sm:text-xs font-mono w-full min-w-0">
             </div>
 
             <!-- TANGGAL AKHIR -->
             <div class="flex items-center gap-1.5 bg-[#09090b] border border-zinc-800 px-2.5 py-1.5 rounded-lg col-span-1">
-              <span class="text-zinc-500 text-[10px] sm:text-[11px] shrink-0">S/D:</span>
+              <span class="text-zinc-500 text-[10px] sm:text-[11px] shrink-0" data-i18n="admin.date_to">S/D:</span>
               <input type="date" id="endDateInput" onchange="handleFilterChange()"
                 class="bg-transparent text-zinc-200 focus:outline-none text-[11px] sm:text-xs font-mono w-full min-w-0">
             </div>
@@ -241,8 +262,8 @@
             <!-- URUTKAN TANGGAL -->
             <select id="dateSortSelect" onchange="handleFilterChange()"
               class="bg-[#09090b] border border-zinc-800 text-zinc-200 rounded-lg px-2.5 py-2 focus:outline-none text-xs font-mono col-span-1">
-              <option value="newest">Urutan: Terbaru</option>
-              <option value="oldest">Urutan: Terlama</option>
+              <option value="newest" data-i18n="admin.order_newest">Urutan: Terbaru</option>
+              <option value="oldest" data-i18n="admin.order_oldest">Urutan: Terlama</option>
             </select>
 
             <!-- RESET FILTER -->
@@ -258,13 +279,13 @@
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div class="flex items-center gap-1 bg-[#121215] p-1 rounded-xl border border-zinc-800 text-xs font-mono overflow-x-auto custom-scrollbar">
             <button onclick="filterStatus('ALL')" id="tab-ALL"
-              class="px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition shrink-0">Semua</button>
+              class="px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition shrink-0" data-i18n="admin.tab_all">Semua</button>
             <button onclick="filterStatus('PENDING')" id="tab-PENDING"
-              class="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition shrink-0">Pending</button>
+              class="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition shrink-0" data-i18n="admin.tab_pending">Pending</button>
             <button onclick="filterStatus('APPROVED')" id="tab-APPROVED"
-              class="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition shrink-0">Approved</button>
+              class="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition shrink-0" data-i18n="admin.tab_approved">Approved</button>
             <button onclick="filterStatus('REJECTED')" id="tab-REJECTED"
-              class="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition shrink-0">Rejected</button>
+              class="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition shrink-0" data-i18n="admin.tab_rejected">Rejected</button>
           </div>
           <span class="text-xs text-zinc-500 font-mono text-right sm:text-left" id="row-count">0 record(s)</span>
         </div>
@@ -275,13 +296,13 @@
             <table class="w-full text-left text-xs min-w-[650px]">
               <thead class="bg-[#18181b] text-zinc-400 font-mono text-[10px] sm:text-[11px] uppercase border-b border-zinc-800">
                 <tr>
-                  <th class="p-3 sm:p-3.5">ID / Time</th>
-                  <th class="p-3 sm:p-3.5">User Minecraft</th>
-                  <th class="p-3 sm:p-3.5">Item & Category</th>
-                  <th class="p-3 sm:p-3.5">Amount</th>
-                  <th class="p-3 sm:p-3.5 text-center">Assets</th>
-                  <th class="p-3 sm:p-3.5 text-center">Status</th>
-                  <th class="p-3 sm:p-3.5 text-right">Actions</th>
+                  <th class="p-3 sm:p-3.5" data-i18n="admin.col_id_time">ID / Time</th>
+                  <th class="p-3 sm:p-3.5" data-i18n="admin.col_user">User Minecraft</th>
+                  <th class="p-3 sm:p-3.5" data-i18n="admin.col_item">Item & Category</th>
+                  <th class="p-3 sm:p-3.5" data-i18n="admin.col_amount">Amount</th>
+                  <th class="p-3 sm:p-3.5 text-center" data-i18n="admin.col_assets">Assets</th>
+                  <th class="p-3 sm:p-3.5 text-center" data-i18n="admin.col_status">Status</th>
+                  <th class="p-3 sm:p-3.5 text-right" data-i18n="admin.col_actions">Actions</th>
                 </tr>
               </thead>
               <tbody id="order-list" class="divide-y divide-zinc-800/60 font-sans text-zinc-300">
@@ -303,12 +324,12 @@
             <table class="w-full text-left text-xs min-w-[780px]">
               <thead class="bg-[#18181b] text-zinc-400 font-mono text-[10px] sm:text-[11px] uppercase border-b border-zinc-800">
                 <tr>
-                  <th class="p-3 sm:p-3.5 w-12">Avatar</th>
-                  <th class="p-3 sm:p-3.5">Username</th>
-                  <th class="p-3 sm:p-3.5">Rank Group</th>
-                  <th class="p-3 sm:p-3.5">Clan</th>
-                  <th class="p-3 sm:p-3.5">Balance</th>
-                  <th class="p-3 sm:p-3.5 text-right">Aksi Moderasi</th>
+                  <th class="p-3 sm:p-3.5 w-12" data-i18n="admin.col_avatar">Avatar</th>
+                  <th class="p-3 sm:p-3.5" data-i18n="admin.col_user">Username</th>
+                  <th class="p-3 sm:p-3.5" data-i18n="admin.col_rank">Rank Group</th>
+                  <th class="p-3 sm:p-3.5" data-i18n="admin.col_clan">Clan</th>
+                  <th class="p-3 sm:p-3.5" data-i18n="admin.col_balance">Balance</th>
+                  <th class="p-3 sm:p-3.5 text-right" data-i18n="admin.col_mod">Aksi Moderasi</th>
                 </tr>
               </thead>
               <tbody id="player-table-list" class="divide-y divide-zinc-800/60 font-sans text-zinc-300">
@@ -747,7 +768,8 @@
     </div>
   </div>
 
-  <!-- EXTERNAL JS SCRIPT -->
+  <!-- EXTERNAL JS SCRIPTS -->
+  <script src="./javascript/i18n.js" defer></script>
   <script src="./javascript/admin.js" defer></script>
 </body>
 

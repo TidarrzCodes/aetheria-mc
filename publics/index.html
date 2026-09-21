@@ -24,8 +24,10 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- EXTERNAL CSS -->
+  <!-- EXTERNAL CSS & THEME -->
   <link rel="stylesheet" href="./style/index.css">
+  <link rel="stylesheet" href="./style/theme.css">
+  <script src="./javascript/theme.js"></script>
 </head>
 
 <body
@@ -54,28 +56,40 @@
               <span
                 class="font-epic font-black text-base sm:text-lg text-white tracking-widest block leading-tight">AETHERIA<span
                   class="text-rose-500">: ECLIPSE</span></span>
-              <p class="text-[9px] sm:text-[10px] text-slate-400 font-mono-code tracking-tight">DRAGON'S ECLIPSE NETWORK
+              <p class="text-[9px] sm:text-[10px] text-slate-400 font-mono-code tracking-tight" data-i18n="nav.network">DRAGON'S ECLIPSE NETWORK
               </p>
             </div>
           </div>
         </a>
 
-        <!-- RIGHT WIDGETS (IP COPY & PLAYER LOGIN) -->
-        <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+        <!-- RIGHT WIDGETS (IP COPY, THEME/LANG TOGGLES & PLAYER LOGIN) -->
+        <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto justify-center sm:justify-end">
           <!-- SERVER IP COPY WIDGET -->
           <button onclick="copyIP('aetheria.raditnex.my.id')"
             class="w-full sm:w-auto bg-slate-900/90 hover:bg-slate-800 border border-rose-500/50 text-xs px-3.5 py-2 rounded-xl transition flex items-center justify-center sm:justify-start gap-2 shadow-lg shadow-rose-950/40 active:scale-95">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-            <span class="text-slate-300 truncate text-[11px] sm:text-xs">SERVER IP: <strong
+            <span class="text-slate-300 truncate text-[11px] sm:text-xs"><span data-i18n="nav.server_ip">SERVER IP:</span> <strong
                 class="text-white font-mono-code">aetheria.raditnex.my.id</strong></span>
             <i class="fa-regular fa-copy text-rose-400 shrink-0 ml-1"></i>
+          </button>
+
+          <!-- THEME TOGGLE BUTTON -->
+          <button type="button" id="themeToggleBtn" onclick="toggleTheme()" class="theme-toggle-btn" title="Toggle Theme">
+            <i class="fa-solid fa-sun text-amber-400"></i>
+            <span class="hidden sm:inline ml-1 text-xs">Light</span>
+          </button>
+
+          <!-- LANGUAGE TOGGLE BUTTON -->
+          <button type="button" id="langToggleBtn" onclick="toggleLanguage()" class="lang-toggle-btn" title="Toggle Language">
+            <span class="lang-toggle-badge bg-emerald-600 text-white">ID</span>
+            <span class="hidden sm:inline ml-1 text-xs text-slate-300">ID</span>
           </button>
 
           <!-- TOMBOL LOGIN / PLAYER AREA -->
           <a href="./login.html" id="navAuthBtn"
             class="w-full sm:w-auto bg-rose-600 hover:bg-rose-500 text-white text-xs px-3.5 py-2 rounded-xl transition flex items-center justify-center gap-2 font-mono-code font-bold shadow-lg shadow-rose-950/40 shrink-0">
             <i class="fa-solid fa-user-shield"></i>
-            <span id="navAuthBtnText">Login</span>
+            <span id="navAuthBtnText" data-i18n="nav.login">Login</span>
           </a>
         </div>
 
@@ -86,7 +100,7 @@
     <section class="max-w-6xl mx-auto px-4 py-8 md:py-16 w-full text-center">
       <div
         class="inline-flex items-center gap-2 bg-rose-950/90 border border-rose-500/60 text-rose-300 text-[10px] sm:text-xs font-semibold px-3 py-1.5 rounded-full mb-5 glow-rose max-w-full">
-        <span class="truncate">AETHERIA: DRAGON'S ECLIPSE • EPIC FIGHT • SURVIVAL 1.20.1</span>
+        <span class="truncate" data-i18n="hero.badge">AETHERIA: DRAGON'S ECLIPSE • EPIC FIGHT • SURVIVAL 1.20.1</span>
       </div>
 
       <h1
@@ -96,7 +110,7 @@
           ECLIPSE</span>
       </h1>
 
-      <p class="mt-4 sm:mt-5 text-slate-300 text-xs sm:text-base leading-relaxed max-w-2xl mx-auto px-2">
+      <p class="mt-4 sm:mt-5 text-slate-300 text-xs sm:text-base leading-relaxed max-w-2xl mx-auto px-2" data-i18n-html="hero.subtitle">
         Kuasai pertarungan pedang berseni tinggi ala Soulslike dengan sistem combo <strong class="text-rose-400">Epic
           Fight Mod</strong>, bertarung & terbang menunggangi naga di bawah bayang-bayang Gerhana Naga!
       </p>
@@ -106,14 +120,14 @@
         <!-- TOMBOL 1: JOIN DISCORD COMMUNITY -->
         <a href="https://discord.gg/vm7QNWuRgE" target="_blank"
           class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-xl transition shadow-lg shadow-indigo-950/50 flex items-center gap-2.5 font-epic">
-          <i class="fa-brands fa-discord text-base"></i> Join Discord Aetheria
+          <i class="fa-brands fa-discord text-base"></i> <span data-i18n="hero.btn_discord">Join Discord Aetheria</span>
         </a>
 
         <!-- TOMBOL 2: DOWNLOAD MODPACK -->
         <a href="https://drive.google.com/drive/folders/1RoBEnPzmepIOVjlnwSfXcIKkJ5Zau6ri?usp=drive_link"
           target="_blank"
           class="bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-xl transition shadow-lg shadow-rose-950/50 flex items-center gap-2.5 font-epic">
-          <i class="fa-brands fa-google-drive text-base"></i> Download Modpack (GDrive)
+          <i class="fa-brands fa-google-drive text-base"></i> <span data-i18n="hero.btn_modpack">Download Modpack (GDrive)</span>
         </a>
       </div>
 
@@ -124,17 +138,17 @@
           <div class="flex items-center gap-2">
             <span id="server-status-dot" class="w-2.5 h-2.5 rounded-full bg-gray-500"></span>
             <span
-              class="text-[11px] sm:text-xs font-extrabold text-white uppercase font-mono-code tracking-wider">KSATRIA
+              class="text-[11px] sm:text-xs font-extrabold text-white uppercase font-mono-code tracking-wider" data-i18n="live.title">KSATRIA
               ECLIPSE ONLINE</span>
           </div>
           <div class="text-[11px] sm:text-xs font-mono-code text-slate-400">
-            <span id="player-count-text" class="text-rose-400 font-bold">Checking status...</span>
+            <span id="player-count-text" class="text-rose-400 font-bold" data-i18n="live.checking">Checking status...</span>
           </div>
         </div>
 
         <div id="player-list-container"
           class="mt-4 flex flex-wrap gap-2.5 items-center min-h-[50px] max-h-48 overflow-y-auto custom-scrollbar pr-1">
-          <span class="text-xs text-slate-500 italic font-mono-code">Memuat daftar ksatria & rank online...</span>
+          <span class="text-xs text-slate-500 italic font-mono-code" data-i18n="live.empty">Memuat daftar ksatria & rank online...</span>
         </div>
       </div>
     </section>
@@ -144,9 +158,9 @@
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6 sm:mb-8">
         <div>
           <h3 class="text-xl sm:text-3xl font-black text-white tracking-tight font-epic flex items-center gap-2.5">
-            <i class="fa-solid fa-gamepad text-rose-500"></i> Panduan Masuk Server
+            <i class="fa-solid fa-gamepad text-rose-500"></i> <span data-i18n="tutorial.heading">Panduan Masuk Server</span>
           </h3>
-          <p class="text-xs text-slate-400 mt-1">Ikuti 4 langkah mudah berikut untuk mulai bertualang di Aetheria</p>
+          <p class="text-xs text-slate-400 mt-1" data-i18n="tutorial.subheading">Ikuti 4 langkah mudah berikut untuk mulai bertualang di Aetheria</p>
         </div>
       </div>
 
@@ -159,8 +173,8 @@
             <div
               class="w-8 h-8 bg-rose-500/20 text-rose-400 rounded-lg flex items-center justify-center font-bold text-sm mb-3 font-mono-code border border-rose-500/40">
               1</div>
-            <h4 class="text-sm font-bold text-white mb-2 font-epic">Unduh Modpack</h4>
-            <p class="text-xs text-slate-400 leading-relaxed">Download file Modpack Aetheria dari Google Drive melalui
+            <h4 class="text-sm font-bold text-white mb-2 font-epic" data-i18n="tutorial.step1_title">Unduh Modpack</h4>
+            <p class="text-xs text-slate-400 leading-relaxed" data-i18n="tutorial.step1_desc">Download file Modpack Aetheria dari Google Drive melalui
               tombol di atas.</p>
           </div>
           <div class="mt-4 pt-3 border-t border-slate-800/80 text-[11px] text-amber-400 font-mono-code">
@@ -176,8 +190,8 @@
             <div
               class="w-8 h-8 bg-amber-500/20 text-amber-400 rounded-lg flex items-center justify-center font-bold text-sm mb-3 font-mono-code border border-amber-500/40">
               2</div>
-            <h4 class="text-sm font-bold text-white mb-2 font-epic">Pasang Forge 1.20.1</h4>
-            <p class="text-xs text-slate-400 leading-relaxed">Gunakan Launcher favoritmu (Prism, CurseForge, atau
+            <h4 class="text-sm font-bold text-white mb-2 font-epic" data-i18n="tutorial.step2_title">Pasang Forge 1.20.1</h4>
+            <p class="text-xs text-slate-400 leading-relaxed" data-i18n="tutorial.step2_desc">Gunakan Launcher favoritmu (Prism, CurseForge, atau
               TLauncher) & pilih versi Forge 1.20.1.</p>
           </div>
           <div class="mt-4 pt-3 border-t border-slate-800/80 text-[11px] text-amber-400 font-mono-code">
@@ -193,8 +207,8 @@
             <div
               class="w-8 h-8 bg-cyan-500/20 text-cyan-400 rounded-lg flex items-center justify-center font-bold text-sm mb-3 font-mono-code border border-cyan-500/40">
               3</div>
-            <h4 class="text-sm font-bold text-white mb-2 font-epic">Ekstrak Mod</h4>
-            <p class="text-xs text-slate-400 leading-relaxed">Masukkan seluruh file dari modpack ke dalam folder <code
+            <h4 class="text-sm font-bold text-white mb-2 font-epic" data-i18n="tutorial.step3_title">Ekstrak Mod</h4>
+            <p class="text-xs text-slate-400 leading-relaxed" data-i18n-html="tutorial.step3_desc">Masukkan seluruh file dari modpack ke dalam folder <code
                 class="bg-slate-900 text-cyan-300 px-1 py-0.5 rounded">.minecraft/mods</code>.</p>
           </div>
           <div class="mt-4 pt-3 border-t border-slate-800/80 text-[11px] text-cyan-400 font-mono-code">
@@ -210,8 +224,8 @@
             <div
               class="w-8 h-8 bg-emerald-500/20 text-emerald-400 rounded-lg flex items-center justify-center font-bold text-sm mb-3 font-mono-code border border-emerald-500/40">
               4</div>
-            <h4 class="text-sm font-bold text-white mb-2 font-epic">Join Server</h4>
-            <p class="text-xs text-slate-400 leading-relaxed">Buka game, masuk Multiplayer, tambahkan IP server dan
+            <h4 class="text-sm font-bold text-white mb-2 font-epic" data-i18n="tutorial.step4_title">Join Server</h4>
+            <p class="text-xs text-slate-400 leading-relaxed" data-i18n="tutorial.step4_desc">Buka game, masuk Multiplayer, tambahkan IP server dan
               selamat bermain!</p>
           </div>
           <div class="mt-4 pt-3 border-t border-slate-800/80 text-[11px] text-emerald-400 font-mono-code truncate">
@@ -230,8 +244,8 @@
             class="w-10 h-10 sm:w-12 sm:h-12 bg-rose-500/10 border border-rose-500/40 text-rose-400 rounded-xl flex items-center justify-center text-lg sm:text-xl mb-3 sm:mb-4 shadow-lg shadow-rose-950/50">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
           </div>
-          <h4 class="text-base sm:text-lg font-bold text-white mb-1.5 font-epic">Combos Epic Fight Mod</h4>
-          <p class="text-xs text-slate-400 leading-relaxed">Sistem pertarungan dinamis dengan tebasan Greatsword,
+          <h4 class="text-base sm:text-lg font-bold text-white mb-1.5 font-epic" data-i18n="hl.fight_title">Combos Epic Fight Mod</h4>
+          <p class="text-xs text-slate-400 leading-relaxed" data-i18n="hl.fight_desc">Sistem pertarungan dinamis dengan tebasan Greatsword,
             Katana, Longsword, Dodge Roll, dan combo serangan udara yang memukau.</p>
         </div>
 
@@ -240,8 +254,8 @@
             class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-500/10 border border-amber-500/40 text-amber-400 rounded-xl flex items-center justify-center text-lg sm:text-xl mb-3 sm:mb-4 shadow-lg shadow-amber-950/50">
             <i class="fa-solid fa-dragon"></i>
           </div>
-          <h4 class="text-base sm:text-lg font-bold text-white mb-1.5 font-epic">Jinakkan & Tunggangi Naga</h4>
-          <p class="text-xs text-slate-400 leading-relaxed">Berburu telur naga langka, tetaskan di sarang, lalu terbang
+          <h4 class="text-base sm:text-lg font-bold text-white mb-1.5 font-epic" data-i18n="hl.dragon_title">Jinakkan & Tunggangi Naga</h4>
+          <p class="text-xs text-slate-400 leading-relaxed" data-i18n="hl.dragon_desc">Berburu telur naga langka, tetaskan di sarang, lalu terbang
             bertarung di udara bersama naga tempur peliharaanmu.</p>
         </div>
 
@@ -250,8 +264,8 @@
             class="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 rounded-xl flex items-center justify-center text-lg sm:text-xl mb-3 sm:mb-4 shadow-lg shadow-emerald-950/50">
             <i class="fa-solid fa-coins"></i>
           </div>
-          <h4 class="text-base sm:text-lg font-bold text-white mb-1.5 font-epic">Ekonomi & Pasar Pedang</h4>
-          <p class="text-xs text-slate-400 leading-relaxed">Jual beli senjata Epic, material naga, dan item langka via
+          <h4 class="text-base sm:text-lg font-bold text-white mb-1.5 font-epic" data-i18n="hl.eco_title">Ekonomi & Pasar Pedang</h4>
+          <p class="text-xs text-slate-400 leading-relaxed" data-i18n="hl.eco_desc">Jual beli senjata Epic, material naga, dan item langka via
             Auction House serta toko fisik player.</p>
         </div>
 
@@ -263,28 +277,28 @@
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
           <h3 class="text-2xl sm:text-4xl font-black text-white tracking-tight font-epic flex items-center gap-3">
-            <i class="fa-solid fa-crown text-amber-400"></i> Leaderboard Ksatria
+            <i class="fa-solid fa-crown text-amber-400"></i> <span data-i18n="lb.title">Leaderboard Ksatria</span>
           </h3>
-          <p class="text-xs text-slate-400 mt-1">Peringkat ksatria paling tangguh, paling setia, dan donatur terbesar di Aetheria</p>
+          <p class="text-xs text-slate-400 mt-1" data-i18n="lb.sub">Peringkat ksatria paling tangguh, paling setia, dan donatur terbesar di Aetheria</p>
         </div>
 
         <!-- CATEGORY TABS -->
         <div class="flex flex-wrap w-full md:w-auto bg-slate-900/90 p-1.5 rounded-xl border border-slate-800 text-xs font-semibold font-mono-code gap-1">
           <button onclick="switchLeaderboardCategory('kills')" id="lb-tab-kills"
             class="flex-1 sm:flex-none px-3.5 py-2 rounded-lg bg-rose-600 text-white shadow-lg shadow-rose-900/40 transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-skull text-rose-300"></i> Top Kills
+            <i class="fa-solid fa-skull text-rose-300"></i> <span data-i18n="lb.tab_kills">Top Kills</span>
           </button>
           <button onclick="switchLeaderboardCategory('playtime')" id="lb-tab-playtime"
             class="flex-1 sm:flex-none px-3.5 py-2 rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-clock text-amber-400"></i> Paling Setia
+            <i class="fa-solid fa-clock text-amber-400"></i> <span data-i18n="lb.tab_playtime">Paling Setia</span>
           </button>
           <button onclick="switchLeaderboardCategory('donators')" id="lb-tab-donators"
             class="flex-1 sm:flex-none px-3.5 py-2 rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-gem text-cyan-400"></i> Top Donatur
+            <i class="fa-solid fa-gem text-cyan-400"></i> <span data-i18n="lb.tab_donators">Top Donatur</span>
           </button>
           <button onclick="switchLeaderboardCategory('baltop')" id="lb-tab-baltop"
             class="flex-1 sm:flex-none px-3.5 py-2 rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-coins text-emerald-400"></i> Top Baltop
+            <i class="fa-solid fa-coins text-emerald-400"></i> <span data-i18n="lb.tab_baltop">Top Baltop</span>
           </button>
         </div>
       </div>
@@ -386,9 +400,9 @@
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6 sm:mb-8">
         <div>
           <h3 class="text-xl sm:text-3xl font-black text-white tracking-tight font-epic flex items-center gap-2.5">
-            <i class="fa-solid fa-images text-rose-500"></i> Realm Gallery Showcase
+            <i class="fa-solid fa-images text-rose-500"></i> <span data-i18n="gallery.title">Realm Gallery Showcase</span>
           </h3>
-          <p class="text-xs text-slate-400 mt-1">Cuplikan aksi pertarungan naga & duel combo pedang in-game Aetheria</p>
+          <p class="text-xs text-slate-400 mt-1" data-i18n="gallery.sub">Cuplikan aksi pertarungan naga & duel combo pedang in-game Aetheria</p>
         </div>
       </div>
 
@@ -426,19 +440,19 @@
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
           <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight font-epic flex items-center gap-2">
-            <i class="fa-solid fa-fire text-rose-500"></i> Eclipse Webstore
+            <i class="fa-solid fa-fire text-rose-500"></i> <span data-i18n="store.title">Eclipse Webstore</span>
           </h2>
-          <p class="text-xs text-slate-400 mt-0.5">Dukung operasional server & dapatkan rank serta saldo eksklusif</p>
+          <p class="text-xs text-slate-400 mt-0.5" data-i18n="store.sub">Dukung operasional server & dapatkan rank serta saldo eksklusif</p>
         </div>
 
         <div
           class="flex w-full sm:w-auto bg-slate-900/90 p-1.5 rounded-xl border border-slate-800 text-xs font-semibold">
           <button onclick="switchTab('rank')" id="tab-rank"
-            class="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg bg-rose-600 text-white shadow-lg shadow-rose-900/40 transition">
+            class="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg bg-rose-600 text-white shadow-lg shadow-rose-900/40 transition" data-i18n="store.tab_rank">
             Rank Membership
           </button>
           <button onclick="switchTab('money')" id="tab-money"
-            class="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg text-slate-400 hover:text-white transition">
+            class="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg text-slate-400 hover:text-white transition" data-i18n="store.tab_money">
             Coins / Money
           </button>
         </div>
@@ -452,7 +466,7 @@
           <div>
             <div class="flex justify-between items-center mb-3">
               <span
-                class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[11px] font-semibold px-2.5 py-1 rounded-md">PERMANENT
+                class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[11px] font-semibold px-2.5 py-1 rounded-md" data-i18n="store.permanent">PERMANENT
                 RANK</span>
               <span class="text-xs font-mono-code text-amber-400 font-bold">[VIP]</span>
             </div>
@@ -462,7 +476,7 @@
             <p class="text-xs text-slate-400 mb-6 leading-relaxed"></p>
 
             <div class="border-t border-slate-800/80 pt-4 mb-6">
-              <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">KEUNTUNGAN RANK:</p>
+              <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3" data-i18n="store.perks_heading">KEUNTUNGAN RANK:</p>
               <ul class="text-xs text-slate-300 space-y-2.5 font-mono-code">
                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-amber-400"></i> Prefix Tag Chat
                   <strong class="text-amber-300">[VIP]</strong>
@@ -474,7 +488,7 @@
           </div>
 
           <button onclick="openModal('VIP Warrior', 'Rp 25.000', 'Rank')"
-            class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-amber-950/40">
+            class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-amber-950/40" data-i18n="store.btn_buy_vip">
             Beli Rank VIP
           </button>
         </div>
@@ -485,7 +499,7 @@
           <div>
             <div class="flex justify-between items-center mb-3">
               <span
-                class="bg-rose-500/10 text-rose-400 border border-rose-500/30 text-[11px] font-semibold px-2.5 py-1 rounded-md">PERMANENT
+                class="bg-rose-500/10 text-rose-400 border border-rose-500/30 text-[11px] font-semibold px-2.5 py-1 rounded-md" data-i18n="store.permanent">PERMANENT
                 RANK</span>
               <span class="text-xs font-mono-code text-cyan-400 font-bold">[MVP]</span>
             </div>
@@ -495,7 +509,7 @@
             <p class="text-xs text-slate-400 mb-6 leading-relaxed"></p>
 
             <div class="border-t border-slate-800/80 pt-4 mb-6">
-              <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">KEUNTUNGAN RANK:</p>
+              <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3" data-i18n="store.perks_heading">KEUNTUNGAN RANK:</p>
               <ul class="text-xs text-slate-300 space-y-2.5 font-mono-code">
                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-rose-400"></i> Prefix Tag Chat
                   <strong class="text-cyan-300">[MVP]</strong> Cyan
@@ -507,7 +521,7 @@
           </div>
 
           <button onclick="openModal('MVP Dragon Knight', 'Rp 50.000', 'Rank')"
-            class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-rose-950/40 font-epic">
+            class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-rose-950/40 font-epic" data-i18n="store.btn_buy_mvp">
             Beli Rank MVP
           </button>
         </div>
@@ -520,7 +534,7 @@
           <div>
             <div class="flex justify-between items-center mb-3">
               <span
-                class="bg-gradient-to-r from-amber-500/20 to-rose-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-extrabold px-2.5 py-1 rounded-md font-epic">ULTIMATE
+                class="bg-gradient-to-r from-amber-500/20 to-rose-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-extrabold px-2.5 py-1 rounded-md font-epic" data-i18n="store.ultimate">ULTIMATE
                 RANK</span>
               <span class="text-xs font-mono-code text-amber-300 font-extrabold tracking-wider">[DRAGONIAN]</span>
             </div>
@@ -531,7 +545,7 @@
             <p class="text-2xl sm:text-3xl font-extrabold text-amber-300 my-2 font-mono-code">Rp 100.000</p>
 
             <div class="border-t border-slate-800/80 pt-4 mb-6">
-              <p class="text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-3">KEUNTUNGAN MYTHIC:</p>
+              <p class="text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-3" data-i18n="store.perks_mythic">KEUNTUNGAN MYTHIC:</p>
               <ul class="text-xs text-slate-300 space-y-2.5 font-mono-code">
                 <li class="flex items-center gap-2"><i class="fa-solid fa-crown text-amber-400"></i> Prefix Tag <strong
                     class="text-amber-300">[DRAGONIAN]</strong> Emas/Rainbow</li>
@@ -542,7 +556,7 @@
           </div>
 
           <button onclick="openModal('Dragonian Rank', 'Rp 100.000', 'Rank')"
-            class="w-full bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-slate-950 font-black py-3 rounded-xl transition text-xs shadow-lg shadow-amber-950/50 font-epic tracking-wider">
+            class="w-full bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-slate-950 font-black py-3 rounded-xl transition text-xs shadow-lg shadow-amber-950/50 font-epic tracking-wider" data-i18n="store.btn_buy_dragonian">
             Beli Rank Dragonian
           </button>
         </div>
@@ -554,7 +568,7 @@
           <div>
             <div class="flex justify-between items-center mb-3">
               <span
-                class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[11px] font-semibold px-2.5 py-1 rounded-md">STARTER
+                class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[11px] font-semibold px-2.5 py-1 rounded-md" data-i18n="store.starter_vault">STARTER
                 VAULT</span>
               <span class="text-xs font-mono-code text-emerald-400 font-bold"><i class="fa-solid fa-coins"></i></span>
             </div>
@@ -565,7 +579,7 @@
               dan kebutuhan harian saat memulai petualangan.</p>
 
             <div class="border-t border-slate-800/80 pt-4 mb-6">
-              <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">PENGGUNAAN:</p>
+              <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3" data-i18n="store.usage_heading">PENGGUNAAN:</p>
               <ul class="text-xs text-slate-300 space-y-2.5 font-mono-code">
                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Masuk ke <code
                     class="bg-slate-950 px-1.5 py-0.5 rounded text-emerald-300">/balance</code></li>
@@ -576,7 +590,7 @@
           </div>
 
           <button onclick="openModal('10.000 Coins', 'Rp 10.000', 'Money')"
-            class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-950/40">
+            class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-950/40" data-i18n="store.btn_buy_coins">
             Beli Coins Starter
           </button>
         </div>
@@ -586,7 +600,7 @@
           <div>
             <div class="flex justify-between items-center mb-3">
               <span
-                class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 text-[11px] font-semibold px-2.5 py-1 rounded-md">ADVENTURER
+                class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 text-[11px] font-semibold px-2.5 py-1 rounded-md" data-i18n="store.adventurer_vault">ADVENTURER
                 VAULT</span>
               <span class="text-xs font-mono-code text-cyan-400 font-bold">SAVE</span>
             </div>
@@ -597,7 +611,7 @@
               dan persiapan petualangan besar berikutnya.</p>
 
             <div class="border-t border-slate-800/80 pt-4 mb-6">
-              <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">PENGGUNAAN:</p>
+              <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3" data-i18n="store.usage_heading">PENGGUNAAN:</p>
               <ul class="text-xs text-slate-300 space-y-2.5 font-mono-code">
                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Hemat Rp 3.000
                   dari harga normal</li>
@@ -608,7 +622,7 @@
           </div>
 
           <button onclick="openModal('25.000 Coins', 'Rp 22.000', 'Money')"
-            class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-950/40">
+            class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-950/40" data-i18n="store.btn_buy_coins">
             Beli Coins Adventurer
           </button>
         </div>
@@ -618,7 +632,7 @@
           <div>
             <div class="flex justify-between items-center mb-3">
               <span
-                class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[11px] font-semibold px-2.5 py-1 rounded-md">GUILD
+                class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[11px] font-semibold px-2.5 py-1 rounded-md" data-i18n="store.guild_core">GUILD
                 CORE</span>
               <span class="text-xs font-mono-code text-amber-400 font-bold">BEST VALUE</span>
             </div>
@@ -629,7 +643,7 @@
               dan menyiapkan kebutuhan ekspedisi harian.</p>
 
             <div class="border-t border-slate-800/80 pt-4 mb-6">
-              <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">PENGGUNAAN:</p>
+              <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3" data-i18n="store.usage_heading">PENGGUNAAN:</p>
               <ul class="text-xs text-slate-300 space-y-2.5 font-mono-code">
                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Hemat Rp 10.000
                   dibanding ketengan</li>
@@ -640,7 +654,7 @@
           </div>
 
           <button onclick="openModal('50.000 Coins', 'Rp 40.000', 'Money')"
-            class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-950/40">
+            class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-950/40" data-i18n="store.btn_buy_coins">
             Beli Coins Guild
           </button>
         </div>
@@ -653,7 +667,7 @@
           <div>
             <div class="flex justify-between items-center mb-3">
               <span
-                class="bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 border border-emerald-500/40 text-[11px] font-extrabold px-2.5 py-1 rounded-md font-epic">DRAGON
+                class="bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 border border-emerald-500/40 text-[11px] font-extrabold px-2.5 py-1 rounded-md font-epic" data-i18n="store.dragon_vault">DRAGON
                 VAULT</span>
               <span class="text-xs font-mono-code text-amber-300 font-extrabold tracking-wider">LEGENDARY</span>
             </div>
@@ -666,7 +680,7 @@
               dan kebutuhan progres besar tanpa harus menunggu lama.</p>
 
             <div class="border-t border-slate-800/80 pt-4 mb-6">
-              <p class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-3">KEUNTUNGAN SULTAN:</p>
+              <p class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-3" data-i18n="store.perks_sultan">KEUNTUNGAN SULTAN:</p>
               <ul class="text-xs text-slate-300 space-y-2.5 font-mono-code">
                 <li class="flex items-center gap-2"><i class="fa-solid fa-fire text-amber-400"></i> HEMAT MAXIMAL RP
                   25.000!</li>
@@ -679,7 +693,7 @@
           </div>
 
           <button onclick="openModal('100.000 Coins', 'Rp 75.000', 'Money')"
-            class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-950/50 font-epic tracking-wider">
+            class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black py-3 rounded-xl transition text-xs shadow-lg shadow-emerald-950/50 font-epic tracking-wider" data-i18n="store.btn_buy_coins">
             Beli Coins Dragon Vault
           </button>
         </div>
@@ -692,7 +706,7 @@
           <div>
             <div class="flex justify-between items-center mb-3">
               <span
-                class="bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 text-violet-300 border border-violet-500/40 text-[11px] font-extrabold px-2.5 py-1 rounded-md font-epic">ROYAL
+                class="bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 text-violet-300 border border-violet-500/40 text-[11px] font-extrabold px-2.5 py-1 rounded-md font-epic" data-i18n="store.royal_treasury">ROYAL
                 TREASURY</span>
               <span class="text-xs font-mono-code text-violet-300 font-extrabold tracking-wider">VIP</span>
             </div>
@@ -705,7 +719,7 @@
               dan kebutuhan ekonomi jangka panjang di server.</p>
 
             <div class="border-t border-slate-800/80 pt-4 mb-6">
-              <p class="text-[11px] font-bold text-violet-400 uppercase tracking-wider mb-3">PENGGUNAAN:</p>
+              <p class="text-[11px] font-bold text-violet-400 uppercase tracking-wider mb-3" data-i18n="store.usage_heading">PENGGUNAAN:</p>
               <ul class="text-xs text-slate-300 space-y-2.5 font-mono-code">
                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Hemat Rp 50.000
                   dari pembelian biasa</li>
@@ -716,7 +730,7 @@
           </div>
 
           <button onclick="openModal('250.000 Coins', 'Rp 175.000', 'Money')"
-            class="w-full bg-gradient-to-r from-violet-500 to-fuchsia-600 hover:from-violet-400 hover:to-fuchsia-500 text-white font-black py-3 rounded-xl transition text-xs shadow-lg shadow-violet-950/50 font-epic tracking-wider">
+            class="w-full bg-gradient-to-r from-violet-500 to-fuchsia-600 hover:from-violet-400 hover:to-fuchsia-500 text-white font-black py-3 rounded-xl transition text-xs shadow-lg shadow-violet-950/50 font-epic tracking-wider" data-i18n="store.btn_buy_coins">
             Beli Royal Treasury
           </button>
         </div>
@@ -729,7 +743,7 @@
           <div>
             <div class="flex justify-between items-center mb-3">
               <span
-                class="bg-gradient-to-r from-amber-500/20 to-rose-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-extrabold px-2.5 py-1 rounded-md font-epic">DRAGON
+                class="bg-gradient-to-r from-amber-500/20 to-rose-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-extrabold px-2.5 py-1 rounded-md font-epic" data-i18n="store.dragon_kingdom">DRAGON
                 KINGDOM</span>
               <span class="text-xs font-mono-code text-amber-300 font-extrabold tracking-wider">ULTIMATE</span>
             </div>
@@ -742,7 +756,7 @@
               dan menjaga ekonomi guild dalam skala besar.</p>
 
             <div class="border-t border-slate-800/80 pt-4 mb-6">
-              <p class="text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-3">KEUNTUNGAN KINGDOM:</p>
+              <p class="text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-3" data-i18n="store.perks_kingdom">KEUNTUNGAN KINGDOM:</p>
               <ul class="text-xs text-slate-300 space-y-2.5 font-mono-code">
                 <li class="flex items-center gap-2"><i class="fa-solid fa-crown text-amber-400"></i> Hemat Rp 75.000
                   dari harga normal</li>
@@ -755,7 +769,7 @@
           </div>
 
           <button onclick="openModal('500.000 Coins', 'Rp 300.000', 'Money')"
-            class="w-full bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-slate-950 font-black py-3 rounded-xl transition text-xs shadow-lg shadow-amber-950/50 font-epic tracking-wider">
+            class="w-full bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-slate-950 font-black py-3 rounded-xl transition text-xs shadow-lg shadow-amber-950/50 font-epic tracking-wider" data-i18n="store.btn_buy_coins">
             Beli Coins Kingdom
           </button>
         </div>
@@ -789,17 +803,17 @@
 
         <h3
           class="text-base sm:text-lg font-bold text-white mb-4 border-b border-slate-800/80 pb-3 font-epic flex items-center gap-2">
-          <i class="fa-solid fa-shield-halved text-rose-500"></i> Konfirmasi Pembayaran GoPay
+          <i class="fa-solid fa-shield-halved text-rose-500"></i> <span data-i18n="checkout.title">Konfirmasi Pembayaran GoPay</span>
         </h3>
 
         <div
           class="bg-slate-950/80 p-3 sm:p-3.5 rounded-xl border border-slate-800/80 mb-4 text-xs flex justify-between items-center">
           <div>
-            <p class="text-slate-400 text-[10px] sm:text-[11px]">Item Dipilih:</p>
+            <p class="text-slate-400 text-[10px] sm:text-[11px]" data-i18n="checkout.item_label">Item Dipilih:</p>
             <p id="modal-item-name" class="font-bold text-white mt-0.5 font-epic"></p>
           </div>
           <div class="text-right">
-            <p class="text-slate-400 text-[10px] sm:text-[11px]">Harga:</p>
+            <p class="text-slate-400 text-[10px] sm:text-[11px]" data-i18n="checkout.price_label">Harga:</p>
             <p id="modal-item-price" class="font-bold text-emerald-400 mt-0.5 font-mono-code"></p>
           </div>
         </div>
@@ -814,36 +828,36 @@
             </div>
             <div>
               <p class="text-slate-400 text-[9px] sm:text-[10px] tracking-wider font-semibold flex items-center gap-1">
-                TRANSFER KE <b class="text-blue-400">GOPAY</b>:</p>
+                <span data-i18n="checkout.transfer_to">TRANSFER KE</span> <b class="text-blue-400">GOPAY</b>:</p>
               <p class="font-mono-code font-bold text-white text-xs sm:text-sm mt-0.5">0858-8022-6237</p>
-              <p class="text-[9px] sm:text-[10px] text-slate-400">a.n. Operator Server</p>
+              <p class="text-[9px] sm:text-[10px] text-slate-400" data-i18n="checkout.an_operator">a.n. Operator Server</p>
             </div>
           </div>
           <button onclick="copyGopay('085880226237')"
-            class="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs px-3 py-1.5 rounded-lg transition shadow-md shadow-blue-950 shrink-0">
+            class="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs px-3 py-1.5 rounded-lg transition shadow-md shadow-blue-950 shrink-0" data-i18n="checkout.copy_btn">
             Copy
           </button>
         </div>
 
         <form id="orderForm" onsubmit="handleFormSubmit(event)" class="space-y-4 text-xs">
           <div>
-            <label class="block text-slate-300 font-semibold mb-1.5">Username Minecraft *</label>
-            <input type="text" id="usernameInput" required placeholder="Contoh: Steve"
+            <label class="block text-slate-300 font-semibold mb-1.5" data-i18n="checkout.user_label">Username Minecraft *</label>
+            <input type="text" id="usernameInput" required placeholder="Contoh: Steve" data-i18n-placeholder="checkout.user_ph"
               class="w-full input-box px-3.5 py-2.5 rounded-xl text-white font-mono-code">
           </div>
 
           <div>
-            <label class="block text-slate-300 font-semibold mb-1.5">Upload Bukti Transfer *</label>
+            <label class="block text-slate-300 font-semibold mb-1.5" data-i18n="checkout.proof_label">Upload Bukti Transfer *</label>
             <input type="file" id="proofInput" accept="image/*" required
               class="w-full input-box p-1.5 rounded-xl text-slate-400 font-mono-code text-xs">
           </div>
 
           <div>
             <div class="flex justify-between items-center mb-1.5">
-              <label class="text-slate-300 font-semibold">Tanda Tangan Pemesan *</label>
+              <label class="text-slate-300 font-semibold" data-i18n="checkout.sig_label">Tanda Tangan Pemesan *</label>
               <button type="button" onclick="clearSignature()"
                 class="text-[11px] text-rose-400 hover:text-rose-300 hover:underline flex items-center gap-1">
-                <i class="fa-solid fa-rotate-left"></i> Hapus TTD
+                <i class="fa-solid fa-rotate-left"></i> <span data-i18n="checkout.btn_clear">Hapus TTD</span>
               </button>
             </div>
             <div class="input-box rounded-xl overflow-hidden border border-slate-800">
@@ -852,7 +866,7 @@
           </div>
 
           <button type="submit" id="submitBtn"
-            class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3.5 rounded-xl transition text-xs mt-3 shadow-lg shadow-rose-950/60 font-epic tracking-wider uppercase">
+            class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3.5 rounded-xl transition text-xs mt-3 shadow-lg shadow-rose-950/60 font-epic tracking-wider uppercase" data-i18n="checkout.btn_submit">
             Kirim Bukti Pembayaran
           </button>
         </form>
@@ -874,7 +888,7 @@
       <div class="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
         <div class="flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
-          <h4 class="text-xs font-bold text-white font-epic tracking-wide">LIVE CHAT IN-GAME</h4>
+          <h4 class="text-xs font-bold text-white font-epic tracking-wide" data-i18n="webchat.title">LIVE CHAT IN-GAME</h4>
         </div>
         <button type="button" onclick="toggleWebChatPopup()" class="text-slate-400 hover:text-white text-xs w-6 h-6 flex items-center justify-center rounded-lg bg-slate-900 border border-slate-800 transition cursor-pointer">
           <i class="fa-solid fa-xmark"></i>
@@ -883,17 +897,17 @@
 
       <!-- STEP 1: IDENTITY REGISTRATION (EMAIL & USERNAME) -->
       <div id="webChatAuthContainer" class="space-y-3 text-xs">
-        <p class="text-slate-300 text-[11px] leading-relaxed">Masukkan Username & Email kamu untuk mulai live chat ke server Minecraft:</p>
+        <p class="text-slate-300 text-[11px] leading-relaxed" data-i18n="webchat.enter_user">Masukkan Username & Email kamu untuk mulai live chat ke server Minecraft:</p>
         <form onsubmit="initWebChatUser(event)" class="space-y-2.5">
           <div>
-            <label class="block text-slate-400 mb-1 text-[10px]">Username Minecraft *</label>
-            <input type="text" id="webChatUsername" required placeholder="Steve" class="w-full input-box px-3 py-2 rounded-xl text-white text-xs bg-slate-950">
+            <label class="block text-slate-400 mb-1 text-[10px]" data-i18n="webchat.user_label">Username Minecraft *</label>
+            <input type="text" id="webChatUsername" required placeholder="Steve" data-i18n-placeholder="webchat.input_user" class="w-full input-box px-3 py-2 rounded-xl text-white text-xs bg-slate-950">
           </div>
           <div>
             <label class="block text-slate-400 mb-1 text-[10px]">Email *</label>
             <input type="email" id="webChatEmail" required placeholder="steve@email.com" class="w-full input-box px-3 py-2 rounded-xl text-white text-xs bg-slate-950">
           </div>
-          <button type="submit" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-2.5 rounded-xl transition text-xs flex items-center justify-center gap-2 cursor-pointer">
+          <button type="submit" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-2.5 rounded-xl transition text-xs flex items-center justify-center gap-2 cursor-pointer" data-i18n="webchat.btn_start">
             <i class="fa-solid fa-comments"></i> Masuk Chat
           </button>
         </form>
@@ -902,20 +916,20 @@
       <!-- STEP 2: LIVE CHAT MESSENGER -->
       <div id="webChatBoxContainer" class="hidden space-y-2.5 text-xs">
         <div class="flex justify-between items-center text-[10px] bg-slate-950/80 px-2.5 py-1.5 rounded-lg border border-slate-800">
-          <span class="text-slate-300 truncate">Pengirim: <strong id="activeChatUser" class="text-cyan-400"></strong></span>
-          <button type="button" onclick="resetWebChatUser()" class="text-rose-400 hover:text-rose-300 text-[9px] underline shrink-0 ml-1 cursor-pointer">
+          <span class="text-slate-300 truncate"><span data-i18n="webchat.sender_label">Pengirim:</span> <strong id="activeChatUser" class="text-cyan-400"></strong></span>
+          <button type="button" onclick="resetWebChatUser()" class="text-rose-400 hover:text-rose-300 text-[9px] underline shrink-0 ml-1 cursor-pointer" data-i18n="webchat.btn_change">
             Ganti
           </button>
         </div>
 
         <!-- CHAT LOG HISTORY -->
         <div id="webChatLog" class="bg-slate-950/90 border border-slate-800 rounded-xl p-2.5 h-44 overflow-y-auto custom-scrollbar space-y-1.5 text-xs">
-          <div class="text-slate-500 italic text-[10px]">Pesan yang kamu kirim akan langsung muncul di chat pemain Minecraft in-game.</div>
+          <div class="text-slate-500 italic text-[10px]" data-i18n="webchat.in_game_desc">Pesan yang kamu kirim akan langsung muncul di chat pemain Minecraft in-game.</div>
         </div>
 
         <!-- CHAT INPUT FORM -->
         <form onsubmit="handleSendWebChat(event)" class="flex gap-1.5">
-          <input type="text" id="webChatMessage" required placeholder="Tulis pesan..." class="flex-1 input-box px-3 py-2 rounded-xl text-white text-xs bg-slate-950 focus:border-cyan-500">
+          <input type="text" id="webChatMessage" required placeholder="Tulis pesan..." data-i18n-placeholder="webchat.input_msg" class="flex-1 input-box px-3 py-2 rounded-xl text-white text-xs bg-slate-950 focus:border-cyan-500">
           <button type="submit" id="btnSendWebChat" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-3.5 py-2 rounded-xl transition text-xs shrink-0 cursor-pointer flex items-center justify-center">
             <i class="fa-solid fa-paper-plane"></i>
           </button>
@@ -933,7 +947,8 @@
 
   </div>
 
-  <!-- EXTERNAL JS SCRIPT -->
+  <!-- EXTERNAL JS SCRIPTS -->
+  <script src="./javascript/i18n.js" defer></script>
   <script src="./javascript/index.js" defer></script>
 </body>
 

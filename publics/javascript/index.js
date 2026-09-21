@@ -335,15 +335,22 @@ function checkAuthNavState() {
 
   if (adminCookie || sessionAuth === 'true') {
     btn.href = './admin.html';
-    btnText.innerText = 'Dashboard Staff';
+    btnText.setAttribute('data-i18n', 'nav.dashboard_staff');
+    btnText.innerText = (typeof window.t === 'function' ? window.t('nav.dashboard_staff') : 'Dashboard Staff');
   } else if (playerUser) {
     btn.href = './players.html';
-    btnText.innerText = 'Dashboard Player';
+    btnText.setAttribute('data-i18n', 'nav.dashboard_player');
+    btnText.innerText = (typeof window.t === 'function' ? window.t('nav.dashboard_player') : 'Dashboard Player');
   } else {
     btn.href = './login.html';
-    btnText.innerText = 'Login';
+    btnText.setAttribute('data-i18n', 'nav.login');
+    btnText.innerText = (typeof window.t === 'function' ? window.t('nav.login') : 'Login');
   }
 }
+
+window.addEventListener('languageChanged', () => {
+  try { checkAuthNavState(); } catch (e) { }
+});
 
 window.addEventListener('DOMContentLoaded', () => {
   try { checkAuthNavState(); } catch (e) { console.error(e); }

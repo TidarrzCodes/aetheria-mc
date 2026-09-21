@@ -16,8 +16,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Fira+Code:wght@500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- EXTERNAL CSS -->
+  <!-- EXTERNAL CSS & THEME -->
   <link rel="stylesheet" href="./style/players.css">
+  <link rel="stylesheet" href="./style/theme.css">
+  <script src="./javascript/theme.js"></script>
 </head>
 
 <body class="min-h-screen bg-[#020305] text-slate-200 antialiased flex flex-col justify-between selection:bg-rose-600 selection:text-white relative">
@@ -34,16 +36,28 @@
           <img src="./library/aetheria.png" alt="Aetheria Logo" class="w-9 h-9 object-contain">
           <div>
             <span class="font-black text-base text-white tracking-widest block leading-tight font-epic">AETHERIA<span class="text-rose-500">: PLAYER HUD</span></span>
-            <p class="text-[9px] text-slate-400 font-mono-code tracking-tight">PLAYER PROFILE & REALM HUB</p>
+            <p class="text-[9px] text-slate-400 font-mono-code tracking-tight" data-i18n="player.hud_title">PLAYER PROFILE & REALM HUB</p>
           </div>
         </a>
 
         <div class="flex items-center gap-2 font-mono-code">
+          <!-- THEME TOGGLE BUTTON -->
+          <button type="button" id="themeToggleBtn" onclick="toggleTheme()" class="theme-toggle-btn" title="Toggle Theme">
+            <i class="fa-solid fa-sun text-amber-400"></i>
+            <span class="hidden sm:inline ml-1 text-xs">Light</span>
+          </button>
+
+          <!-- LANGUAGE TOGGLE BUTTON -->
+          <button type="button" id="langToggleBtn" onclick="toggleLanguage()" class="lang-toggle-btn" title="Toggle Language">
+            <span class="lang-toggle-badge bg-emerald-600 text-white">ID</span>
+            <span class="hidden sm:inline ml-1 text-xs text-slate-300">ID</span>
+          </button>
+
           <a href="./index.html#store" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
-            <i class="fa-solid fa-cart-shopping"></i> Webstore
+            <i class="fa-solid fa-cart-shopping"></i> <span data-i18n="nav.store">Webstore</span>
           </a>
           <button onclick="handlePlayerLogout()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-bold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
-            <i class="fa-solid fa-right-from-bracket"></i> Logout
+            <i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="nav.logout">Logout</span>
           </button>
         </div>
       </div>
@@ -70,17 +84,17 @@
           </div>
 
           <div class="w-full pt-4 border-t border-slate-800/80 text-xs font-mono-code text-slate-400 space-y-2 mt-4">
-            <div class="flex justify-between"><span>Status In-Game:</span> <strong id="playerOnlineState" class="text-slate-500">Offline</strong></div>
-            <div class="flex justify-between"><span>Realm Server:</span> <strong class="text-rose-400">1.20.1 Forge</strong></div>
+            <div class="flex justify-between"><span data-i18n="player.status_ingame">Status In-Game:</span> <strong id="playerOnlineState" class="text-slate-500">Offline</strong></div>
+            <div class="flex justify-between"><span data-i18n="player.realm_server">Realm Server:</span> <strong class="text-rose-400">1.20.1 Forge</strong></div>
             
             <div id="staffAccessContainer" class="hidden">
               <a href="./admin.html" class="w-full mt-2 bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 py-2 rounded-xl transition text-xs font-mono-code flex items-center justify-center gap-1.5 font-bold">
-                <i class="fa-solid fa-user-shield"></i> Ke Dashboard Staff
+                <i class="fa-solid fa-user-shield"></i> <span data-i18n="player.to_staff">Ke Dashboard Staff</span>
               </a>
             </div>
 
             <button onclick="handlePlayerLogout()" class="w-full mt-2 bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/30 text-rose-300 py-2 rounded-xl transition text-xs font-mono-code">
-              <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout Akun
+              <i class="fa-solid fa-right-from-bracket mr-1"></i> <span data-i18n="player.logout_btn">Logout Akun</span>
             </button>
           </div>
         </div>
@@ -88,7 +102,7 @@
         <!-- RANK BENEFITS & STATS -->
         <div class="md:col-span-2 supreme-card p-6 rounded-2xl space-y-4 shadow-xl">
           <h4 class="text-sm font-bold text-white font-mono-code uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-3">
-            <i class="fa-solid fa-shield-halved text-rose-500"></i> Benefit & Keuntungan Rank Kamu
+            <i class="fa-solid fa-shield-halved text-rose-500"></i> <span data-i18n="player.perks_title">Benefit & Keuntungan Rank Kamu</span>
           </h4>
 
           <div id="rankBenefitList" class="space-y-3 text-xs font-mono-code">
@@ -102,12 +116,12 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-slate-800">
           <div>
             <h3 class="text-lg font-bold text-white font-mono-code flex items-center gap-2">
-              <i class="fa-solid fa-box-open text-rose-500"></i> INVENTORI IN-GAME KAMU
+              <i class="fa-solid fa-box-open text-rose-500"></i> <span data-i18n="player.inv_title">INVENTORI IN-GAME KAMU</span>
             </h3>
             <p id="player-inv-status" class="text-xs text-slate-400 font-mono-code mt-0.5">Memuat data item dari server...</p>
           </div>
           <button onclick="fetchPlayerInventoryHUD()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs px-3.5 py-1.5 rounded-xl font-mono-code text-slate-300 transition flex items-center gap-1.5">
-            <i class="fa-solid fa-rotate text-[11px]"></i> Refresh Inventori
+            <i class="fa-solid fa-rotate text-[11px]"></i> <span data-i18n="player.inv_refresh">Refresh Inventori</span>
           </button>
         </div>
 
@@ -128,7 +142,7 @@
           <!-- ARMOR & OFFHAND SECTION -->
           <div class="bg-[#06080d] border border-slate-800/80 p-3.5 rounded-xl">
             <p class="text-[10px] font-mono-code text-slate-400 uppercase mb-2.5 font-semibold tracking-wider flex items-center gap-1.5">
-              <i class="fa-solid fa-shield-halved text-amber-500"></i> Armor & Offhand
+              <i class="fa-solid fa-shield-halved text-amber-500"></i> <span data-i18n="player.armor_title">Armor & Offhand</span>
             </p>
             <div class="flex flex-wrap items-center justify-between sm:justify-start gap-2.5">
               <!-- Helmet (103) -->
@@ -166,7 +180,7 @@
           <!-- MAIN INVENTORY GRID (3 x 9) -->
           <div class="bg-[#06080d] border border-slate-800/80 p-3.5 rounded-xl overflow-x-auto custom-scrollbar">
             <p class="text-[10px] font-mono-code text-slate-400 uppercase mb-2.5 font-semibold tracking-wider flex items-center gap-1.5">
-              <i class="fa-solid fa-boxes-stacked text-rose-500"></i> Main Inventory (Slot 9 - 35)
+              <i class="fa-solid fa-boxes-stacked text-rose-500"></i> <span data-i18n="player.main_inv_title">Main Inventory (Slot 9 - 35)</span>
             </p>
             <div id="hudMainGrid" class="grid grid-cols-9 gap-1.5 min-w-[340px] justify-items-center">
               <!-- 27 slots generated dynamically -->
@@ -176,7 +190,7 @@
           <!-- HOTBAR GRID (1 x 9) -->
           <div class="bg-[#06080d] border border-slate-800/80 p-3.5 rounded-xl overflow-x-auto custom-scrollbar">
             <p class="text-[10px] font-mono-code text-slate-400 uppercase mb-2.5 font-semibold tracking-wider flex items-center gap-1.5">
-              <i class="fa-solid fa-hand text-emerald-500"></i> Hotbar (Slot 0 - 8)
+              <i class="fa-solid fa-hand text-emerald-500"></i> <span data-i18n="player.hotbar_title">Hotbar (Slot 0 - 8)</span>
             </p>
             <div id="hudHotbarGrid" class="grid grid-cols-9 gap-1.5 min-w-[340px] justify-items-center">
               <!-- 9 slots generated dynamically -->
@@ -194,6 +208,7 @@
 
   </div>
 
+  <script src="./javascript/i18n.js" defer></script>
   <script src="./javascript/players.js" defer></script>
 </body>
 

@@ -500,3 +500,7 @@ function formatItemName(id) {
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
 }
+
+window.addEventListener('languageChanged', () => {
+  try { checkPlayerSession(); } catch (e) { }
+});
