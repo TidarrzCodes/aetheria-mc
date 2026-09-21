@@ -33,6 +33,12 @@ function eraseCookie(name) {
   document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 }
 
+function getAdminToken() {
+  const cookie = getCookie('aetheria_admin_token');
+  if (cookie && cookie !== 'true') return cookie;
+  return '';
+}
+
 // ==========================================
 // TOAST NOTIFICATION SYSTEM
 // ==========================================
@@ -136,12 +142,12 @@ function startAutoReloadAnimation() {
     }
   }, 100);
 
-  // Interval terpisah khusus console log agar tetap realtime cepat (500ms)
+  // Interval terpisah khusus console log (3000ms) untuk menghemat kuota Worker & Pterodactyl
   setInterval(() => {
     if (currentMainTab === 'systems') {
       fetchRealtimeConsoleLogs();
     }
-  }, 500);
+  }, 3000);
 }
 
 function unlockDashboard() {
@@ -161,7 +167,7 @@ async function renderStaffProfileBadge() {
   const savedRank = sessionStorage.getItem('aetheria_admin_rank') || 'Staff';
 
   try {
-    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
+    const adminToken = getAdminToken();
     const res = await fetch(`${WORKER_PROXY_URL}?action=staff_heartbeat`, {
       method: 'POST',
       headers: {
@@ -320,7 +326,7 @@ async function invseePlayer(username) {
   if (contentEl) contentEl.classList.add('hidden');
 
   try {
-    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
+    const adminToken = getAdminToken();
     const res = await fetch(`${WORKER_PROXY_URL}?action=get_inventory`, {
       method: 'POST',
       headers: {
@@ -665,7 +671,7 @@ async function controlServerPower(signal) {
   });
 
   try {
-    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
+    const adminToken = getAdminToken();
     const res = await fetch(`${WORKER_PROXY_URL}?action=server_power`, {
       method: 'POST',
       headers: {
@@ -716,7 +722,7 @@ async function executeAdminCommand(command, successMessage) {
   }
 
   try {
-    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
+    const adminToken = getAdminToken();
     const res = await fetch(`${WORKER_PROXY_URL}?action=admin_command`, {
       method: 'POST',
       headers: {
@@ -757,7 +763,7 @@ async function fetchRealtimeConsoleLogs() {
   isFetchingConsole = true;
 
   try {
-    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
+    const adminToken = getAdminToken();
     const res = await fetch(`${WORKER_PROXY_URL}?action=get_console_logs`, {
       method: 'POST',
       headers: {
@@ -842,7 +848,7 @@ async function fetchOnlinePlayers() {
   const badgeCount = document.getElementById('nav-player-badge');
 
   try {
-    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
+    const adminToken = getAdminToken();
     const [pteroRes, rconPlayersRes] = await Promise.all([
       fetch(`${WORKER_PROXY_URL}?action=get_server_status`).catch(() => null),
       fetch(`${WORKER_PROXY_URL}?action=get_online_players`, {
@@ -950,8 +956,8 @@ async function fetchOrders() {
   if (icon) icon.classList.add('fa-spin');
 
   try {
-    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
-    const res = await fetch(WORKER_PROXY_URL, {
+    const adminToken = getAdminToken();
+    const res = await fetch(`${WORKER_PROXY_URL}?action=get_admin_orders`, {
       headers: {
         'X-Admin-Token': adminToken
       }
@@ -1160,7 +1166,7 @@ async function updateStatus(id, newStatus, username, itemName) {
   }
 
   try {
-    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
+    const adminToken = getAdminToken();
     const res = await fetch(`${WORKER_PROXY_URL}?action=update_status`, {
       method: 'POST',
       headers: {
@@ -1281,7 +1287,7 @@ let allWebChatLogs = [];
 async function fetchWebChatLogs() {
   const tableBody = document.getElementById('webchat-table-list');
   try {
-    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
+    const adminToken = getAdminToken();
     const res = await fetch(`${WORKER_PROXY_URL}?action=get_webchat_logs`, {
       method: 'POST',
       headers: {
@@ -1385,7 +1391,7 @@ async function openPlayerDetailModal(username) {
   };
 
   try {
-    const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_auth') || '';
+    const adminToken = getAdminToken();
     const res = await fetch(`${WORKER_PROXY_URL}?action=get_player_geo`, {
       method: 'POST',
       headers: {
@@ -1416,23 +1422,23 @@ async function openPlayerDetailModal(username) {
         balance: data.balance || data.money || data.eco || data.cash || data.saldo || geoData.balance
       };
 
-      // Fallback: Jika koordinat tidak tersedia atau ISP unknown, fetch via IP-API publik
+      // Fallback: Jika koordinat tidak tersedia atau ISP unknown, fetch via HTTPS
       if (geoData.ip && !geoData.ip.includes('Internal') && !geoData.lat) {
         try {
-          const extRes = await fetch(`http://ip-api.com/json/${geoData.ip}`);
+          const extRes = await fetch(`https://ipwho.is/${geoData.ip}`);
           const extData = await extRes.json();
-          if (extData && extData.status === 'success') {
-            geoData.isp = extData.isp || extData.org || geoData.isp;
+          if (extData && extData.success !== false) {
+            geoData.isp = extData.connection?.isp || extData.org || geoData.isp;
             geoData.country = extData.country || geoData.country;
-            geoData.countryCode = extData.countryCode || geoData.countryCode;
-            geoData.region = extData.regionName || geoData.region;
+            geoData.countryCode = extData.country_code || geoData.countryCode;
+            geoData.region = extData.region || geoData.region;
             geoData.city = extData.city || geoData.city;
-            geoData.timezone = extData.timezone || geoData.timezone;
-            geoData.lat = extData.lat;
-            geoData.lon = extData.lon;
+            geoData.timezone = extData.timezone?.id || geoData.timezone;
+            geoData.lat = extData.latitude;
+            geoData.lon = extData.longitude;
           }
         } catch (e) {
-          console.error("IP-API fallback failed", e);
+          console.error("IP fallback failed", e);
         }
       }
     }

@@ -130,7 +130,6 @@ input:focus, select:focus, textarea:focus {
   /* Modals max height momentum scrolling */
   #invseeModal > div,
   #editPlayerModal > div,
-  #editClanModal > div,
   #playerDetailModal > div {
     max-height: 90vh;
     overflow-y: auto;
@@ -217,13 +216,12 @@ input:focus, select:focus, textarea:focus {
   }
 
   /* Modal Padding & Boundary Fixes */
-  #invseeModal, #editPlayerModal, #editClanModal, #playerDetailModal, #imageModal {
+  #invseeModal, #editPlayerModal, #playerDetailModal, #imageModal {
     padding: 0.375rem !important;
   }
 
   #invseeModal > div,
   #editPlayerModal > div,
-  #editClanModal > div,
   #playerDetailModal > div,
   #imageModal > div {
     padding: 0.875rem !important;
