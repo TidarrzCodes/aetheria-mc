@@ -928,33 +928,12 @@ function renderLeaderboard(cat) {
 
 async function syncDonatorsFromWorker() {
   try {
-    const res = await fetch(WORKER_PROXY_URL);
+    const res = await fetch(`${WORKER_PROXY_URL}?action=get_public_donators`);
     const json = await res.json();
-    if (json && json.result === 'success' && Array.isArray(json.data)) {
-      const totals = {};
-      json.data.forEach(ord => {
-        if (ord.status === 'APPROVED' && ord.username && ord.price) {
-          const numPrice = Number(String(ord.price).replace(/[^0-9]/g, '')) || 0;
-          if (numPrice > 0) {
-            totals[ord.username] = (totals[ord.username] || 0) + numPrice;
-          }
-        }
-      });
-
-      const sorted = Object.entries(totals)
-        .map(([user, amt]) => ({ username: user, amount: amt }))
-        .sort((a, b) => b.amount - a.amount);
-
-      if (sorted.length > 0) {
-        LEADERBOARD_DATA.donators = sorted.map((item, index) => ({
-          rank: index + 1,
-          username: item.username,
-          stat: 'Rp ' + item.amount.toLocaleString('id-ID'),
-          title: index === 0 ? 'Sultan Realm' : (index === 1 ? 'Royal Patron' : (index === 2 ? 'Crown Sponsor' : 'Supporter'))
-        }));
-        if (currentLbCategory === 'donators') {
-          renderLeaderboard('donators');
-        }
+    if (json && json.result === 'success' && Array.isArray(json.donators) && json.donators.length > 0) {
+      LEADERBOARD_DATA.donators = json.donators;
+      if (currentLbCategory === 'donators') {
+        renderLeaderboard('donators');
       }
     }
   } catch (e) {
