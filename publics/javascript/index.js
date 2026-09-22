@@ -40,19 +40,27 @@ function showToast(message, type = 'info') {
 }
 
 // WEB AUDIO SYNTHESIZER
+let cachedAudioCtx = null;
 function playUiSound(freq = 440, type = 'sine', duration = 0.08) {
   try {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    if (!cachedAudioCtx) {
+      cachedAudioCtx = new AudioContextClass();
+    }
+    if (cachedAudioCtx.state === 'suspended') {
+      cachedAudioCtx.resume();
+    }
+    const osc = cachedAudioCtx.createOscillator();
+    const gain = cachedAudioCtx.createGain();
     osc.type = type;
     osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    gain.gain.setValueAtTime(0.05, cachedAudioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, cachedAudioCtx.currentTime + duration);
     osc.connect(gain);
-    gain.connect(audioCtx.destination);
+    gain.connect(cachedAudioCtx.destination);
     osc.start();
-    osc.stop(audioCtx.currentTime + duration);
+    osc.stop(cachedAudioCtx.currentTime + duration);
   } catch (e) { }
 }
 
@@ -377,6 +385,10 @@ async function handleFormSubmit(e) {
       }]
     };
 
+    formData.append("username", username);
+    formData.append("category", selectedItem.category);
+    formData.append("itemName", selectedItem.name);
+    formData.append("price", selectedItem.price);
     formData.append("payload_json", JSON.stringify(payloadJSON));
     formData.append("file1", proofFile, `bukti_${username}.png`);
     formData.append("file2", signatureBlob, `ttd_${username}.png`);

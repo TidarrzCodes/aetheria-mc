@@ -137,8 +137,17 @@ async function handleLoginSubmit(e) {
       const isStaff = staffRanks.some(r => rankUpper.includes(r));
 
       if (isStaff) {
-        // Staff Authentication
-        const staffToken = data.token || btoa(JSON.stringify({ username: data.username || username, rank: data.rank, time: Date.now() }));
+        // Staff Authentication - Wajib memiliki token kriptografi resmi dari Worker
+        if (!data.token) {
+          showToast("Gagal menginisialisasi sesi staff: Token otentikasi tidak valid.", "error");
+          if (errorBox && errorText) {
+            errorText.innerText = "Gagal menginisialisasi token sesi staff dari server!";
+            errorBox.classList.remove('hidden');
+          }
+          return;
+        }
+
+        const staffToken = data.token;
         setCookie('aetheria_admin_token', staffToken, 1);
         sessionStorage.setItem('aetheria_admin_auth', 'true');
         sessionStorage.setItem('aetheria_admin_username', data.username || username);
