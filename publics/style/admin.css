@@ -112,6 +112,45 @@ input:focus, select:focus, textarea:focus {
   animation: barShimmer 2s ease infinite;
 }
 
+/* Tactile Interactive Buttons */
+button {
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+button:active {
+  transform: scale(0.96) !important;
+}
+
+/* Modal Smooth Zoom-In */
+@keyframes adminModalPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+#editPlayerModal:not(.hidden) > div,
+#invseeModal:not(.hidden) > div,
+#imageModal:not(.hidden) > div,
+#playerDetailModal:not(.hidden) > div {
+  animation: adminModalPopIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Table Row Hover Slide Effect */
+tbody tr {
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+@media (hover: hover) {
+  tbody tr:hover {
+    transform: translateX(2px);
+  }
+}
+
 /* =========================================================================
    MOBILE (HP) & TABLET RESPONSIVENESS
    ========================================================================= */
