@@ -14,36 +14,170 @@ body {
   font-family: 'Fira Code', monospace;
 }
 
-/* Fullscreen Particle Canvas (Disesuaikan agar tidak memicu horizontal scrollbar di HP) */
-#emberCanvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
-}
+/* =========================================================================
+   AAA GAME SUPREME GLASS CARDS & COMPONENT ANIMATIONS
+   ========================================================================= */
 
-/* AAA Game Supreme Glass Cards */
 .supreme-card {
+  position: relative;
   background: linear-gradient(135deg, rgba(18, 12, 24, 0.95), rgba(5, 6, 10, 0.98));
   border: 1px solid rgba(244, 63, 94, 0.3);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+  overflow: hidden;
 }
 
-/* Efek Hover Hanya Aktif di Perangkat Non-Touchscreen */
+/* Diagonal Holo Sheen Sweep Effect on Cards */
+.supreme-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.04) 45%,
+    rgba(255, 255, 255, 0.14) 50%,
+    rgba(255, 255, 255, 0.04) 55%,
+    transparent 60%
+  );
+  transform: rotate(-25deg) translateY(-100%);
+  transition: transform 0.75s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Efek Hover Pada Perangkat Non-Touchscreen */
 @media (hover: hover) {
   .supreme-card:hover {
-    border-color: rgba(244, 63, 94, 0.9);
-    box-shadow: 0 0 35px -5px rgba(244, 63, 94, 0.45);
-    transform: translateY(-4px);
+    border-color: rgba(244, 63, 94, 0.85);
+    box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.65), 0 0 24px -4px rgba(244, 63, 94, 0.35);
+    transform: translateY(-6px);
+  }
+
+  .supreme-card:hover::before {
+    transform: rotate(-25deg) translateY(100%);
   }
 }
 
-/* Animated Fire Aura Glowing Text (Glow disesuaikan untuk layar HP) */
+/* Tactile Interactive Buttons & Micro-Interactions */
+button, .btn-interactive, a.btn-interactive {
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+button:active, .btn-interactive:active {
+  transform: scale(0.96) !important;
+}
+
+@media (hover: hover) {
+  button:hover i, a:hover i {
+    transition: transform 0.25s ease;
+  }
+  button:hover i.fa-cart-shopping, a:hover i.fa-cart-shopping {
+    transform: scale(1.18) rotate(-6deg);
+  }
+  button:hover i.fa-paper-plane, a:hover i.fa-paper-plane {
+    transform: translateX(3px) translateY(-2px);
+  }
+  button:hover i.fa-rotate, button:hover i.fa-rotate-right, button:hover i.fa-rotate-left {
+    transform: rotate(180deg);
+  }
+  button:hover i.fa-crown {
+    transform: scale(1.2) rotate(8deg);
+  }
+}
+
+/* Button Shimmer Sweep Effect */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.28),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
+}
+
+.btn-shimmer:hover::after {
+  left: 150%;
+}
+
+/* Animated Gradient Text Shimmer */
+@keyframes textShimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.text-shimmer {
+  background: linear-gradient(90deg, #f43f5e, #fb7185, #f59e0b, #fbbf24, #f43f5e);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShimmer 4s ease-in-out infinite;
+}
+
+.text-shimmer-gold {
+  background: linear-gradient(90deg, #f59e0b, #fef08a, #fbbf24, #d97706, #f59e0b);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShimmer 3.5s ease-in-out infinite;
+}
+
+/* Floating Bobbing for Champion Crown & Badges */
+@keyframes floatBob {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-float {
+  animation: floatBob 3s ease-in-out infinite;
+}
+
+/* Soft Ring Wave Pulse for Live Status Indicator */
+@keyframes ringWave {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+.status-ring-pulse {
+  animation: ringWave 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+/* Animated Fire Aura Glowing Text */
 @keyframes dragonGlow {
   0%, 100% {
     text-shadow: 0 0 15px rgba(244, 63, 94, 0.7), 0 0 30px rgba(245, 158, 11, 0.4);

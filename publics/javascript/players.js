@@ -7,49 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
   checkPlayerSession();
 });
 
-// EMBERS PARTICLE ENGINE
-(function initEmbers() {
-  const canvas = document.getElementById('emberCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  let width = canvas.width = window.innerWidth;
-  let height = canvas.height = window.innerHeight;
-
-  window.addEventListener('resize', () => {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
-  });
-
-  const embers = Array.from({ length: 30 }, () => ({
-    x: Math.random() * width,
-    y: Math.random() * height,
-    r: Math.random() * 2 + 0.5,
-    dx: (Math.random() - 0.5) * 0.5,
-    dy: -Math.random() * 1.2 - 0.3,
-    alpha: Math.random() * 0.8 + 0.2
-  }));
-
-  function draw() {
-    ctx.clearRect(0, 0, width, height);
-    embers.forEach(e => {
-      ctx.beginPath();
-      ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(244, 63, 94, ${e.alpha})`;
-      ctx.fill();
-
-      e.x += e.dx;
-      e.y += e.dy;
-
-      if (e.y < 0) {
-        e.y = height + 10;
-        e.x = Math.random() * width;
-      }
-    });
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
-
 // SANITASI INPUT XSS
 function escapeHTML(str) {
   if (!str) return '';
