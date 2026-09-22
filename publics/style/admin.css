@@ -1,150 +1,343 @@
 /* =========================================================================
-   AETHERIA ADMIN DASHBOARD STYLES (ADMIN.CSS)
-   Optimized for High-Density Systems, Moderation Tables & Mobile Controls
+   AETHERIA ADMIN DASHBOARD STYLES
+   Dark Slate & Crimson Modern Aesthetic
    ========================================================================= */
 
+:root {
+  --bg-dark: #09090b;
+  --bg-card: #121215;
+  --border-subtle: #27272a;
+  --accent-rose: #f43f5e;
+  --accent-emerald: #10b981;
+}
+
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-dark);
+  color: #f4f4f5;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
   width: 100%;
 }
 
 /* =========================================================================
-   HEADER NAV & LIVE-SYNC BADGE
+   CUSTOM SCROLLBARS
    ========================================================================= */
-
-header nav {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
 }
 
-header nav::-webkit-scrollbar {
-  display: none;
+::-webkit-scrollbar-track {
+  background: #09090b;
 }
 
-/* Auto reload progress bar */
-#autoReloadBar {
-  transition: width 0.1s linear;
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 9999px;
 }
 
-/* Modal Pop-In Animation */
-@keyframes adminModalIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
 }
 
-#invseeModal:not(.hidden) > div,
-#editPlayerModal:not(.hidden) > div,
-#playerDetailModal:not(.hidden) > div,
-#imageModal:not(.hidden) > div {
-  animation: adminModalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.custom-scrollbar::-webkit-scrollbar {
+  height: 5px;
+  width: 5px;
 }
 
-/* =========================================================================
-   CONSOLE TERMINAL STYLING
-   ========================================================================= */
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #121215;
+}
 
-#consoleTerminalWindow {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  line-height: 1.6;
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
+.custom-scrollbar {
   scrollbar-width: thin;
+  scrollbar-color: #27272a #121215;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* =========================================================================
-   TABLES & MODERATION ACTIONS
+   FORM ELEMENTS & INPUT ENHANCEMENTS
    ========================================================================= */
-
-table {
-  border-collapse: separate;
-  border-spacing: 0;
-  width: 100%;
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+  cursor: pointer;
 }
 
-th {
-  position: sticky;
-  top: 0;
-  z-index: 10;
+input:focus, select:focus, textarea:focus {
+  outline: none;
+}
+
+/* Glassmorphism Card Effect */
+.glass-panel {
+  background: rgba(18, 18, 21, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(39, 39, 42, 0.8);
 }
 
 /* =========================================================================
-   RESPONSIVE DESIGN (TABLET & MOBILE)
+   GLOW & ANIMATION UTILITIES
+   ========================================================================= */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(244, 63, 94, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(244, 63, 94, 0.6);
+  }
+}
+
+.glow-rose {
+  animation: pulseGlow 2.5s infinite ease-in-out;
+}
+
+/* Auto reload bar gradient shimmer */
+@keyframes barShimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+#autoReloadBar {
+  background-size: 200% 200%;
+  animation: barShimmer 2s ease infinite;
+}
+
+/* =========================================================================
+   MOBILE (HP) & TABLET RESPONSIVENESS
    ========================================================================= */
 
+/* Tablet & Mobile shared improvements (max-width: 1024px) */
 @media (max-width: 1024px) {
   table {
     font-size: 11px;
   }
 
   th, td {
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
+    padding-left: 0.625rem !important;
+    padding-right: 0.625rem !important;
   }
 
+  /* Modals max height momentum scrolling */
   #invseeModal > div,
   #editPlayerModal > div,
   #playerDetailModal > div {
-    max-height: 92vh;
+    max-height: 90vh;
     overflow-y: auto;
   }
 }
 
+/* HP / Smartphone Specifics (max-width: 640px) */
 @media (max-width: 640px) {
-  /* Header Nav compact horizontal swipe on mobile */
+  /* Header Nav Bar Compact Scaling without overlap */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+
   header .max-w-7xl {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
+    padding-top: 0.4rem !important;
+    padding-bottom: 0.4rem !important;
+    row-gap: 0.4rem !important;
   }
 
   header nav {
-    width: 100%;
+    padding: 2px !important;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
 
   header nav button {
-    padding-left: 0.6rem !important;
-    padding-right: 0.6rem !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
     font-size: 11px !important;
     white-space: nowrap;
-    flex-shrink: 0;
   }
 
-  /* Compact button tags inside table cells */
+  #autoReloadBadge {
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+    font-size: 9px !important;
+  }
+
+  #autoReloadBadge div {
+    width: 1.5rem !important; /* Compact progress bar on phone */
+  }
+
+  #staffProfileBadge {
+    max-width: 100px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  /* Table Cell Padding & White-space rules */
+  table {
+    font-size: 11px;
+    width: 100%;
+  }
+
+  th, td {
+    padding-left: 0.4rem !important;
+    padding-right: 0.4rem !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+
+  /* Prevent button misclicks and overlapping in moderation column */
   td .inline-flex {
     flex-wrap: wrap !important;
     gap: 0.25rem !important;
   }
 
   td button {
-    padding: 0.25rem 0.45rem !important;
-    font-size: 10px !important;
+    padding: 0.25rem 0.4rem !important;
+    font-size: 10.5px !important;
+    white-space: nowrap;
   }
 
-  /* Modals sizing on smartphone screens */
+  /* Touch optimization for mobile */
+  button, a, input, select {
+    touch-action: manipulation;
+  }
+
+  input[type="date"] {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* Modal Padding & Boundary Fixes */
   #invseeModal, #editPlayerModal, #playerDetailModal, #imageModal {
-    padding: 0.5rem !important;
+    padding: 0.375rem !important;
   }
 
   #invseeModal > div,
   #editPlayerModal > div,
   #playerDetailModal > div,
   #imageModal > div {
-    width: 100% !important;
-    max-width: 100% !important;
-    max-height: 90vh !important;
-    border-radius: 0.75rem !important;
-    padding: 1rem !important;
+    padding: 0.875rem !important;
+    width: 96vw !important;
+    max-width: 96vw !important;
+    max-height: 88vh !important;
+    border-radius: 0.875rem !important;
   }
 
+  /* Console Terminal Text Size on HP */
   #consoleTerminalWindow {
-    font-size: 10px;
+    font-size: 10.5px;
     min-height: 180px;
-    max-height: 280px;
+    max-height: 300px;
+    padding: 0.5rem !important;
+    word-break: break-all;
+  }
+}
+
+/* Extra Small Phones (max-width: 480px) */
+@media (max-width: 480px) {
+  .mc-slot {
+    width: 32px !important;
+    height: 32px !important;
+    border-width: 1.5px !important;
+    border-radius: 4px !important;
+  }
+
+  .mc-slot-item-img {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .mc-slot-count {
+    font-size: 9px !important;
+    bottom: 0px !important;
+    right: 1px !important;
+  }
+
+  #mainInventoryGrid, #hotbarGrid {
+    min-width: 300px !important;
+    gap: 3px !important;
+  }
+}
+
+/* =========================================================================
+   MINECRAFT INVENTORY (INVSEE) STYLES
+   ========================================================================= */
+.mc-slot {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  background-color: #121215;
+  border: 2px solid #27272a;
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.8), inset -1px -1px 2px rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+@media (min-width: 640px) {
+  .mc-slot {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.mc-slot:hover {
+  border-color: #f43f5e;
+  background-color: #18181b;
+  transform: translateY(-1px);
+}
+
+.mc-slot-empty {
+  opacity: 0.5;
+}
+
+.mc-slot-empty:hover {
+  opacity: 0.85;
+}
+
+.mc-slot-item-img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: -webkit-optimize-contrast;
+  filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.7));
+}
+
+@media (min-width: 640px) {
+  .mc-slot-item-img {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+.mc-slot-count {
+  position: absolute;
+  bottom: 1px;
+  right: 2px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 1px 1px 0 #000000, -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 0 2px 4px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
+@media (min-width: 640px) {
+  .mc-slot-count {
+    font-size: 11px;
+    bottom: 2px;
+    right: 3px;
   }
 }

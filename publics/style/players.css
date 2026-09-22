@@ -1,43 +1,155 @@
-/* =========================================================================
-   AETHERIA PLAYER HUD STYLES (PLAYERS.CSS)
-   Player Profile, Real-time Armor/Offhand & Inventory HUD
-   ========================================================================= */
-
 body {
-  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #020305;
+  color: #e2e8f0;
+  font-family: 'Space Grotesk', sans-serif;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .font-epic {
-  font-family: 'Cinzel Decorative', Georgia, serif;
+  font-family: 'Cinzel Decorative', serif;
 }
 
 .font-mono-code {
-  font-family: 'Fira Code', 'JetBrains Mono', monospace;
+  font-family: 'Fira Code', monospace;
 }
 
-/* Avatar Border Glow */
-#playerSkinHead {
-  transition: transform 0.3s ease, border-color 0.3s ease;
+.supreme-card {
+  position: relative;
+  background: linear-gradient(135deg, rgba(18, 12, 24, 0.95), rgba(5, 6, 10, 0.98));
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+  overflow: hidden;
 }
 
-#playerSkinHead:hover {
-  transform: scale(1.04);
-  border-color: #f43f5e;
+/* Card Holo Light Sweep */
+.supreme-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.04) 45%,
+    rgba(255, 255, 255, 0.14) 50%,
+    rgba(255, 255, 255, 0.04) 55%,
+    transparent 60%
+  );
+  transform: rotate(-25deg) translateY(-100%);
+  transition: transform 0.75s ease;
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* Touch and Slot Responsive Tweaks */
-@media (max-width: 480px) {
+@media (hover: hover) {
+  .supreme-card:hover {
+    border-color: rgba(244, 63, 94, 0.75);
+    box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.65), 0 0 25px -4px rgba(244, 63, 94, 0.35);
+    transform: translateY(-4px);
+  }
+
+  .supreme-card:hover::before {
+    transform: rotate(-25deg) translateY(100%);
+  }
+}
+
+/* Tactile Button Feedback */
+button {
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease;
+}
+
+button:active {
+  transform: scale(0.96) !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  height: 4px;
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #090d16;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #f43f5e;
+  border-radius: 4px;
+}
+
+/* =========================================================================
+   MINECRAFT INVENTORY (PLAYER HUD) STYLES
+   ========================================================================= */
+
+.mc-slot {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  background-color: #0c0f17;
+  border: 2px solid #1e293b;
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.8), inset -1px -1px 2px rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+@media (min-width: 640px) {
   .mc-slot {
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
   }
+}
 
+.mc-slot:hover {
+  border-color: #f43f5e;
+  background-color: #121827;
+}
+
+.mc-slot-empty {
+  opacity: 0.6;
+}
+
+.mc-slot-empty:hover {
+  opacity: 0.9;
+}
+
+.mc-slot-item-img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: -webkit-optimize-contrast;
+  filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.7));
+}
+
+@media (min-width: 640px) {
   .mc-slot-item-img {
-    width: 22px;
-    height: 22px;
+    width: 30px;
+    height: 30px;
   }
+}
 
+.mc-slot-count {
+  position: absolute;
+  bottom: 1px;
+  right: 2px;
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 1px 1px 0 #000000, -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 0 2px 4px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
+@media (min-width: 640px) {
   .mc-slot-count {
-    font-size: 9px;
+    font-size: 11px;
+    bottom: 2px;
+    right: 3px;
   }
 }

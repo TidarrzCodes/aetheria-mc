@@ -797,6 +797,23 @@ async function fetchRealtimeConsoleLogs() {
           const lower = line.toLowerCase();
           return !lower.includes('issued server command: /list') &&
             !lower.includes('issued server command: /data get entity') &&
+            !lower.includes('issued server command: /clan') &&
+            !lower.includes('issued server command: /baltop') &&
+            !lower.includes('issued server command: /playtime') &&
+            !lower.includes('issued server command: /money') &&
+            !lower.includes('issued server command: /lp user') &&
+            !lower.includes('[console/]: default:') &&
+            !lower.includes('[console/]: member:') &&
+            !lower.includes('[console/]: vip:') &&
+            !lower.includes('[console/]: mvp:') &&
+            !lower.includes('[console/]: dragonian:') &&
+            !lower.includes('[console/]: admin:') &&
+            !lower.includes('[console/]: owner:') &&
+            !(lower.includes('[console/]:') && (lower.includes('default:') || lower.includes('there are') || lower.includes('online:'))) &&
+            !lower.includes('inactive :') &&
+            !lower.includes('kdr :') &&
+            !lower.includes('deaths :') &&
+            !lower.includes('kills :') &&
             !lower.includes('there are 0 out of maximum') &&
             !lower.includes('players online');
         })
@@ -1695,7 +1712,21 @@ function renderInGameChatLogs() {
   const stream = document.getElementById('ingameChatStream');
   if (!stream) return;
 
-  let filtered = [...inGameChatLogs];
+  const INVALID_CHAT_SENDERS = [
+    'info', 'warn', 'error', 'debug', 'server', 'thread', 'uuid', 'player',
+    'usage', 'clan', 'clans', 'system', 'console', 'authme', 'luckperms',
+    'cmi', 'vault', 'essentials', 'inactive', 'kdr', 'deaths', 'kills',
+    'kill', 'default', 'status', 'balance', 'money', 'total', 'ping',
+    'group', 'member', 'admin', 'owner'
+  ];
+
+  let filtered = inGameChatLogs.filter(c => {
+    if (!c || !c.timestamp || c.timestamp === '--:--:--') return false;
+    const sender = (c.sender || '').toLowerCase().trim();
+    if (INVALID_CHAT_SENDERS.includes(sender)) return false;
+    if (/^\d+(\/\d+)?(?:\s*(?:days|hours|mins|sec|kdr|kills|deaths))?$/i.test(c.message || '')) return false;
+    return true;
+  });
 
   if (chatFilterMode === 'WHISPER') {
     filtered = filtered.filter(c => c.type === 'whisper');
