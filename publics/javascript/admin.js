@@ -1621,19 +1621,10 @@ function setWhisperTarget(playerName) {
   showToast(`Mode Whisper aktif untuk pemain: ${playerName}`, "info");
 }
 
+let localAdminSentChats = [];
+
 function setChatFilter(mode) {
-  chatFilterMode = mode;
-  const btnAll = document.getElementById('chatFilterBtn-ALL');
-  const btnWhisper = document.getElementById('chatFilterBtn-WHISPER');
-  const btnPublic = document.getElementById('chatFilterBtn-PUBLIC');
-
-  const activeClass = "px-2.5 py-1 rounded-lg bg-zinc-800 text-white font-medium transition text-[11px] flex items-center gap-1";
-  const inactiveClass = "px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white transition text-[11px] flex items-center gap-1";
-
-  if (btnAll) btnAll.className = mode === 'ALL' ? activeClass : inactiveClass;
-  if (btnWhisper) btnWhisper.className = mode === 'WHISPER' ? activeClass : inactiveClass;
-  if (btnPublic) btnPublic.className = mode === 'PUBLIC' ? activeClass : inactiveClass;
-
+  chatFilterMode = 'ALL';
   renderInGameChatLogs();
 }
 
@@ -1683,7 +1674,22 @@ async function fetchInGameChatLogs() {
 
     const data = await res.json().catch(() => null);
     if (res.ok && data && data.result === 'success' && Array.isArray(data.chats)) {
-      inGameChatLogs = data.chats;
+      const serverChats = data.chats;
+      const now = Date.now();
+      localAdminSentChats = localAdminSentChats.filter(c => (now - (c.timeMs || now)) < 120000);
+
+      const combined = [...serverChats];
+      for (const localMsg of localAdminSentChats) {
+        const exists = combined.some(c => 
+          c.message === localMsg.message && 
+          c.sender.toLowerCase() === localMsg.sender.toLowerCase()
+        );
+        if (!exists) {
+          combined.push(localMsg);
+        }
+      }
+
+      inGameChatLogs = combined;
       renderInGameChatLogs();
       updateWhisperBadge();
     }
@@ -1694,9 +1700,6 @@ async function fetchInGameChatLogs() {
 
 function updateWhisperBadge() {
   const count = inGameChatLogs.filter(c => c.type === 'whisper').length;
-  const countEl = document.getElementById('chatCountWhisper');
-  if (countEl) countEl.innerText = count;
-
   const navBadge = document.getElementById('nav-chat-whisper-badge');
   if (navBadge) {
     if (count > 0) {
@@ -1713,26 +1716,21 @@ function renderInGameChatLogs() {
   if (!stream) return;
 
   const INVALID_CHAT_SENDERS = [
-    'info', 'warn', 'error', 'debug', 'server', 'thread', 'uuid', 'player',
-    'usage', 'clan', 'clans', 'system', 'console', 'authme', 'luckperms',
+    'info', 'warn', 'error', 'debug', 'thread', 'uuid',
+    'usage', 'clan', 'clans', 'system', 'authme', 'luckperms',
     'cmi', 'vault', 'essentials', 'inactive', 'kdr', 'deaths', 'kills',
     'kill', 'default', 'status', 'balance', 'money', 'total', 'ping',
-    'group', 'member', 'admin', 'owner'
+    'group', 'member'
   ];
 
   let filtered = inGameChatLogs.filter(c => {
     if (!c || !c.timestamp || c.timestamp === '--:--:--') return false;
+    if (c.type === 'console' || c.isConsole || c.type === 'staff' || c.type === 'webchat' || c.type === 'broadcast' || c.type === 'whisper') return true;
     const sender = (c.sender || '').toLowerCase().trim();
     if (INVALID_CHAT_SENDERS.includes(sender)) return false;
     if (/^\d+(\/\d+)?(?:\s*(?:days|hours|mins|sec|kdr|kills|deaths))?$/i.test(c.message || '')) return false;
     return true;
   });
-
-  if (chatFilterMode === 'WHISPER') {
-    filtered = filtered.filter(c => c.type === 'whisper');
-  } else if (chatFilterMode === 'PUBLIC') {
-    filtered = filtered.filter(c => c.type === 'chat' || c.type === 'staff' || c.type === 'broadcast' || c.type === 'webchat');
-  }
 
   if (chatSearchQuery) {
     filtered = filtered.filter(c => {
@@ -1747,7 +1745,7 @@ function renderInGameChatLogs() {
     stream.innerHTML = `
       <div class="flex flex-col items-center justify-center h-full text-zinc-500 font-mono text-xs py-12">
         <i class="fa-regular fa-comment-dots text-3xl mb-2 text-zinc-600"></i>
-        <span>${chatSearchQuery || chatFilterMode !== 'ALL' ? 'Tidak ada pesan yang sesuai filter pencarian' : 'Belum ada log chat in-game tercatat'}</span>
+        <span>${chatSearchQuery ? 'Tidak ada pesan yang sesuai filter pencarian' : 'Belum ada log chat in-game tercatat'}</span>
       </div>
     `;
     return;
@@ -1759,7 +1757,40 @@ function renderInGameChatLogs() {
     const recipient = escapeHTML(item.recipient || '');
     const message = escapeHTML(item.message || '');
 
+    if (item.type === 'console' || item.isConsole) {
+      return `
+        <div class="group flex items-start gap-2.5 p-2 rounded-lg bg-amber-950/20 hover:bg-amber-950/30 border border-amber-500/30 transition shadow-sm">
+          <div class="shrink-0 flex items-center gap-1.5 pt-0.5">
+            <span class="text-[10px] text-zinc-500 select-none">[${time}]</span>
+            <span class="bg-amber-900/80 text-amber-300 border border-amber-500/50 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider flex items-center gap-1 font-mono">
+              <i class="fa-solid fa-terminal text-[9px]"></i> CONSOLE
+            </span>
+          </div>
+          <div class="flex-1 min-w-0 leading-relaxed">
+            <span class="font-bold text-amber-400 font-mono text-xs">CONSOLE</span>
+            <span class="text-zinc-500">:</span>
+            <span class="text-amber-100 break-words font-sans text-xs ml-1">${message}</span>
+          </div>
+        </div>
+      `;
+    }
+
     if (item.type === 'whisper') {
+      const senderHtml = sender.toLowerCase() === 'console' 
+        ? `<span class="font-bold text-amber-300 font-mono text-xs inline-flex items-center gap-1"><i class="fa-solid fa-terminal text-[9px]"></i>CONSOLE</span>`
+        : `<button onclick="setWhisperTarget('${sender}')" class="font-bold text-purple-300 hover:text-white transition cursor-pointer hover:underline" title="Klik untuk bisik balik ${sender}">${sender}</button>`;
+
+      const recipientHtml = recipient.toLowerCase() === 'console'
+        ? `<span class="font-bold text-amber-300 font-mono text-xs inline-flex items-center gap-1"><i class="fa-solid fa-terminal text-[9px]"></i>CONSOLE</span>`
+        : `<button onclick="setWhisperTarget('${recipient}')" class="font-bold text-amber-300 hover:text-white transition cursor-pointer hover:underline" title="Klik untuk bisik ${recipient}">${recipient}</button>`;
+
+      const replyTarget = sender.toLowerCase() === 'console' ? recipient : sender;
+      const replyBtn = (replyTarget && replyTarget.toLowerCase() !== 'console' && replyTarget !== '(Balasan/Reply)') ? `
+        <button onclick="setWhisperTarget('${replyTarget}')" class="opacity-0 group-hover:opacity-100 transition bg-purple-900 hover:bg-purple-800 text-purple-200 border border-purple-600/50 px-2 py-0.5 rounded text-[10px] shrink-0 font-mono flex items-center gap-1" title="Balas whisper ke ${replyTarget}">
+          <i class="fa-solid fa-reply text-[9px]"></i> Balas
+        </button>
+      ` : '';
+
       return `
         <div class="group flex items-start gap-2.5 p-2 rounded-lg bg-purple-950/25 hover:bg-purple-950/40 border border-purple-500/30 transition shadow-sm">
           <div class="shrink-0 flex items-center gap-1.5 pt-0.5">
@@ -1770,20 +1801,32 @@ function renderInGameChatLogs() {
           </div>
           <div class="flex-1 min-w-0 leading-relaxed">
             <div class="flex flex-wrap items-center gap-1.5">
-              <button onclick="setWhisperTarget('${sender}')" class="font-bold text-purple-300 hover:text-white transition cursor-pointer hover:underline" title="Klik untuk bisik balik ${sender}">
-                ${sender}
-              </button>
+              ${senderHtml}
               <i class="fa-solid fa-arrow-right text-[10px] text-purple-400"></i>
-              <button onclick="setWhisperTarget('${recipient}')" class="font-bold text-amber-300 hover:text-white transition cursor-pointer hover:underline" title="Klik untuk bisik ${recipient}">
-                ${recipient}
-              </button>
+              ${recipientHtml}
               <span class="text-zinc-600">:</span>
               <span class="text-zinc-100 break-words font-sans text-xs">${message}</span>
             </div>
           </div>
-          <button onclick="setWhisperTarget('${sender}')" class="opacity-0 group-hover:opacity-100 transition bg-purple-900 hover:bg-purple-800 text-purple-200 border border-purple-600/50 px-2 py-0.5 rounded text-[10px] shrink-0 font-mono flex items-center gap-1" title="Balas whisper ke ${sender}">
-            <i class="fa-solid fa-reply text-[9px]"></i> Balas
-          </button>
+          ${replyBtn}
+        </div>
+      `;
+    }
+
+    if (item.type === 'broadcast' || item.type === 'pengumuman' || item.type === 'alert') {
+      return `
+        <div class="group flex items-start gap-2.5 p-2 rounded-lg bg-emerald-950/20 hover:bg-emerald-950/30 border border-emerald-500/30 transition shadow-sm">
+          <div class="shrink-0 flex items-center gap-1.5 pt-0.5">
+            <span class="text-[10px] text-zinc-500 select-none">[${time}]</span>
+            <span class="bg-emerald-900/80 text-emerald-300 border border-emerald-500/50 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider flex items-center gap-1 font-mono">
+              <i class="fa-solid fa-bullhorn text-[9px]"></i> BROADCAST
+            </span>
+          </div>
+          <div class="flex-1 min-w-0 leading-relaxed">
+            <span class="font-bold text-emerald-400 font-mono text-xs">${sender}</span>
+            <span class="text-zinc-500">:</span>
+            <span class="text-emerald-100 break-words font-sans text-xs ml-1">${message}</span>
+          </div>
         </div>
       `;
     }
@@ -1916,6 +1959,8 @@ async function submitAdminInGameChat() {
       showToast(sendChatMode === 'whisper' ? `Whisper terkirim ke ${target}!` : "Pesan chat berhasil dibroadcast!", "success");
       inputEl.value = "";
       if (data.chat) {
+        localAdminSentChats.push(data.chat);
+        if (localAdminSentChats.length > 50) localAdminSentChats.shift();
         inGameChatLogs.push(data.chat);
         renderInGameChatLogs();
       }

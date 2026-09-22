@@ -134,7 +134,7 @@ html.light [class*="bg-[#121215]"] {
 html.light [class*="bg-[#09090b]"],
 html.light [class*="bg-[#06080d]"],
 html.light [class*="bg-[#07080a]"],
-html.light [class*="bg-[#0b0c0e]"]:not(#consoleTerminalWindow),
+html.light [class*="bg-[#0b0c0e]"],
 html.light [class*="bg-slate-950"],
 html.light [class*="bg-zinc-950"] {
   background-color: #f8fafc !important;
@@ -360,11 +360,41 @@ html.light [class*="bg-black/90"] {
    9. TERMINAL CONSOLE & MINECRAFT INVENTORY SLOTS
    ========================================================================= */
 
-/* Console Terminal Window (Tetap Gelap dengan Kontras Tajam Seperti Terminal Nyata) */
+/* Console Terminal Window (Menyesuaikan Tema Terang dengan Teks Kontras Tinggi) */
 html.light #consoleTerminalWindow {
-  background-color: #0b0c0e !important;
-  color: #cbd5e1 !important;
-  border-color: #1e293b !important;
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light #consoleTerminalWindow div {
+  color: #334155;
+}
+
+html.light #consoleTerminalWindow .text-zinc-300 {
+  color: #1e293b !important;
+}
+
+html.light #consoleTerminalWindow .text-zinc-600 {
+  color: #94a3b8 !important;
+}
+
+html.light #consoleTerminalWindow .text-rose-400 {
+  color: #dc2626 !important;
+  font-weight: 600;
+}
+
+html.light #consoleTerminalWindow .text-amber-300 {
+  color: #b45309 !important;
+  font-weight: 600;
+}
+
+html.light #consoleCommandInput {
+  color: #0f172a !important;
+}
+
+html.light #consoleCommandInput::placeholder {
+  color: #94a3b8 !important;
 }
 
 /* Minecraft Inventory Slots */
@@ -505,5 +535,31 @@ html.light #ingameChatStream .text-rose-100 {
 html.light #ingameChatStream .bg-cyan-950\/20 {
   background-color: rgba(207, 250, 254, 0.75) !important;
   border-color: rgba(6, 182, 212, 0.45) !important;
+}
+
+html.light #ingameChatStream .bg-amber-950\/20 {
+  background-color: rgba(254, 243, 199, 0.75) !important;
+  border-color: rgba(245, 158, 11, 0.45) !important;
+}
+
+html.light #ingameChatStream .bg-amber-950\/20:hover {
+  background-color: rgba(254, 243, 199, 0.95) !important;
+}
+
+html.light #ingameChatStream .text-amber-100 {
+  color: #78350f !important;
+}
+
+html.light #ingameChatStream .bg-emerald-950\/20 {
+  background-color: rgba(209, 250, 229, 0.75) !important;
+  border-color: rgba(16, 185, 129, 0.45) !important;
+}
+
+html.light #ingameChatStream .bg-emerald-950\/20:hover {
+  background-color: rgba(209, 250, 229, 0.95) !important;
+}
+
+html.light #ingameChatStream .text-emerald-100 {
+  color: #065f46 !important;
 }
 

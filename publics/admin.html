@@ -365,30 +365,15 @@
             </div>
           </div>
 
-          <!-- SEARCH & FILTER BAR -->
+          <!-- SEARCH BAR -->
           <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-2 border-t border-zinc-800/80 font-mono text-xs">
-            <!-- FILTER PILLS -->
-            <div class="flex items-center gap-1 bg-[#09090b] p-1 rounded-xl border border-zinc-800 overflow-x-auto custom-scrollbar shrink-0">
-              <button onclick="setChatFilter('ALL')" id="chatFilterBtn-ALL"
-                class="px-2.5 py-1 rounded-lg bg-zinc-800 text-white font-medium transition text-[11px] flex items-center gap-1">
-                <i class="fa-solid fa-layer-group text-[10px]"></i>
-                <span data-i18n="admin.chat_filter_all">Semua Chat</span>
-              </button>
-              <button onclick="setChatFilter('WHISPER')" id="chatFilterBtn-WHISPER"
-                class="px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white transition text-[11px] flex items-center gap-1">
-                <i class="fa-solid fa-user-secret text-[10px] text-purple-400"></i>
-                <span data-i18n="admin.chat_filter_whisper">Hanya Whisper</span>
-                <span id="chatCountWhisper" class="bg-purple-950/80 text-purple-300 border border-purple-600/40 text-[9px] px-1 rounded font-bold">0</span>
-              </button>
-              <button onclick="setChatFilter('PUBLIC')" id="chatFilterBtn-PUBLIC"
-                class="px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white transition text-[11px] flex items-center gap-1">
-                <i class="fa-solid fa-bullhorn text-[10px] text-emerald-400"></i>
-                <span data-i18n="admin.chat_filter_public">Chat Publik</span>
-              </button>
+            <div class="flex items-center gap-2 text-zinc-400 text-[11px]">
+              <i class="fa-solid fa-clock-rotate-left text-purple-400"></i>
+              <span>Riwayat Chat & Console Real-time</span>
             </div>
 
             <!-- SEARCH INPUT -->
-            <div class="relative flex-1 sm:max-w-xs">
+            <div class="relative flex-1 sm:max-w-sm">
               <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"></i>
               <input type="text" id="chatSearchInput" oninput="handleChatSearch()" placeholder="Cari pesan atau player..." data-i18n-placeholder="admin.chat_search_placeholder"
                 class="w-full bg-[#09090b] border border-zinc-800 rounded-lg pl-8 pr-3 py-1.5 text-white placeholder:text-zinc-600 focus:outline-none focus:border-purple-500/60 text-xs">
