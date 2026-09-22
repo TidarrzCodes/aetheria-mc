@@ -1,441 +1,182 @@
 /* =========================================================================
-   AETHERIA THEME SYSTEM (DARK & LIGHT MODE)
-   Fully Optimized for High Contrast & Complete Element Coverage
+   AETHERIA UNIFIED THEME SYSTEM (DARK & LIGHT MODE)
+   Clean, Semantic, and Fully Integrated with Tailwind CSS
    ========================================================================= */
 
 :root {
-  --bg-main: #020305;
-  --bg-card: linear-gradient(135deg, rgba(18, 12, 24, 0.95), rgba(5, 6, 10, 0.98));
-  --bg-card-hover: linear-gradient(135deg, rgba(28, 18, 36, 0.95), rgba(10, 12, 18, 0.98));
-  --bg-subtle: #070910;
-  --bg-header: rgba(2, 3, 5, 0.95);
-  --border-card: rgba(244, 63, 94, 0.3);
+  /* Dark Theme Palette (Default Fantasy Gaming Aesthetic) */
+  --bg-app: #020305;
+  --bg-surface: linear-gradient(135deg, rgba(18, 12, 24, 0.95), rgba(5, 6, 10, 0.98));
+  --bg-surface-elevated: #0f121a;
+  --bg-header: rgba(2, 3, 5, 0.92);
+  --border-app: rgba(244, 63, 94, 0.25);
   --border-subtle: #1e2638;
+  --border-card: rgba(244, 63, 94, 0.35);
+
   --text-title: #ffffff;
-  --text-main: #e2e8f0;
+  --text-body: #e2e8f0;
   --text-muted: #94a3b8;
   --text-subtle: #64748b;
+
   --input-bg: #070910;
   --input-border: #1e2638;
   --input-text: #ffffff;
-  --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+  --input-focus-border: #f43f5e;
+
   --slot-bg: #0c0f17;
   --slot-border: #1e293b;
-  --terminal-bg: #0b0c0e;
+  --slot-hover-border: #f43f5e;
+
+  --table-border: #1e2638;
+  --table-hover: rgba(244, 63, 94, 0.05);
+
+  --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+  --modal-backdrop: rgba(0, 0, 0, 0.8);
 }
 
 html.light {
-  --bg-main: #f1f5f9;
-  --bg-card: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
-  --bg-card-hover: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(241, 245, 249, 1));
-  --bg-subtle: #ffffff;
-  --bg-header: rgba(255, 255, 255, 0.96);
-  --border-card: rgba(226, 232, 240, 0.95);
+  /* Light Theme Palette (Crisp, High-Contrast Modern Aesthetic) */
+  --bg-app: #f1f5f9;
+  --bg-surface: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+  --bg-surface-elevated: #ffffff;
+  --bg-header: rgba(255, 255, 255, 0.94);
+  --border-app: rgba(226, 232, 240, 0.9);
   --border-subtle: #cbd5e1;
+  --border-card: rgba(203, 213, 225, 0.95);
+
   --text-title: #0f172a;
-  --text-main: #1e293b;
+  --text-body: #1e293b;
   --text-muted: #475569;
   --text-subtle: #64748b;
+
   --input-bg: #ffffff;
   --input-border: #cbd5e1;
   --input-text: #0f172a;
-  --shadow-card: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
-  --slot-bg: #f1f5f9;
+  --input-focus-border: #e11d48;
+
+  --slot-bg: #f8fafc;
   --slot-border: #cbd5e1;
-  --terminal-bg: #0b0c0e;
+  --slot-hover-border: #e11d48;
+
+  --table-border: #e2e8f0;
+  --table-hover: #f8fafc;
+
+  --shadow-card: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --modal-backdrop: rgba(15, 23, 42, 0.65);
 }
 
 /* =========================================================================
-   1. BASE STYLES & LAYOUT
+   BASE BODY & SMOOTH TRANSITIONS
    ========================================================================= */
 
 body {
-  background-color: var(--bg-main) !important;
-  color: var(--text-main) !important;
+  background-color: var(--bg-app);
+  color: var(--text-body);
   transition: background-color 0.25s ease, color 0.25s ease;
+  overflow-x: hidden;
+  width: 100%;
 }
 
-html.light body,
-html.light [class*="bg-[#020305]"]:not(header) {
-  background-color: var(--bg-main) !important;
+/* =========================================================================
+   GLOBAL CUSTOM SCROLLBARS
+   ========================================================================= */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-/* Header Navbar */
-header,
-html.light header,
-html.light header[class*="bg-[#020305]"],
-html.light header[class*="bg-[#09090b]"] {
-  background-color: var(--bg-header) !important;
-  border-color: #e2e8f0 !important;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
-  transition: background-color 0.25s ease, border-color 0.25s ease;
+::-webkit-scrollbar-track {
+  background: var(--bg-app);
 }
 
-/* Supreme Glass Cards & Panels */
+::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #f43f5e;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #f43f5e;
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* =========================================================================
+   SUPREME CARDS & GLASS PANELS
+   ========================================================================= */
+
 .supreme-card, .glass-panel {
-  background: var(--bg-card) !important;
-  border-color: var(--border-card) !important;
-  box-shadow: var(--shadow-card) !important;
-  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-card);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-html.light .supreme-card::before {
-  background: linear-gradient(
-    60deg,
-    transparent 40%,
-    rgba(244, 63, 94, 0.03) 45%,
-    rgba(244, 63, 94, 0.1) 50%,
-    rgba(244, 63, 94, 0.03) 55%,
-    transparent 60%
-  ) !important;
-}
-
-html.light .supreme-card:hover {
-  border-color: rgba(244, 63, 94, 0.5) !important;
-  box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.12), 0 0 20px -2px rgba(244, 63, 94, 0.18) !important;
-}
-
-html.light .text-shimmer {
-  background: linear-gradient(90deg, #e11d48, #be123c, #d97706, #b45309, #e11d48) !important;
-  background-size: 200% auto !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-}
-
-html.light .text-shimmer-gold {
-  background: linear-gradient(90deg, #d97706, #b45309, #f59e0b, #92400e, #d97706) !important;
-  background-size: 200% auto !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-}
-
-/* Inputs & Form Elements Default */
-.input-box, input[type="text"], input[type="password"], input[type="email"], input[type="number"], select, textarea {
-  background-color: var(--input-bg) !important;
-  border-color: var(--input-border) !important;
-  color: var(--input-text) !important;
+@media (hover: hover) {
+  .supreme-card:hover {
+    border-color: rgba(244, 63, 94, 0.75);
+    box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.6), 0 0 20px -2px rgba(244, 63, 94, 0.25);
+  }
 }
 
 /* =========================================================================
-   2. LIGHT THEME - CARD, MODAL & SURFACE OVERRIDES
+   FORM INPUTS & SELECTS
    ========================================================================= */
 
-/* Main Surface Cards (e.g. #121215, .supreme-card) */
-html.light [class*="bg-[#121215]"] {
-  background-color: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  color: var(--text-main) !important;
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+.input-box {
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--input-text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Inner Panels & Secondary Containers */
-html.light [class*="bg-[#09090b]"],
-html.light [class*="bg-[#06080d]"],
-html.light [class*="bg-[#07080a]"],
-html.light [class*="bg-[#0b0c0e]"]:not(#consoleTerminalWindow),
-html.light [class*="bg-slate-950"],
-html.light [class*="bg-zinc-950"] {
-  background-color: #f8fafc !important;
-  border-color: #e2e8f0 !important;
-  color: var(--text-main) !important;
-}
-
-/* Interactive Rows, Tab Bars, Inset Highlights */
-html.light [class*="bg-[#18181b]"],
-html.light [class*="bg-slate-900"],
-html.light [class*="bg-zinc-900"] {
-  background-color: #f1f5f9 !important;
-  border-color: #e2e8f0 !important;
-  color: var(--text-main) !important;
-}
-
-/* Active Tabs & Button Highlights */
-html.light [class*="bg-zinc-800"],
-html.light [class*="bg-slate-800"] {
-  background-color: #e2e8f0 !important;
-  border-color: #cbd5e1 !important;
-  color: #0f172a !important;
-}
-
-/* Inline Code Elements */
-html.light code[class*="bg-slate"],
-html.light code[class*="bg-zinc"] {
-  background-color: #e2e8f0 !important;
-  border-color: #cbd5e1 !important;
-  color: #0f172a !important;
+.input-box:focus {
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.2);
+  outline: none;
 }
 
 /* =========================================================================
-   3. LIGHT THEME - BORDER SYSTEM
-   ========================================================================= */
-
-html.light [class*="border-zinc-800"],
-html.light [class*="border-zinc-700"],
-html.light [class*="border-zinc-600"],
-html.light [class*="border-slate-800"],
-html.light [class*="border-slate-700"],
-html.light [class*="border-slate-900"],
-html.light [class*="border-slate-950"],
-html.light [class*="border-rose-950"] {
-  border-color: #e2e8f0 !important;
-}
-
-/* =========================================================================
-   4. LIGHT THEME - ACTION BUTTONS & BADGES (COLOR-CODED)
-   ========================================================================= */
-
-/* Emerald Actions (Approve, ON, Give Money) */
-html.light [class*="bg-emerald-950"] {
-  background-color: #dcfce7 !important;
-  border-color: #86efac !important;
-  color: #15803d !important;
-}
-html.light [class*="bg-emerald-950"]:hover {
-  background-color: #bbf7d0 !important;
-}
-
-/* Rose Actions (Reject, OFF, Ban, Logout, Delete) */
-html.light [class*="bg-rose-950"] {
-  background-color: #ffe4e6 !important;
-  border-color: #fca5a5 !important;
-  color: #be123c !important;
-}
-html.light [class*="bg-rose-950"]:hover {
-  background-color: #fecdd3 !important;
-}
-
-/* Amber Actions (Restart, Kick, Reset) */
-html.light [class*="bg-amber-950"] {
-  background-color: #fef3c7 !important;
-  border-color: #fcd34d !important;
-  color: #b45309 !important;
-}
-html.light [class*="bg-amber-950"]:hover {
-  background-color: #fde68a !important;
-}
-
-/* Purple Actions (Edit, Rank Management) */
-html.light [class*="bg-purple-950"] {
-  background-color: #f3e8ff !important;
-  border-color: #d8b4fe !important;
-  color: #7e22ce !important;
-}
-html.light [class*="bg-purple-950"]:hover {
-  background-color: #e9d5ff !important;
-}
-
-/* Blue Actions (Invsee, Info, Set Balance, GoPay Box) */
-html.light [class*="bg-blue-950"] {
-  background-color: #dbeafe !important;
-  border-color: #93c5fd !important;
-  color: #1d4ed8 !important;
-}
-html.light [class*="bg-blue-950"]:hover {
-  background-color: #bfdbfe !important;
-}
-
-/* Neutral Buttons (e.g. Home, View Proof, Sig) */
-html.light button[class*="bg-zinc-900"],
-html.light a[class*="bg-zinc-900"],
-html.light button[class*="bg-slate-900"],
-html.light a[class*="bg-slate-900"] {
-  background-color: #f1f5f9 !important;
-  border-color: #cbd5e1 !important;
-  color: #1e293b !important;
-}
-
-html.light button[class*="bg-zinc-900"]:hover,
-html.light a[class*="bg-zinc-900"]:hover,
-html.light button[class*="bg-slate-900"]:hover,
-html.light a[class*="bg-slate-900"]:hover {
-  background-color: #e2e8f0 !important;
-  color: #0f172a !important;
-}
-
-/* =========================================================================
-   5. LIGHT THEME - TYPOGRAPHY & CONTRAST
-   ========================================================================= */
-
-html.light h1:not(.dragon-title),
-html.light h2, 
-html.light h3, 
-html.light h4, 
-html.light strong.text-white {
-  color: var(--text-title);
-}
-
-/* Teks putih generik di dalam card/container diubah agar terbaca jelas di Light Mode */
-html.light .text-white:not([class*="bg-rose"]):not([class*="bg-emerald"]):not([class*="bg-indigo"]):not([class*="bg-cyan"]):not([class*="bg-amber"]):not([class*="bg-purple"]):not([class*="bg-blue"]):not(.btn-keep-white):not(.lang-toggle-badge) {
-  color: var(--text-title) !important;
-}
-
-/* Slate & Zinc Text Hierarchies */
-html.light [class*="text-slate-100"],
-html.light [class*="text-slate-200"],
-html.light [class*="text-slate-300"],
-html.light [class*="text-zinc-100"],
-html.light [class*="text-zinc-200"],
-html.light [class*="text-zinc-300"] {
-  color: var(--text-main) !important;
-}
-
-html.light [class*="text-slate-400"],
-html.light [class*="text-zinc-400"] {
-  color: var(--text-muted) !important;
-}
-
-html.light [class*="text-slate-500"],
-html.light [class*="text-zinc-500"],
-html.light [class*="text-slate-600"],
-html.light [class*="text-zinc-600"] {
-  color: var(--text-subtle) !important;
-}
-
-/* =========================================================================
-   6. LIGHT THEME - FORM INPUTS & CONTROLS
-   ========================================================================= */
-
-html.light input:not([type="submit"]):not([type="button"]),
-html.light select,
-html.light textarea,
-html.light .input-box {
-  background-color: #ffffff !important;
-  border-color: #cbd5e1 !important;
-  color: #0f172a !important;
-}
-
-html.light input::placeholder,
-html.light textarea::placeholder {
-  color: #94a3b8 !important;
-}
-
-html.light input[type="date"] {
-  color-scheme: light !important;
-  color: #1e293b !important;
-}
-
-html.light input[type="file"]::file-selector-button {
-  background-color: #e2e8f0 !important;
-  color: #1e293b !important;
-  border: 1px solid #cbd5e1 !important;
-}
-
-html.light input[type="file"]::file-selector-button:hover {
-  background-color: #cbd5e1 !important;
-  color: #0f172a !important;
-}
-
-/* =========================================================================
-   7. LIGHT THEME - TABLES & LISTS
-   ========================================================================= */
-
-html.light thead,
-html.light [class*="thead"] {
-  background-color: #f1f5f9 !important;
-  color: #475569 !important;
-  border-color: #e2e8f0 !important;
-}
-
-html.light tr[class*="hover:bg-zinc-900"]:hover,
-html.light tr[class*="hover:bg-slate-900"]:hover,
-html.light tr:hover {
-  background-color: #f8fafc !important;
-}
-
-/* =========================================================================
-   8. LIGHT THEME - MODALS & BACKDROPS
-   ========================================================================= */
-
-html.light [class*="bg-black"],
-html.light [class*="bg-black/85"],
-html.light [class*="bg-black/90"] {
-  background-color: rgba(15, 23, 42, 0.65) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-}
-
-/* =========================================================================
-   9. TERMINAL CONSOLE & MINECRAFT INVENTORY SLOTS
-   ========================================================================= */
-
-/* Console Terminal Window (Tetap Gelap dengan Kontras Tajam Seperti Terminal Nyata) */
-html.light #consoleTerminalWindow {
-  background-color: #0b0c0e !important;
-  color: #cbd5e1 !important;
-  border-color: #1e293b !important;
-}
-
-/* Minecraft Inventory Slots */
-html.light .mc-slot {
-  background-color: var(--slot-bg) !important;
-  border-color: var(--slot-border) !important;
-  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.12);
-}
-
-html.light .mc-slot:hover {
-  border-color: #f43f5e !important;
-  background-color: #e2e8f0 !important;
-}
-
-/* =========================================================================
-   10. LIGHT THEME - WEBCHAT & TOAST NOTIFICATIONS
-   ========================================================================= */
-
-html.light #webChatPopup {
-  background-color: rgba(255, 255, 255, 0.98) !important;
-  border-color: #cbd5e1 !important;
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.12) !important;
-}
-
-html.light #webChatLog {
-  background-color: #f8fafc !important;
-  border-color: #e2e8f0 !important;
-}
-
-html.light #webChatLog span[class*="text-slate-200"] {
-  color: #1e293b !important;
-}
-
-html.light #webChatLog [class*="border-slate-900"] {
-  border-color: #e2e8f0 !important;
-}
-
-html.light #toast-container > div {
-  background-color: rgba(255, 255, 255, 0.96) !important;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12) !important;
-}
-
-html.light #toast-container > div span {
-  color: #0f172a !important;
-}
-
-/* =========================================================================
-   11. LIGHT THEME - FOOTER
-   ========================================================================= */
-
-html.light footer {
-  background-color: #f8fafc !important;
-  border-color: #e2e8f0 !important;
-  color: #64748b !important;
-}
-
-/* =========================================================================
-   12. CONTROLS (BUTTONS & SWITCHERS)
+   TOGGLE CONTROLS (THEME & LANGUAGE)
    ========================================================================= */
 
 .theme-toggle-btn, .lang-toggle-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.4rem 0.65rem;
-  border-radius: 0.75rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 0.65rem;
   font-size: 0.75rem;
-  font-weight: 700;
-  transition: all 0.2s ease;
+  font-weight: 600;
   cursor: pointer;
   border: 1px solid var(--border-subtle);
-  background-color: var(--bg-subtle);
-  color: var(--text-main);
+  background: var(--bg-surface-elevated);
+  color: var(--text-body);
+  transition: all 0.2s ease;
   user-select: none;
 }
 
@@ -448,60 +189,126 @@ html.light footer {
   font-size: 0.65rem;
   padding: 0.1rem 0.35rem;
   border-radius: 0.25rem;
-  font-family: 'Fira Code', monospace;
+  font-family: 'Fira Code', 'JetBrains Mono', monospace;
   font-weight: 700;
 }
 
 /* =========================================================================
-   13. LIGHT THEME - IN-GAME CHAT & WHISPER FEED
+   MINECRAFT INVENTORY SLOTS (MC-SLOT)
    ========================================================================= */
 
+.mc-slot {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  background-color: var(--slot-bg);
+  border: 2px solid var(--slot-border);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  user-select: none;
+}
+
+.mc-slot:hover {
+  border-color: var(--slot-hover-border);
+}
+
+.mc-slot-item-img {
+  width: 26px;
+  height: 26px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.mc-slot-count {
+  position: absolute;
+  bottom: 0.5px;
+  right: 2px;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'Fira Code', 'JetBrains Mono', monospace;
+  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+  pointer-events: none;
+  line-height: 1;
+}
+
+/* =========================================================================
+   LIGHT MODE CLEAN TARGETED OVERRIDES (NO WILDCARDS)
+   ========================================================================= */
+
+html.light header {
+  background-color: var(--bg-header);
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+html.light h1:not(.dragon-title),
+html.light h2,
+html.light h3,
+html.light h4 {
+  color: var(--text-title);
+}
+
+html.light footer {
+  border-color: #e2e8f0;
+  color: var(--text-muted);
+}
+
+/* Table Light Styling */
+html.light table {
+  color: var(--text-body);
+}
+
+html.light thead {
+  background-color: #f8fafc;
+  color: var(--text-muted);
+  border-color: #e2e8f0;
+}
+
+html.light tbody tr {
+  border-color: #f1f5f9;
+}
+
+html.light tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Terminal Console stays dark with high-contrast font */
+#consoleTerminalWindow {
+  background-color: #0b0c0e;
+  border-color: #1e2638;
+}
+
+/* Light Theme Modal Backdrop */
+html.light .fixed.inset-0.bg-black\/80,
+html.light .fixed.inset-0.bg-black\/85,
+html.light .fixed.inset-0.bg-black\/90,
+html.light .fixed.inset-0.bg-black\/75 {
+  background-color: var(--modal-backdrop);
+}
+
+/* WebChat in Light Mode */
+html.light #webChatPopup {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: #cbd5e1;
+}
+
+html.light #webChatLog {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+html.light #webChatLog span.text-slate-200 {
+  color: #0f172a;
+}
+
+/* In-game Chat Stream in Light Mode */
 html.light #ingameChatStream {
-  background-color: #f8fafc !important;
+  background-color: #f8fafc;
 }
-
-html.light #ingameChatStream .bg-zinc-900\/30 {
-  background-color: rgba(255, 255, 255, 0.9) !important;
-  border-color: #e2e8f0 !important;
-}
-
-html.light #ingameChatStream .bg-zinc-900\/30:hover {
-  background-color: #ffffff !important;
-}
-
-html.light #ingameChatStream .text-zinc-200,
-html.light #ingameChatStream .text-zinc-100 {
-  color: #0f172a !important;
-}
-
-html.light #ingameChatStream .bg-purple-950\/25 {
-  background-color: rgba(243, 232, 255, 0.75) !important;
-  border-color: rgba(168, 85, 247, 0.45) !important;
-}
-
-html.light #ingameChatStream .bg-purple-950\/25:hover {
-  background-color: rgba(243, 232, 255, 0.95) !important;
-}
-
-html.light #ingameChatStream .text-purple-300 {
-  color: #7e22ce !important;
-}
-
-html.light #ingameChatStream .text-amber-300 {
-  color: #b45309 !important;
-}
-
-html.light #ingameChatStream .bg-rose-950\/20 {
-  background-color: rgba(255, 228, 230, 0.75) !important;
-  border-color: rgba(244, 63, 94, 0.45) !important;
-}
-
-html.light #ingameChatStream .text-rose-100 {
-  color: #9f1239 !important;
-}
-
-html.light #ingameChatStream .bg-cyan-950\/20 {
-  background-color: rgba(207, 250, 254, 0.75) !important;
-  border-color: rgba(6, 182, 212, 0.45) !important;
-}
-

@@ -1,30 +1,29 @@
+/* =========================================================================
+   AETHERIA ECLIPSE — MAIN STYLESHEET (INDEX.CSS)
+   AAA Game Aesthetics, 3D Podium, Micro-Interactions & Mobile Polish
+   ========================================================================= */
+
 body {
-  background-color: #020305;
-  color: #e2e8f0;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
   width: 100%;
 }
 
 .font-epic {
-  font-family: 'Cinzel Decorative', serif;
+  font-family: 'Cinzel Decorative', Georgia, serif;
 }
 
 .font-mono-code {
-  font-family: 'Fira Code', monospace;
+  font-family: 'Fira Code', 'JetBrains Mono', monospace;
 }
 
 /* =========================================================================
-   AAA GAME SUPREME GLASS CARDS & COMPONENT ANIMATIONS
+   SUPREME GLASS CARDS & CARD SWEEP
    ========================================================================= */
 
 .supreme-card {
   position: relative;
-  background: linear-gradient(135deg, rgba(18, 12, 24, 0.95), rgba(5, 6, 10, 0.98));
-  border: 1px solid rgba(244, 63, 94, 0.3);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+  border-radius: 1rem;
   overflow: hidden;
 }
 
@@ -39,9 +38,9 @@ body {
   background: linear-gradient(
     60deg,
     transparent 40%,
-    rgba(255, 255, 255, 0.04) 45%,
-    rgba(255, 255, 255, 0.14) 50%,
-    rgba(255, 255, 255, 0.04) 55%,
+    rgba(255, 255, 255, 0.03) 45%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.03) 55%,
     transparent 60%
   );
   transform: rotate(-25deg) translateY(-100%);
@@ -50,12 +49,9 @@ body {
   z-index: 1;
 }
 
-/* Efek Hover Pada Perangkat Non-Touchscreen */
 @media (hover: hover) {
   .supreme-card:hover {
-    border-color: rgba(244, 63, 94, 0.85);
-    box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.65), 0 0 24px -4px rgba(244, 63, 94, 0.35);
-    transform: translateY(-6px);
+    transform: translateY(-4px);
   }
 
   .supreme-card:hover::before {
@@ -63,7 +59,10 @@ body {
   }
 }
 
-/* Tactile Interactive Buttons & Micro-Interactions */
+/* =========================================================================
+   TACTILE BUTTONS & MICRO-INTERACTIONS
+   ========================================================================= */
+
 button, .btn-interactive, a.btn-interactive {
   transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease, filter 0.2s ease;
 }
@@ -73,11 +72,8 @@ button:active, .btn-interactive:active {
 }
 
 @media (hover: hover) {
-  button:hover i, a:hover i {
-    transition: transform 0.25s ease;
-  }
   button:hover i.fa-cart-shopping, a:hover i.fa-cart-shopping {
-    transform: scale(1.18) rotate(-6deg);
+    transform: scale(1.15) rotate(-6deg);
   }
   button:hover i.fa-paper-plane, a:hover i.fa-paper-plane {
     transform: translateX(3px) translateY(-2px);
@@ -86,7 +82,7 @@ button:active, .btn-interactive:active {
     transform: rotate(180deg);
   }
   button:hover i.fa-crown {
-    transform: scale(1.2) rotate(8deg);
+    transform: scale(1.18) rotate(8deg);
   }
 }
 
@@ -106,7 +102,7 @@ button:active, .btn-interactive:active {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.28),
+    rgba(255, 255, 255, 0.25),
     transparent
   );
   transform: skewX(-20deg);
@@ -119,15 +115,9 @@ button:active, .btn-interactive:active {
 
 /* Animated Gradient Text Shimmer */
 @keyframes textShimmer {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .text-shimmer {
@@ -144,37 +134,6 @@ button:active, .btn-interactive:active {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: textShimmer 3.5s ease-in-out infinite;
-}
-
-/* Floating Bobbing for Champion Crown & Badges */
-@keyframes floatBob {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
-.animate-float {
-  animation: floatBob 3s ease-in-out infinite;
-}
-
-/* Soft Ring Wave Pulse for Live Status Indicator */
-@keyframes ringWave {
-  0% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-  }
-  70% {
-    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-  }
-}
-
-.status-ring-pulse {
-  animation: ringWave 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
 }
 
 /* Animated Fire Aura Glowing Text */
@@ -204,35 +163,13 @@ button:active, .btn-interactive:active {
   box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
 }
 
-.glow-violet {
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.35);
+/* Touch action optimization for digital signature */
+#signaturePad {
+  touch-action: none;
+  cursor: crosshair;
 }
 
-.input-box {
-  background-color: #070910;
-  border: 1px solid #1e2638;
-  transition: all 0.2s ease-in-out;
-}
-
-.input-box:focus {
-  border-color: #f43f5e;
-  box-shadow: 0 0 12px rgba(244, 63, 94, 0.3);
-  outline: none;
-}
-
-.custom-scrollbar::-webkit-scrollbar {
-  height: 4px;
-  width: 4px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #090d16;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #f43f5e;
-  border-radius: 4px;
-}
-
-/* Input File Button Responsif di HP */
+/* Input File Selector Button */
 input[type="file"]::file-selector-button {
   background-color: #1e2638;
   color: #e2e8f0;
@@ -250,136 +187,122 @@ input[type="file"]::file-selector-button:hover {
   color: #ffffff;
 }
 
-/* Optimasi tambahan khusus layar HP (dibawah 640px) */
-@media (max-width: 639px) {
-  input[type="file"]::file-selector-button {
-    display: block;
-    width: 100%;
-    margin-bottom: 0.5rem;
-    margin-right: 0;
-  }
-  
-  .glow-rose, .glow-gold, .glow-emerald, .glow-violet {
-    box-shadow: 0 0 12px rgba(244, 63, 94, 0.25);
-  }
-}
-
 /* =========================================================================
-   REALM 3D STAGE & PODIUM PEDESTAL STYLES
+   REALM 3D STAGE & PODIUM PEDESTAL
    ========================================================================= */
 
 .podium-stage-container {
   perspective: 1200px;
+  width: 100%;
 }
 
 .podium-block-wrapper {
   transform-style: preserve-3d;
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.podium-block-wrapper:hover {
-  transform: translateY(-8px);
+@media (hover: hover) {
+  .podium-block-wrapper:hover {
+    transform: translateY(-6px);
+  }
 }
 
-/* 3D Top Surface Platform where player skin stands */
+/* 3D Top Surface Platform where skin stands */
 .podium-top-surface {
   position: relative;
   width: 92%;
-  height: 34px;
+  height: 32px;
   border-radius: 50%;
   transform: rotateX(65deg);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
-  margin-bottom: -17px;
+  margin-bottom: -16px;
   z-index: 2;
 }
 
 .podium-top-gold {
   background: radial-gradient(ellipse at center, #fef08a 0%, #f59e0b 50%, #78350f 100%);
-  border: 3px solid #fde047;
-  box-shadow: 0 0 35px rgba(245, 158, 11, 0.7), inset 0 0 20px rgba(254, 240, 138, 0.9);
+  border: 2px solid #fde047;
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.6), inset 0 0 15px rgba(254, 240, 138, 0.8);
 }
 
 .podium-top-silver {
   background: radial-gradient(ellipse at center, #f8fafc 0%, #94a3b8 50%, #334155 100%);
-  border: 3px solid #e2e8f0;
-  box-shadow: 0 0 25px rgba(148, 163, 184, 0.6), inset 0 0 15px rgba(248, 250, 252, 0.9);
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 0 20px rgba(148, 163, 184, 0.5), inset 0 0 12px rgba(248, 250, 252, 0.8);
 }
 
 .podium-top-bronze {
   background: radial-gradient(ellipse at center, #ffedd5 0%, #d97706 50%, #451a03 100%);
-  border: 3px solid #f97316;
-  box-shadow: 0 0 25px rgba(217, 119, 6, 0.6), inset 0 0 15px rgba(255, 237, 213, 0.9);
+  border: 2px solid #f97316;
+  box-shadow: 0 0 20px rgba(217, 119, 6, 0.5), inset 0 0 12px rgba(255, 237, 213, 0.8);
 }
 
 /* 3D Front Face Pedestal Block */
 .podium-front-block {
   position: relative;
   width: 100%;
-  border-top-left-radius: 12px;
-  border-top-right-radius: 12px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.85);
   overflow: hidden;
   z-index: 1;
 }
 
 .podium-front-gold {
   background: linear-gradient(180deg, #b45309 0%, #78350f 35%, #451a03 80%, #1c0a00 100%);
-  border-top: 3px solid #fde047;
+  border-top: 2px solid #fde047;
   border-left: 2px solid #f59e0b;
   border-right: 2px solid #78350f;
-  box-shadow: inset 0 2px 10px rgba(253, 224, 71, 0.5), 0 15px 35px rgba(0, 0, 0, 0.85);
 }
 
 .podium-front-silver {
   background: linear-gradient(180deg, #64748b 0%, #334155 35%, #1e293b 80%, #0f172a 100%);
-  border-top: 3px solid #cbd5e1;
+  border-top: 2px solid #cbd5e1;
   border-left: 2px solid #94a3b8;
   border-right: 2px solid #334155;
-  box-shadow: inset 0 2px 10px rgba(248, 250, 252, 0.4), 0 15px 35px rgba(0, 0, 0, 0.85);
 }
 
 .podium-front-bronze {
   background: linear-gradient(180deg, #9a3412 0%, #7c2d12 35%, #431407 80%, #1a0500 100%);
-  border-top: 3px solid #fb923c;
+  border-top: 2px solid #fb923c;
   border-left: 2px solid #ea580c;
   border-right: 2px solid #7c2d12;
-  box-shadow: inset 0 2px 10px rgba(251, 146, 60, 0.4), 0 15px 35px rgba(0, 0, 0, 0.85);
 }
 
 /* 3D Embossed Rank Numbers */
 .podium-rank-num {
-  font-family: 'Cinzel Decorative', serif;
+  font-family: 'Cinzel Decorative', Georgia, serif;
   font-weight: 900;
   line-height: 1;
 }
 
 .podium-num-gold {
   color: #fef08a;
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.9), 0 0 25px rgba(245, 158, 11, 0.9);
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.9), 0 0 20px rgba(245, 158, 11, 0.8);
 }
 
 .podium-num-silver {
   color: #f8fafc;
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.9), 0 0 20px rgba(148, 163, 184, 0.8);
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.9), 0 0 16px rgba(148, 163, 184, 0.7);
 }
 
 .podium-num-bronze {
   color: #ffedd5;
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.9), 0 0 20px rgba(217, 119, 6, 0.8);
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.9), 0 0 16px rgba(217, 119, 6, 0.7);
 }
 
-/* Spotlight Glow Effect beneath the 3D canvas */
+/* Spotlight Glow */
 .skin-spotlight {
   position: absolute;
-  bottom: -5px;
+  bottom: -4px;
   left: 50%;
   transform: translateX(-50%);
   width: 75%;
-  height: 25px;
+  height: 22px;
   border-radius: 50%;
   pointer-events: none;
   z-index: 0;
@@ -387,156 +310,25 @@ input[type="file"]::file-selector-button:hover {
 }
 
 .spotlight-gold {
-  background: rgba(245, 158, 11, 0.65);
-  box-shadow: 0 0 35px rgba(245, 158, 11, 0.85);
+  background: rgba(245, 158, 11, 0.6);
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.8);
 }
 
 .spotlight-silver {
-  background: rgba(148, 163, 184, 0.55);
-  box-shadow: 0 0 28px rgba(148, 163, 184, 0.75);
+  background: rgba(148, 163, 184, 0.5);
+  box-shadow: 0 0 24px rgba(148, 163, 184, 0.7);
 }
 
 .spotlight-bronze {
-  background: rgba(217, 119, 6, 0.55);
-  box-shadow: 0 0 28px rgba(217, 119, 6, 0.75);
+  background: rgba(217, 119, 6, 0.5);
+  box-shadow: 0 0 24px rgba(217, 119, 6, 0.7);
 }
 
-/* =========================================================================
-   ADVANCED RPG GAME MICRO-ANIMATIONS & INTERACTION SUITE
-   ========================================================================= */
-
-/* 1. Mythic / Legendary Border Running Beam */
-@keyframes borderBeamMove {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.border-beam-card {
-  position: relative;
-  z-index: 1;
-}
-
-.border-beam-card::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0 330deg,
-    #f59e0b 345deg,
-    #f43f5e 360deg
-  );
-  animation: borderBeamMove 4s linear infinite;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0.8;
-}
-
-/* 2. Logo 3D Elastic Hover */
-.brand-logo-img {
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
-}
-.brand-logo-img:hover {
-  transform: rotate(12deg) scale(1.15);
-  filter: drop-shadow(0 0 16px rgba(244, 63, 94, 0.7));
-}
-
-/* 3. Hero Beacon Glow */
-@keyframes beaconPulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.5), inset 0 0 10px rgba(244, 63, 94, 0.2);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow: 0 0 18px 2px rgba(244, 63, 94, 0.35), inset 0 0 16px rgba(244, 63, 94, 0.4);
-    transform: scale(1.02);
-  }
-}
-
-.hero-badge-beacon {
-  animation: beaconPulse 2.8s infinite ease-in-out;
-}
-
-/* 4. Gallery Showcase Cards with Zoom & Lens Reveal */
-.gallery-card {
-  position: relative;
-  overflow: hidden;
-  border-radius: 1rem;
-  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease;
-}
-
-.gallery-card img {
-  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.4s ease;
-}
-
-.gallery-card:hover img {
-  transform: scale(1.09);
-  filter: brightness(1.08);
-}
-
-.gallery-card::after {
-  content: '\f00e';
-  font-family: 'Font Awesome 6 Free';
-  font-weight: 900;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0);
-  width: 44px;
-  height: 44px;
-  background: rgba(244, 63, 94, 0.9);
-  color: #ffffff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  box-shadow: 0 0 20px rgba(244, 63, 94, 0.7);
-  opacity: 0;
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
-  pointer-events: none;
-  z-index: 10;
-}
-
-.gallery-card:hover::after {
-  transform: translate(-50%, -50%) scale(1);
-  opacity: 1;
-}
-
-/* 5. Floating WebChat Toggle with Breathing Pulse */
-@keyframes chatFloat {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
-}
-
-#btnWebChatToggle {
-  animation: chatFloat 3.2s ease-in-out infinite;
-  box-shadow: 0 8px 24px -4px rgba(244, 63, 94, 0.45);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-#btnWebChatToggle:hover {
-  animation-play-state: paused;
-  transform: scale(1.1) translateY(-2px);
-  box-shadow: 0 12px 30px rgba(244, 63, 94, 0.75);
-}
-
-/* 6. Modal Smooth Zoom-In Entrance */
+/* Modal Pop-In Animation */
 @keyframes modalPopIn {
   from {
     opacity: 0;
-    transform: scale(0.92) translateY(14px);
+    transform: scale(0.94) translateY(12px);
   }
   to {
     opacity: 1;
@@ -545,101 +337,46 @@ input[type="file"]::file-selector-button:hover {
 }
 
 #checkoutModal:not(.hidden) > div,
-#lightboxModal:not(.hidden) > div,
-#editPlayerModal:not(.hidden) > div,
-#invseeModal:not(.hidden) > div,
-#imageModal:not(.hidden) > div,
-#playerDetailModal:not(.hidden) > div {
-  animation: modalPopIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+#lightboxModal:not(.hidden) > div {
+  animation: modalPopIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* 7. Animated Checkmark Perks on Store Hover */
-.item-card {
-  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+/* Floating WebChat Widget Button */
+#webChatToggleBtn {
+  box-shadow: 0 8px 24px -4px rgba(6, 182, 212, 0.45);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.item-card:hover .fa-check {
-  transform: scale(1.35) rotate(-6deg);
-  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.8));
+#webChatToggleBtn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 12px 28px rgba(6, 182, 212, 0.65);
 }
 
-.item-card .fa-check {
-  display: inline-block;
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
-}
+/* =========================================================================
+   MOBILE & TABLET OPTIMIZATIONS (UNDER 640px)
+   ========================================================================= */
 
-.item-card:hover p[class*="font-extrabold"] {
-  transform: scale(1.04);
-  transition: transform 0.25s ease;
-  display: inline-block;
-}
-
-/* 8. Spotlight Pulse Beneath 3D Podium */
-@keyframes spotlightGlow {
-  0%, 100% {
-    transform: translateX(-50%) scale(1);
-    opacity: 0.65;
+@media (max-width: 639px) {
+  .podium-stage-container {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    overflow-x: hidden;
   }
-  50% {
-    transform: translateX(-50%) scale(1.18);
-    opacity: 0.95;
+
+  .podium-top-surface {
+    height: 24px;
+    margin-bottom: -12px;
   }
-}
 
-.skin-spotlight {
-  animation: spotlightGlow 3.5s ease-in-out infinite;
-}
-
-/* 9. Category Tabs Active Micro-Interactions */
-#leaderboard button,
-#store .flex button {
-  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease;
-}
-
-#leaderboard button:hover,
-#store .flex button:hover {
-  transform: translateY(-2px);
-}
-
-#leaderboard button:hover i,
-#store .flex button:hover i {
-  transform: scale(1.25);
-  transition: transform 0.2s ease;
-}
-
-/* 10. Elastic Toast Slide In */
-@keyframes toastSlideIn {
-  0% {
-    opacity: 0;
-    transform: translateX(45px) scale(0.88);
+  .skin-spotlight {
+    height: 16px;
+    filter: blur(5px);
   }
-  70% {
-    transform: translateX(-6px) scale(1.02);
+
+  input[type="file"]::file-selector-button {
+    display: block;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    margin-right: 0;
   }
-  100% {
-    opacity: 1;
-    transform: translateX(0) scale(1);
-  }
-}
-
-#toast-container > div {
-  animation: toastSlideIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-/* 11. Subtle Underline Glide for Nav Links */
-header a:not([class*="bg-"]):not([class*="rounded"])::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 50%;
-  width: 0;
-  height: 2px;
-  background: #f43f5e;
-  transition: width 0.3s ease, left 0.3s ease;
-  border-radius: 2px;
-}
-
-header a:not([class*="bg-"]):not([class*="rounded"]):hover::after {
-  width: 100%;
-  left: 0;
 }
