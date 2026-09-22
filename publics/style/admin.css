@@ -77,11 +77,29 @@ input:focus, select:focus, textarea:focus {
   outline: none;
 }
 
-/* Glassmorphism Card Effect */
+/* Glassmorphism Card Effect & Supreme Panels */
 .glass-panel {
   background: rgba(18, 18, 21, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(39, 39, 42, 0.8);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(39, 39, 42, 0.85);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+/* Card Surface Hover & Sheen */
+.admin-card {
+  position: relative;
+  background: #121215;
+  border: 1px solid #27272a;
+  border-radius: 0.75rem;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.admin-card:hover {
+  border-color: rgba(244, 63, 94, 0.4);
+  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.5), 0 0 12px -2px rgba(244, 63, 94, 0.15);
 }
 
 /* =========================================================================
@@ -92,12 +110,131 @@ input:focus, select:focus, textarea:focus {
     box-shadow: 0 0 8px rgba(244, 63, 94, 0.3);
   }
   50% {
-    box-shadow: 0 0 16px rgba(244, 63, 94, 0.6);
+    box-shadow: 0 0 18px rgba(244, 63, 94, 0.6);
   }
 }
 
 .glow-rose {
   animation: pulseGlow 2.5s infinite ease-in-out;
+}
+
+@keyframes pulseGlowEmerald {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.55);
+  }
+}
+
+.glow-emerald {
+  animation: pulseGlowEmerald 2.5s infinite ease-in-out;
+}
+
+@keyframes pulseGlowPurple {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(168, 85, 247, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(168, 85, 247, 0.55);
+  }
+}
+
+.glow-purple {
+  animation: pulseGlowPurple 2.5s infinite ease-in-out;
+}
+
+/* Modal Entry Keyframe Animation */
+@keyframes adminModalScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+#invseeModal:not(.hidden) > div,
+#editPlayerModal:not(.hidden) > div,
+#playerDetailModal:not(.hidden) > div,
+#imageModal:not(.hidden) > div {
+  animation: adminModalScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Smooth Interactive Micro-Interactions on Buttons */
+button, .btn-interactive {
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease, filter 0.15s ease, background-color 0.15s ease;
+}
+
+button:active, .btn-interactive:active {
+  transform: scale(0.96) !important;
+}
+
+@media (hover: hover) {
+  button:hover i {
+    transition: transform 0.2s ease;
+  }
+  button:hover i.fa-power-off,
+  button:hover i.fa-rotate-right,
+  button:hover i.fa-arrows-rotate,
+  button:hover i.fa-rotate-left {
+    transform: rotate(180deg);
+  }
+  button:hover i.fa-paper-plane {
+    transform: translateX(2px) translateY(-2px);
+  }
+  button:hover i.fa-circle-info,
+  button:hover i.fa-user-gear {
+    transform: scale(1.15);
+  }
+}
+
+/* Minecraft Rank Badges & Roles */
+.badge-rank-owner {
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.25), rgba(190, 18, 60, 0.35));
+  color: #f43f5e;
+  border: 1px solid rgba(244, 63, 94, 0.5);
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(244, 63, 94, 0.6);
+}
+
+.badge-rank-admin {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.35));
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  font-weight: 700;
+}
+
+.badge-rank-helper {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(37, 99, 235, 0.35));
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.5);
+}
+
+.badge-rank-dragonian {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(147, 51, 234, 0.35));
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.5);
+}
+
+.badge-rank-mvp {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(8, 145, 178, 0.35));
+  color: #22d3ee;
+  border: 1px solid rgba(6, 182, 212, 0.5);
+}
+
+.badge-rank-vip {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.35));
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.5);
+}
+
+.badge-rank-default {
+  background: rgba(39, 39, 42, 0.6);
+  color: #a1a1aa;
+  border: 1px solid rgba(63, 63, 70, 0.6);
 }
 
 /* Auto reload bar gradient shimmer */
@@ -136,6 +273,14 @@ input:focus, select:focus, textarea:focus {
   }
 }
 
+/* HP & Tablet Responsive Navbar Polish */
+@media (max-width: 1024px) {
+  header nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 /* HP / Smartphone Specifics (max-width: 640px) */
 @media (max-width: 640px) {
   /* Header Nav Bar Compact Scaling without overlap */
@@ -146,22 +291,24 @@ input:focus, select:focus, textarea:focus {
   }
 
   header .max-w-7xl {
-    padding-top: 0.4rem !important;
-    padding-bottom: 0.4rem !important;
-    row-gap: 0.4rem !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    row-gap: 0.5rem !important;
   }
 
   header nav {
-    padding: 2px !important;
+    padding: 3px !important;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    width: 100%;
   }
 
   header nav button {
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
+    padding-left: 0.6rem !important;
+    padding-right: 0.6rem !important;
     font-size: 11px !important;
     white-space: nowrap;
+    flex-shrink: 0;
   }
 
   #autoReloadBadge {
@@ -171,11 +318,11 @@ input:focus, select:focus, textarea:focus {
   }
 
   #autoReloadBadge div {
-    width: 1.5rem !important; /* Compact progress bar on phone */
+    width: 1.5rem !important;
   }
 
   #staffProfileBadge {
-    max-width: 100px;
+    max-width: 130px;
     overflow: hidden;
     white-space: nowrap;
   }
