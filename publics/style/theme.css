@@ -451,3 +451,57 @@ html.light footer {
   font-family: 'Fira Code', monospace;
   font-weight: 700;
 }
+
+/* =========================================================================
+   13. LIGHT THEME - IN-GAME CHAT & WHISPER FEED
+   ========================================================================= */
+
+html.light #ingameChatStream {
+  background-color: #f8fafc !important;
+}
+
+html.light #ingameChatStream .bg-zinc-900\/30 {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light #ingameChatStream .bg-zinc-900\/30:hover {
+  background-color: #ffffff !important;
+}
+
+html.light #ingameChatStream .text-zinc-200,
+html.light #ingameChatStream .text-zinc-100 {
+  color: #0f172a !important;
+}
+
+html.light #ingameChatStream .bg-purple-950\/25 {
+  background-color: rgba(243, 232, 255, 0.75) !important;
+  border-color: rgba(168, 85, 247, 0.45) !important;
+}
+
+html.light #ingameChatStream .bg-purple-950\/25:hover {
+  background-color: rgba(243, 232, 255, 0.95) !important;
+}
+
+html.light #ingameChatStream .text-purple-300 {
+  color: #7e22ce !important;
+}
+
+html.light #ingameChatStream .text-amber-300 {
+  color: #b45309 !important;
+}
+
+html.light #ingameChatStream .bg-rose-950\/20 {
+  background-color: rgba(255, 228, 230, 0.75) !important;
+  border-color: rgba(244, 63, 94, 0.45) !important;
+}
+
+html.light #ingameChatStream .text-rose-100 {
+  color: #9f1239 !important;
+}
+
+html.light #ingameChatStream .bg-cyan-950\/20 {
+  background-color: rgba(207, 250, 254, 0.75) !important;
+  border-color: rgba(6, 182, 212, 0.45) !important;
+}
+

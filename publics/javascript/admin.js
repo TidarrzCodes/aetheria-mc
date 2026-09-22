@@ -142,10 +142,12 @@ function startAutoReloadAnimation() {
     }
   }, 100);
 
-  // Interval terpisah khusus console log (3000ms) untuk menghemat kuota Worker & Pterodactyl
+  // Interval terpisah khusus console log & in-game chat (3000ms)
   setInterval(() => {
     if (currentMainTab === 'systems') {
       fetchRealtimeConsoleLogs();
+    } else if (currentMainTab === 'chat') {
+      fetchInGameChatLogs();
     }
   }, 3000);
 }
@@ -235,16 +237,19 @@ function switchMainTab(tabName) {
   const viewPlayers = document.getElementById('view-players');
   const viewSystems = document.getElementById('view-systems');
   const viewEtc = document.getElementById('view-etc');
+  const viewChat = document.getElementById('view-chat');
 
   const btnOrders = document.getElementById('main-tab-orders');
   const btnPlayers = document.getElementById('main-tab-players');
   const btnSystems = document.getElementById('main-tab-systems');
   const btnEtc = document.getElementById('main-tab-etc');
+  const btnChat = document.getElementById('main-tab-chat');
 
   if (viewOrders) viewOrders.classList.add('hidden');
   if (viewPlayers) viewPlayers.classList.add('hidden');
   if (viewSystems) viewSystems.classList.add('hidden');
   if (viewEtc) viewEtc.classList.add('hidden');
+  if (viewChat) viewChat.classList.add('hidden');
 
   const inactiveBtnClass = "flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5 text-xs";
   const activeBtnClass = "flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition flex items-center justify-center gap-1.5 text-xs";
@@ -253,6 +258,7 @@ function switchMainTab(tabName) {
   if (btnPlayers) btnPlayers.className = inactiveBtnClass;
   if (btnSystems) btnSystems.className = inactiveBtnClass;
   if (btnEtc) btnEtc.className = inactiveBtnClass;
+  if (btnChat) btnChat.className = inactiveBtnClass;
 
   if (tabName === 'orders') {
     if (viewOrders) viewOrders.classList.remove('hidden');
@@ -266,6 +272,11 @@ function switchMainTab(tabName) {
     if (viewSystems) viewSystems.classList.remove('hidden');
     if (btnSystems) btnSystems.className = activeBtnClass;
     fetchRealtimeConsoleLogs();
+  } else if (tabName === 'chat') {
+    if (viewChat) viewChat.classList.remove('hidden');
+    if (btnChat) btnChat.className = activeBtnClass;
+    initAdminChatSender();
+    fetchInGameChatLogs();
   } else if (tabName === 'etc') {
     if (viewEtc) viewEtc.classList.remove('hidden');
     if (btnEtc) btnEtc.className = activeBtnClass;
@@ -280,6 +291,8 @@ function syncCurrentTab() {
     fetchOnlinePlayers();
   } else if (currentMainTab === 'systems') {
     fetchRealtimeConsoleLogs();
+  } else if (currentMainTab === 'chat') {
+    fetchInGameChatLogs();
   } else if (currentMainTab === 'etc') {
     fetchWebChatLogs();
   }
@@ -1536,6 +1549,367 @@ function copyDetailIp() {
 window.openPlayerDetailModal = openPlayerDetailModal;
 window.closePlayerDetailModal = closePlayerDetailModal;
 window.copyDetailIp = copyDetailIp;
+
+// ==========================================
+// IN-GAME CHAT & WHISPER MONITORING SYSTEM
+// ==========================================
+let inGameChatLogs = [];
+let chatFilterMode = 'ALL'; // 'ALL' | 'WHISPER' | 'PUBLIC'
+let chatSearchQuery = '';
+let isChatAutoScroll = true;
+let sendChatMode = 'global'; // 'global' | 'whisper'
+
+function initAdminChatSender() {
+  const savedUser = sessionStorage.getItem('aetheria_admin_username') || localStorage.getItem('aetheria_player_user') || 'Admin';
+  const nickEl = document.getElementById('adminChatSenderNick');
+  const avatarEl = document.getElementById('adminChatSenderAvatar');
+  if (nickEl) nickEl.innerText = savedUser;
+  if (avatarEl) avatarEl.src = `https://mc-heads.net/avatar/${encodeURIComponent(savedUser)}/20`;
+}
+
+function setSendChatMode(mode) {
+  sendChatMode = mode;
+  const btnGlobal = document.getElementById('btnSendModeGlobal');
+  const btnWhisper = document.getElementById('btnSendModeWhisper');
+  const targetBox = document.getElementById('whisperTargetContainer');
+  const targetInput = document.getElementById('whisperTargetInput');
+  const chatInput = document.getElementById('adminChatMessageInput');
+
+  const activeClass = "px-2.5 py-1 rounded-md bg-zinc-800 text-white font-medium transition text-[11px] flex items-center gap-1";
+  const inactiveClass = "px-2.5 py-1 rounded-md text-zinc-400 hover:text-white transition text-[11px] flex items-center gap-1";
+
+  if (mode === 'whisper') {
+    if (btnWhisper) btnWhisper.className = activeClass;
+    if (btnGlobal) btnGlobal.className = inactiveClass;
+    if (targetBox) targetBox.classList.remove('hidden');
+    if (targetInput) targetInput.focus();
+  } else {
+    if (btnGlobal) btnGlobal.className = activeClass;
+    if (btnWhisper) btnWhisper.className = inactiveClass;
+    if (targetBox) targetBox.classList.add('hidden');
+    if (chatInput) chatInput.focus();
+  }
+}
+
+function setWhisperTarget(playerName) {
+  if (!playerName) return;
+  setSendChatMode('whisper');
+  const targetInput = document.getElementById('whisperTargetInput');
+  const chatInput = document.getElementById('adminChatMessageInput');
+  if (targetInput) targetInput.value = playerName;
+  if (chatInput) {
+    chatInput.focus();
+    chatInput.placeholder = `Bisikkan pesan rahasia ke ${playerName}...`;
+  }
+  showToast(`Mode Whisper aktif untuk pemain: ${playerName}`, "info");
+}
+
+function setChatFilter(mode) {
+  chatFilterMode = mode;
+  const btnAll = document.getElementById('chatFilterBtn-ALL');
+  const btnWhisper = document.getElementById('chatFilterBtn-WHISPER');
+  const btnPublic = document.getElementById('chatFilterBtn-PUBLIC');
+
+  const activeClass = "px-2.5 py-1 rounded-lg bg-zinc-800 text-white font-medium transition text-[11px] flex items-center gap-1";
+  const inactiveClass = "px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white transition text-[11px] flex items-center gap-1";
+
+  if (btnAll) btnAll.className = mode === 'ALL' ? activeClass : inactiveClass;
+  if (btnWhisper) btnWhisper.className = mode === 'WHISPER' ? activeClass : inactiveClass;
+  if (btnPublic) btnPublic.className = mode === 'PUBLIC' ? activeClass : inactiveClass;
+
+  renderInGameChatLogs();
+}
+
+function handleChatSearch() {
+  const input = document.getElementById('chatSearchInput');
+  chatSearchQuery = input ? input.value.trim().toLowerCase() : '';
+  renderInGameChatLogs();
+}
+
+function toggleChatAutoScroll() {
+  isChatAutoScroll = !isChatAutoScroll;
+  const label = document.getElementById('chatAutoScrollLabel');
+  const btn = document.getElementById('btnChatAutoScroll');
+  if (label) label.innerText = `Auto-Scroll: ${isChatAutoScroll ? 'ON' : 'OFF'}`;
+  if (btn) {
+    if (isChatAutoScroll) {
+      btn.classList.add('text-purple-400');
+      btn.classList.remove('text-zinc-500');
+      const stream = document.getElementById('ingameChatStream');
+      if (stream) stream.scrollTop = stream.scrollHeight;
+    } else {
+      btn.classList.remove('text-purple-400');
+      btn.classList.add('text-zinc-500');
+    }
+  }
+}
+
+function handleAdminChatKey(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    submitAdminInGameChat();
+  }
+}
+
+async function fetchInGameChatLogs() {
+  const adminToken = getAdminToken();
+  if (!adminToken) return;
+
+  try {
+    const res = await fetch(`${WORKER_PROXY_URL}?action=get_ingame_chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Token': adminToken
+      }
+    });
+
+    const data = await res.json().catch(() => null);
+    if (res.ok && data && data.result === 'success' && Array.isArray(data.chats)) {
+      inGameChatLogs = data.chats;
+      renderInGameChatLogs();
+      updateWhisperBadge();
+    }
+  } catch (err) {
+    console.warn("Gagal mengambil log chat in-game:", err);
+  }
+}
+
+function updateWhisperBadge() {
+  const count = inGameChatLogs.filter(c => c.type === 'whisper').length;
+  const countEl = document.getElementById('chatCountWhisper');
+  if (countEl) countEl.innerText = count;
+
+  const navBadge = document.getElementById('nav-chat-whisper-badge');
+  if (navBadge) {
+    if (count > 0) {
+      navBadge.innerText = count;
+      navBadge.classList.remove('hidden');
+    } else {
+      navBadge.classList.add('hidden');
+    }
+  }
+}
+
+function renderInGameChatLogs() {
+  const stream = document.getElementById('ingameChatStream');
+  if (!stream) return;
+
+  let filtered = [...inGameChatLogs];
+
+  if (chatFilterMode === 'WHISPER') {
+    filtered = filtered.filter(c => c.type === 'whisper');
+  } else if (chatFilterMode === 'PUBLIC') {
+    filtered = filtered.filter(c => c.type === 'chat' || c.type === 'staff' || c.type === 'broadcast' || c.type === 'webchat');
+  }
+
+  if (chatSearchQuery) {
+    filtered = filtered.filter(c => {
+      const sender = (c.sender || '').toLowerCase();
+      const recipient = (c.recipient || '').toLowerCase();
+      const msg = (c.message || '').toLowerCase();
+      return sender.includes(chatSearchQuery) || recipient.includes(chatSearchQuery) || msg.includes(chatSearchQuery);
+    });
+  }
+
+  if (filtered.length === 0) {
+    stream.innerHTML = `
+      <div class="flex flex-col items-center justify-center h-full text-zinc-500 font-mono text-xs py-12">
+        <i class="fa-regular fa-comment-dots text-3xl mb-2 text-zinc-600"></i>
+        <span>${chatSearchQuery || chatFilterMode !== 'ALL' ? 'Tidak ada pesan yang sesuai filter pencarian' : 'Belum ada log chat in-game tercatat'}</span>
+      </div>
+    `;
+    return;
+  }
+
+  const html = filtered.map(item => {
+    const time = escapeHTML(item.timestamp || '--:--:--');
+    const sender = escapeHTML(item.sender || 'Unknown');
+    const recipient = escapeHTML(item.recipient || '');
+    const message = escapeHTML(item.message || '');
+
+    if (item.type === 'whisper') {
+      return `
+        <div class="group flex items-start gap-2.5 p-2 rounded-lg bg-purple-950/25 hover:bg-purple-950/40 border border-purple-500/30 transition shadow-sm">
+          <div class="shrink-0 flex items-center gap-1.5 pt-0.5">
+            <span class="text-[10px] text-zinc-500 select-none">[${time}]</span>
+            <span class="bg-purple-900/80 text-purple-300 border border-purple-500/50 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider flex items-center gap-1">
+              <i class="fa-solid fa-user-secret text-[9px]"></i> WHISPER
+            </span>
+          </div>
+          <div class="flex-1 min-w-0 leading-relaxed">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <button onclick="setWhisperTarget('${sender}')" class="font-bold text-purple-300 hover:text-white transition cursor-pointer hover:underline" title="Klik untuk bisik balik ${sender}">
+                ${sender}
+              </button>
+              <i class="fa-solid fa-arrow-right text-[10px] text-purple-400"></i>
+              <button onclick="setWhisperTarget('${recipient}')" class="font-bold text-amber-300 hover:text-white transition cursor-pointer hover:underline" title="Klik untuk bisik ${recipient}">
+                ${recipient}
+              </button>
+              <span class="text-zinc-600">:</span>
+              <span class="text-zinc-100 break-words font-sans text-xs">${message}</span>
+            </div>
+          </div>
+          <button onclick="setWhisperTarget('${sender}')" class="opacity-0 group-hover:opacity-100 transition bg-purple-900 hover:bg-purple-800 text-purple-200 border border-purple-600/50 px-2 py-0.5 rounded text-[10px] shrink-0 font-mono flex items-center gap-1" title="Balas whisper ke ${sender}">
+            <i class="fa-solid fa-reply text-[9px]"></i> Balas
+          </button>
+        </div>
+      `;
+    }
+
+    if (item.type === 'staff') {
+      return `
+        <div class="group flex items-start gap-2.5 p-2 rounded-lg bg-rose-950/20 hover:bg-rose-950/30 border border-rose-500/30 transition shadow-sm">
+          <div class="shrink-0 flex items-center gap-1.5 pt-0.5">
+            <span class="text-[10px] text-zinc-500 select-none">[${time}]</span>
+            <span class="bg-rose-900/80 text-rose-300 border border-rose-500/50 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider flex items-center gap-1">
+              <i class="fa-solid fa-shield-halved text-[9px]"></i> STAFF
+            </span>
+          </div>
+          <div class="flex-1 min-w-0 leading-relaxed">
+            <button onclick="setWhisperTarget('${sender}')" class="font-bold text-amber-400 hover:text-amber-300 transition cursor-pointer hover:underline">
+              ${sender}
+            </button>
+            <span class="text-zinc-500">:</span>
+            <span class="text-rose-100 break-words font-sans text-xs ml-1">${message}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    if (item.type === 'webchat') {
+      return `
+        <div class="group flex items-start gap-2.5 p-2 rounded-lg bg-cyan-950/20 hover:bg-cyan-950/30 border border-cyan-500/30 transition shadow-sm">
+          <div class="shrink-0 flex items-center gap-1.5 pt-0.5">
+            <span class="text-[10px] text-zinc-500 select-none">[${time}]</span>
+            <span class="bg-cyan-900/80 text-cyan-300 border border-cyan-500/50 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider flex items-center gap-1">
+              <i class="fa-solid fa-globe text-[9px]"></i> WEBCHAT
+            </span>
+          </div>
+          <div class="flex-1 min-w-0 leading-relaxed">
+            <button onclick="setWhisperTarget('${sender}')" class="font-bold text-cyan-400 hover:text-cyan-300 transition cursor-pointer hover:underline">
+              ${sender}
+            </button>
+            <span class="text-zinc-500">:</span>
+            <span class="text-zinc-200 break-words font-sans text-xs ml-1">${message}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    if (item.type === 'system') {
+      return `
+        <div class="flex items-center gap-2 p-1.5 rounded bg-zinc-900/40 text-zinc-500 text-[11px]">
+          <span class="text-[10px] text-zinc-600 select-none">[${time}]</span>
+          <i class="fa-solid fa-circle-info text-[10px] text-zinc-500"></i>
+          <span class="font-sans italic">${message}</span>
+        </div>
+      `;
+    }
+
+    const prefixHtml = item.prefix ? `<span class="bg-zinc-800 border border-zinc-700 text-emerald-300 text-[9px] px-1.5 py-0.2 rounded uppercase font-bold mr-1">[${escapeHTML(item.prefix)}]</span>` : '';
+
+    return `
+      <div class="group flex items-start gap-2.5 p-2 rounded-lg bg-zinc-900/30 hover:bg-zinc-900/60 border border-zinc-800/60 transition">
+        <div class="shrink-0 flex items-center gap-1.5 pt-0.5">
+          <span class="text-[10px] text-zinc-500 select-none">[${time}]</span>
+          <img src="https://mc-heads.net/avatar/${encodeURIComponent(sender)}/16" alt="${sender}" class="w-4 h-4 rounded-full border border-zinc-700 shrink-0">
+        </div>
+        <div class="flex-1 min-w-0 leading-relaxed">
+          ${prefixHtml}
+          <button onclick="setWhisperTarget('${sender}')" class="font-bold text-emerald-400 hover:text-emerald-300 transition cursor-pointer hover:underline" title="Klik untuk bisik ${sender}">
+            ${sender}
+          </button>
+          <span class="text-zinc-500">:</span>
+          <span class="text-zinc-200 break-words font-sans text-xs ml-1">${message}</span>
+        </div>
+        <button onclick="setWhisperTarget('${sender}')" class="opacity-0 group-hover:opacity-100 transition bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 px-2 py-0.5 rounded text-[10px] shrink-0 font-mono flex items-center gap-1" title="Bisikkan pesan ke ${sender}">
+          <i class="fa-solid fa-reply text-[9px]"></i> Bisik
+        </button>
+      </div>
+    `;
+  }).join('');
+
+  stream.innerHTML = html;
+
+  if (isChatAutoScroll) {
+    stream.scrollTop = stream.scrollHeight;
+  }
+}
+
+async function submitAdminInGameChat() {
+  const inputEl = document.getElementById('adminChatMessageInput');
+  const targetEl = document.getElementById('whisperTargetInput');
+  const btn = document.getElementById('btnSubmitAdminChat');
+
+  if (!inputEl) return;
+  const message = inputEl.value.trim();
+  if (!message) {
+    showToast("Tulis pesan chat terlebih dahulu!", "warning");
+    inputEl.focus();
+    return;
+  }
+
+  const target = targetEl ? targetEl.value.trim() : "";
+  if (sendChatMode === 'whisper' && !target) {
+    showToast("Masukkan username target pemain untuk whisper!", "warning");
+    if (targetEl) targetEl.focus();
+    return;
+  }
+
+  const adminToken = getAdminToken();
+  const savedUser = sessionStorage.getItem('aetheria_admin_username') || localStorage.getItem('aetheria_player_user') || 'Admin';
+
+  if (btn) {
+    btn.disabled = true;
+    btn.classList.add('opacity-70');
+  }
+
+  try {
+    const res = await fetch(`${WORKER_PROXY_URL}?action=send_admin_chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Token': adminToken
+      },
+      body: JSON.stringify({
+        message: message,
+        target: target,
+        mode: sendChatMode,
+        username: savedUser
+      })
+    });
+
+    const data = await res.json().catch(() => null);
+    if (res.ok && data && data.result === 'success') {
+      showToast(sendChatMode === 'whisper' ? `Whisper terkirim ke ${target}!` : "Pesan chat berhasil dibroadcast!", "success");
+      inputEl.value = "";
+      if (data.chat) {
+        inGameChatLogs.push(data.chat);
+        renderInGameChatLogs();
+      }
+    } else {
+      showToast(data?.message || "Gagal mengirim chat in-game!", "error");
+    }
+  } catch (err) {
+    showToast("Gagal terhubung ke server!", "error");
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.classList.remove('opacity-70');
+    }
+  }
+}
+
+window.initAdminChatSender = initAdminChatSender;
+window.setSendChatMode = setSendChatMode;
+window.setWhisperTarget = setWhisperTarget;
+window.setChatFilter = setChatFilter;
+window.handleChatSearch = handleChatSearch;
+window.toggleChatAutoScroll = toggleChatAutoScroll;
+window.handleAdminChatKey = handleAdminChatKey;
+window.fetchInGameChatLogs = fetchInGameChatLogs;
+window.submitAdminInGameChat = submitAdminInGameChat;
 
 window.addEventListener('languageChanged', () => {
   try { syncCurrentTab(); } catch (e) { }

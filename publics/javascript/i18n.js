@@ -176,6 +176,20 @@ const AETHERIA_TRANSLATIONS = {
     "admin.col_mod": "Aksi Moderasi",
     "admin.close": "Tutup",
     "admin.save": "Simpan",
+    "admin.nav_chat": "Chat Ingame",
+    "admin.chat_title": "IN-GAME CHAT & WHISPER MONITOR",
+    "admin.chat_subtitle": "Pantau chat publik, whisper rahasia pemain, dan kirim pesan atas nama admin",
+    "admin.chat_autoscroll": "Auto-Scroll: ON",
+    "admin.chat_filter_all": "Semua Chat",
+    "admin.chat_filter_whisper": "Hanya Whisper",
+    "admin.chat_filter_public": "Chat Publik",
+    "admin.chat_search_placeholder": "Cari pesan atau player...",
+    "admin.chat_as_admin": "Mengirim sebagai:",
+    "admin.chat_mode_global": "Chat Publik",
+    "admin.chat_mode_whisper": "Whisper (Bisik)",
+    "admin.chat_target_placeholder": "Target player...",
+    "admin.chat_input_placeholder": "Ketik pesan untuk dikirim ke in-game... (Tekan Enter)",
+    "admin.chat_send_btn": "Kirim Chat",
 
     // Footer
     "footer.rights": "Not affiliated with Mojang AB. • Powered by RaditNex Infrastructure"
@@ -353,6 +367,20 @@ const AETHERIA_TRANSLATIONS = {
     "admin.col_mod": "Moderation",
     "admin.close": "Close",
     "admin.save": "Save",
+    "admin.nav_chat": "In-Game Chat",
+    "admin.chat_title": "IN-GAME CHAT & WHISPER MONITOR",
+    "admin.chat_subtitle": "Monitor public chat, private whispers, and broadcast messages as admin",
+    "admin.chat_autoscroll": "Auto-Scroll: ON",
+    "admin.chat_filter_all": "All Chat",
+    "admin.chat_filter_whisper": "Whispers Only",
+    "admin.chat_filter_public": "Public Chat",
+    "admin.chat_search_placeholder": "Search message or player...",
+    "admin.chat_as_admin": "Sending as:",
+    "admin.chat_mode_global": "Public Chat",
+    "admin.chat_mode_whisper": "Whisper (Direct)",
+    "admin.chat_target_placeholder": "Target player...",
+    "admin.chat_input_placeholder": "Type message to send in-game... (Press Enter)",
+    "admin.chat_send_btn": "Send Chat",
 
     // Footer
     "footer.rights": "Not affiliated with Mojang AB. • Powered by RaditNex Infrastructure"

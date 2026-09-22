@@ -81,6 +81,12 @@
               <span data-i18n="admin.nav_players">Players</span>
               <span id="nav-player-badge" class="bg-zinc-800 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded font-bold">0</span>
             </button>
+            <button onclick="switchMainTab('chat')" id="main-tab-chat"
+              class="flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5 text-xs">
+              <i class="fa-solid fa-comments text-[11px]"></i>
+              <span data-i18n="admin.nav_chat">Chat Ingame</span>
+              <span id="nav-chat-whisper-badge" class="hidden bg-purple-500/20 text-purple-400 border border-purple-500/40 text-[10px] px-1.5 py-0.2 rounded-full font-bold">0</span>
+            </button>
             <button onclick="switchMainTab('etc')" id="main-tab-etc"
               class="flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5 text-xs">
               <i class="fa-solid fa-sliders text-[11px]"></i>
@@ -323,6 +329,151 @@
             </table>
           </div>
         </div>
+      </section>
+
+      <!-- VIEW IN-GAME CHAT & WHISPERS SECTION -->
+      <section id="view-chat" class="hidden space-y-4 sm:space-y-6">
+        
+        <!-- CHAT HEADER CARD WITH STATS & FILTERS -->
+        <div class="bg-[#121215] border border-zinc-800/80 rounded-xl p-3.5 sm:p-4 shadow-xl space-y-3">
+          
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+            <div class="flex items-center gap-3">
+              <span class="w-3 h-3 rounded-full bg-purple-500 animate-pulse"></span>
+              <div>
+                <h2 class="text-xs sm:text-sm font-bold text-white font-mono uppercase tracking-wider flex items-center gap-2">
+                  <i class="fa-solid fa-comments text-purple-400"></i>
+                  <span data-i18n="admin.chat_title">IN-GAME CHAT & WHISPER MONITOR</span>
+                </h2>
+                <p class="text-[11px] text-zinc-400 font-mono mt-0.5" data-i18n="admin.chat_subtitle">
+                  Pantau chat publik, whisper rahasia pemain, dan kirim pesan atas nama admin
+                </p>
+              </div>
+            </div>
+
+            <!-- LIVE STATUS & QUICK CONTROLS -->
+            <div class="flex flex-wrap items-center gap-2 font-mono text-xs w-full md:w-auto justify-between md:justify-end">
+              <!-- AUTO SCROLL TOGGLE -->
+              <button onclick="toggleChatAutoScroll()" id="btnChatAutoScroll" title="Toggle Auto Scroll ke bawah"
+                class="bg-[#09090b] hover:bg-zinc-800 border border-zinc-800 text-purple-400 px-2.5 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-arrows-down-to-line text-[11px]"></i>
+                <span id="chatAutoScrollLabel" data-i18n="admin.chat_autoscroll">Auto-Scroll: ON</span>
+              </button>
+
+              <!-- REFRESH BUTTON -->
+              <button onclick="fetchInGameChatLogs()" title="Segarkan Log Chat"
+                class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 px-2.5 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5">
+                <i class="fa-solid fa-rotate-right text-[11px]"></i>
+                <span class="hidden sm:inline">Refresh</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- SEARCH & FILTER BAR -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-2 border-t border-zinc-800/80 font-mono text-xs">
+            <!-- FILTER PILLS -->
+            <div class="flex items-center gap-1 bg-[#09090b] p-1 rounded-xl border border-zinc-800 overflow-x-auto custom-scrollbar shrink-0">
+              <button onclick="setChatFilter('ALL')" id="chatFilterBtn-ALL"
+                class="px-2.5 py-1 rounded-lg bg-zinc-800 text-white font-medium transition text-[11px] flex items-center gap-1">
+                <i class="fa-solid fa-layer-group text-[10px]"></i>
+                <span data-i18n="admin.chat_filter_all">Semua Chat</span>
+              </button>
+              <button onclick="setChatFilter('WHISPER')" id="chatFilterBtn-WHISPER"
+                class="px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white transition text-[11px] flex items-center gap-1">
+                <i class="fa-solid fa-user-secret text-[10px] text-purple-400"></i>
+                <span data-i18n="admin.chat_filter_whisper">Hanya Whisper</span>
+                <span id="chatCountWhisper" class="bg-purple-950/80 text-purple-300 border border-purple-600/40 text-[9px] px-1 rounded font-bold">0</span>
+              </button>
+              <button onclick="setChatFilter('PUBLIC')" id="chatFilterBtn-PUBLIC"
+                class="px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white transition text-[11px] flex items-center gap-1">
+                <i class="fa-solid fa-bullhorn text-[10px] text-emerald-400"></i>
+                <span data-i18n="admin.chat_filter_public">Chat Publik</span>
+              </button>
+            </div>
+
+            <!-- SEARCH INPUT -->
+            <div class="relative flex-1 sm:max-w-xs">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"></i>
+              <input type="text" id="chatSearchInput" oninput="handleChatSearch()" placeholder="Cari pesan atau player..." data-i18n-placeholder="admin.chat_search_placeholder"
+                class="w-full bg-[#09090b] border border-zinc-800 rounded-lg pl-8 pr-3 py-1.5 text-white placeholder:text-zinc-600 focus:outline-none focus:border-purple-500/60 text-xs">
+            </div>
+          </div>
+
+        </div>
+
+        <!-- CHAT STREAM FEED CONTAINER -->
+        <div class="bg-[#09090b] border border-zinc-800/90 rounded-xl overflow-hidden shadow-2xl flex flex-col">
+          
+          <div id="ingameChatStream" class="h-[460px] sm:h-[500px] overflow-y-auto p-3 sm:p-4 space-y-2 font-mono text-xs custom-scrollbar">
+            <!-- DYNAMIC CHAT MESSAGES INJECTED HERE -->
+            <div class="flex items-center justify-center h-full text-zinc-500 font-mono text-xs">
+              <i class="fa-solid fa-spinner fa-spin mr-2 text-purple-400"></i>
+              <span>Memuat chat dan whispers dari server Minecraft...</span>
+            </div>
+          </div>
+
+          <!-- ADMIN SEND CHAT BOX BAR -->
+          <div class="bg-[#121215] border-t border-zinc-800 p-3 sm:p-4 space-y-2.5 font-mono text-xs">
+            
+            <!-- CONTROLS & SENDER IDENTITY HEADER -->
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="text-zinc-400 text-[11px]" data-i18n="admin.chat_as_admin">Mengirim sebagai:</span>
+                <div class="flex items-center gap-1.5 bg-[#09090b] border border-zinc-800 px-2.5 py-1 rounded-lg shadow-sm">
+                  <img id="adminChatSenderAvatar" src="https://mc-heads.net/avatar/steve/20" alt="Avatar" class="w-4 h-4 rounded-full border border-rose-500/60 object-cover">
+                  <span id="adminChatSenderNick" class="font-bold text-amber-400 text-xs">Admin</span>
+                  <span class="text-[9px] bg-rose-950/80 text-rose-300 border border-rose-600/40 px-1 rounded font-bold">STAFF</span>
+                </div>
+              </div>
+
+              <!-- CHAT MODE (GLOBAL / WHISPER) -->
+              <div class="flex items-center gap-1 bg-[#09090b] p-1 rounded-lg border border-zinc-800">
+                <button type="button" onclick="setSendChatMode('global')" id="btnSendModeGlobal"
+                  class="px-2.5 py-1 rounded-md bg-zinc-800 text-white font-medium transition text-[11px] flex items-center gap-1">
+                  <i class="fa-solid fa-bullhorn text-emerald-400 text-[10px]"></i>
+                  <span data-i18n="admin.chat_mode_global">Chat Publik</span>
+                </button>
+                <button type="button" onclick="setSendChatMode('whisper')" id="btnSendModeWhisper"
+                  class="px-2.5 py-1 rounded-md text-zinc-400 hover:text-white transition text-[11px] flex items-center gap-1">
+                  <i class="fa-solid fa-user-secret text-purple-400 text-[10px]"></i>
+                  <span data-i18n="admin.chat_mode_whisper">Whisper (Bisik)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- INPUT COMPOSER ROW -->
+            <div class="flex flex-col sm:flex-row items-stretch gap-2">
+              <!-- TARGET PLAYER INPUT (SHOWN WHEN WHISPER MODE IS ACTIVE) -->
+              <div id="whisperTargetContainer" class="hidden sm:w-48 relative shrink-0">
+                <i class="fa-solid fa-at absolute left-2.5 top-1/2 -translate-y-1/2 text-purple-400 text-xs"></i>
+                <input type="text" id="whisperTargetInput" placeholder="Target player..." data-i18n-placeholder="admin.chat_target_placeholder"
+                  class="w-full bg-[#09090b] border border-purple-500/50 rounded-lg pl-7 pr-2 py-2 text-white placeholder:text-zinc-600 focus:outline-none focus:border-purple-400 text-xs font-mono">
+              </div>
+
+              <!-- MESSAGE INPUT -->
+              <div class="relative flex-1">
+                <input type="text" id="adminChatMessageInput" onkeydown="handleAdminChatKey(event)"
+                  placeholder="Ketik pesan untuk dikirim ke in-game... (Tekan Enter)" data-i18n-placeholder="admin.chat_input_placeholder"
+                  class="w-full bg-[#09090b] border border-zinc-800 rounded-lg px-3 py-2 text-white placeholder:text-zinc-600 focus:outline-none focus:border-purple-500 transition text-xs font-mono">
+              </div>
+
+              <!-- SEND BUTTON -->
+              <button onclick="submitAdminInGameChat()" id="btnSubmitAdminChat"
+                class="bg-purple-950/90 hover:bg-purple-900 border border-purple-500/60 text-purple-200 px-4 py-2 rounded-lg font-bold transition flex items-center justify-center gap-1.5 shadow-md shrink-0">
+                <i class="fa-solid fa-paper-plane text-purple-400 text-xs"></i>
+                <span data-i18n="admin.chat_send_btn">Kirim Chat</span>
+              </button>
+            </div>
+
+            <!-- HELPER HINT -->
+            <p class="text-[10px] text-zinc-500">
+              <i class="fa-solid fa-circle-info text-zinc-400 mr-1"></i>
+              <span>Tips: Klik nama pemain pada log chat di atas untuk langsung membisikkan (whisper) pemain tersebut.</span>
+            </p>
+          </div>
+
+        </div>
+
       </section>
 
       <!-- VIEW ETC SECTION (WEBCHAT LOGS & SERVER UTILITIES) -->
