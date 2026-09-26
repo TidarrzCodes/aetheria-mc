@@ -65,6 +65,15 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* =========================================================================
    FORM ELEMENTS & INPUT ENHANCEMENTS
    ========================================================================= */
@@ -204,6 +213,13 @@ button:active, .btn-interactive:active {
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.35));
   color: #fbbf24;
   border: 1px solid rgba(245, 158, 11, 0.5);
+  font-weight: 700;
+}
+
+.badge-rank-mod {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(126, 34, 206, 0.35));
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.5);
   font-weight: 700;
 }
 

@@ -1,6 +1,11 @@
 # Ignore Cloudflare Worker file containing API credentials/keys
 worker.js
 kode.gs
+package.json
+./test/worker.js
+./AetheriaSyncPlugin
+./publics/aetheria_sync.sk
+./publics/AetheriaSync.jar
 
 # OS & IDE junk
 .DS_Store

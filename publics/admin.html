@@ -44,98 +44,136 @@
   <div id="toast-container" class="fixed top-4 right-4 left-4 sm:left-auto z-50 flex flex-col gap-2.5 pointer-events-none max-w-sm"></div>
 
   <!-- MAIN DASHBOARD CONTENT -->
-  <div id="dashboardContent" class="min-h-screen flex flex-col">
-    <header class="border-b border-zinc-800/80 bg-[#09090b]/95 sticky top-0 z-40 backdrop-blur-md">
-      <div class="max-w-7xl mx-auto px-3 sm:px-6 h-auto sm:h-16 py-2.5 sm:py-0 flex flex-col lg:flex-row items-center justify-between gap-2.5 sm:gap-3">
-        
-        <!-- LEFT: BRAND LOGO -->
-        <div class="w-full lg:w-auto flex items-center justify-between lg:justify-start gap-3 shrink-0">
-          <div class="flex items-center gap-2.5">
-            <img src="./library/aetheria.png" alt="Aetheria Logo" class="w-7 h-7 sm:w-8 sm:h-8 object-contain">
-            <div class="flex items-center gap-2">
-              <span id="header-status-dot" class="w-2 h-2 rounded-full bg-zinc-600"></span>
-              <h1 class="text-xs sm:text-sm font-bold text-white tracking-wide uppercase font-mono">
-                AETHERIA <span class="text-zinc-600">/</span> ADMIN
-              </h1>
+  <div id="dashboardContent" class="min-h-screen flex flex-col xl:flex-row bg-[#09090b]">
+    
+    <!-- NAVIGATION BAR (COMPACT HEADER ON MOBILE/TABLET, SIDEBAR ON DESKTOP PC) -->
+    <aside id="adminSidebar" class="w-full xl:w-60 2xl:w-64 bg-[#09090b]/95 border-b xl:border-b-0 xl:border-r border-zinc-800/80 sticky top-0 z-40 backdrop-blur-md flex flex-col justify-between shrink-0 xl:h-screen xl:sticky xl:top-0">
+      
+      <!-- TOP PORTION: BRAND LOGO & MAIN TABS NAV -->
+      <div class="p-2 sm:p-4 space-y-2 sm:space-y-3 flex-1 overflow-y-auto custom-scrollbar">
+        <!-- BRAND LOGO HEADER & MOBILE QUICK CONTROLS -->
+        <div class="flex items-center justify-between gap-2">
+          <a href="./admin.html" class="flex items-center gap-2 shrink-0">
+            <img src="./library/aetheria.png" alt="Aetheria Logo" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover brand-logo-img shrink-0">
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span id="header-status-dot" class="w-2 h-2 rounded-full bg-zinc-600"></span>
+                <h1 class="text-xs sm:text-sm font-bold text-white tracking-wide uppercase font-mono">
+                  AETHERIA <span class="text-zinc-600">/</span> <span class="text-rose-500">ADMIN</span>
+                </h1>
+              </div>
+              <p class="text-[9px] sm:text-[10px] text-zinc-500 font-mono tracking-tight hidden sm:block">MANAGEMENT DASHBOARD</p>
             </div>
+          </a>
+
+          <!-- MOBILE QUICK CONTROLS (THEME, LANG, HOME, LOGOUT) -->
+          <div class="flex xl:hidden items-center gap-1 font-mono text-[11px] shrink-0">
+            <button type="button" id="themeToggleBtnMobile" onclick="toggleTheme()" class="theme-toggle-btn px-2 py-1 rounded-lg border border-zinc-800 bg-[#121215] text-amber-400" title="Toggle Theme">
+              <i class="fa-solid fa-sun text-xs"></i>
+            </button>
+            <button type="button" id="langToggleBtnMobile" onclick="toggleLanguage()" class="lang-toggle-btn px-2 py-1 rounded-lg border border-zinc-800 bg-[#121215] text-zinc-300 font-bold" title="Toggle Language">
+              ID
+            </button>
+            <a href="./index.html" class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 px-2 py-1 rounded-lg text-xs transition" title="Home">
+              <i class="fa-solid fa-house text-xs"></i>
+            </a>
+            <button onclick="handleLogout()" class="bg-rose-950/60 hover:bg-rose-900/80 border border-rose-600/40 text-rose-300 px-2 py-1 rounded-lg text-xs transition" title="Logout">
+              <i class="fa-solid fa-right-from-bracket text-xs"></i>
+            </button>
           </div>
         </div>
 
-        <!-- CENTER: MAIN NAV TABS -->
-        <nav class="w-full lg:w-auto flex items-center gap-1 bg-[#121215] p-1 rounded-xl border border-zinc-800 text-xs font-mono overflow-x-auto custom-scrollbar shrink-0 justify-start lg:justify-center">
+        <!-- NAVIGATION TABS -->
+        <nav class="flex xl:flex-col items-center xl:items-stretch gap-1 sm:gap-1.5 bg-[#121215] xl:bg-transparent p-1 xl:p-0 rounded-xl border xl:border-0 border-zinc-800/80 text-xs font-mono overflow-x-auto xl:overflow-x-visible custom-scrollbar">
           <button onclick="switchMainTab('systems')" id="main-tab-systems"
-            class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition flex items-center justify-center gap-1.5 text-xs whitespace-nowrap">
-            <i class="fa-solid fa-terminal text-[11px]"></i>
-            <span data-i18n="admin.nav_systems">Systems</span>
+            class="w-auto xl:w-full h-9 sm:h-10 px-2.5 sm:px-3 py-1.5 rounded-xl bg-zinc-800 text-white font-semibold transition flex items-center justify-between gap-2 text-xs whitespace-nowrap shrink-0 shadow-sm border border-zinc-700/50">
+            <div class="flex items-center gap-2 sm:gap-2.5">
+              <i class="fa-solid fa-terminal text-xs w-4 text-center text-rose-400"></i>
+              <span data-i18n="admin.nav_systems">Systems</span>
+            </div>
           </button>
           <button onclick="switchMainTab('orders')" id="main-tab-orders"
-            class="px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5 text-xs whitespace-nowrap">
-            <i class="fa-solid fa-receipt text-[11px]"></i>
-            <span data-i18n="admin.nav_orders">Orders</span>
+            class="w-auto xl:w-full h-9 sm:h-10 px-2.5 sm:px-3 py-1.5 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800/40 transition flex items-center justify-between gap-2 sm:gap-2.5 text-xs font-semibold whitespace-nowrap shrink-0">
+            <div class="flex items-center gap-2 sm:gap-2.5">
+              <i class="fa-solid fa-receipt text-xs w-4 text-center text-amber-400"></i>
+              <span data-i18n="admin.nav_orders">Orders</span>
+            </div>
           </button>
           <button onclick="switchMainTab('players')" id="main-tab-players"
-            class="px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5 text-xs whitespace-nowrap">
-            <i class="fa-solid fa-users text-[11px]"></i>
-            <span data-i18n="admin.nav_players">Players</span>
-            <span id="nav-player-badge" class="bg-zinc-800 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded font-bold">0</span>
+            class="w-auto xl:w-full h-9 sm:h-10 px-2.5 sm:px-3 py-1.5 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800/40 transition flex items-center justify-between gap-2 sm:gap-2.5 text-xs font-semibold whitespace-nowrap shrink-0">
+            <div class="flex items-center gap-2 sm:gap-2.5">
+              <i class="fa-solid fa-users text-xs w-4 text-center text-emerald-400"></i>
+              <span data-i18n="admin.nav_players">Players</span>
+            </div>
+            <span id="nav-player-badge" class="bg-zinc-800 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded font-bold ml-1">0</span>
           </button>
           <button onclick="switchMainTab('chat')" id="main-tab-chat"
-            class="px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5 text-xs whitespace-nowrap">
-            <i class="fa-solid fa-comments text-[11px]"></i>
-            <span data-i18n="admin.nav_chat">Chat Ingame</span>
-            <span id="nav-chat-whisper-badge" class="hidden bg-purple-500/20 text-purple-400 border border-purple-500/40 text-[10px] px-1.5 py-0.2 rounded-full font-bold">0</span>
+            class="w-auto xl:w-full h-9 sm:h-10 px-2.5 sm:px-3 py-1.5 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800/40 transition flex items-center justify-between gap-2 sm:gap-2.5 text-xs font-semibold whitespace-nowrap shrink-0">
+            <div class="flex items-center gap-2 sm:gap-2.5">
+              <i class="fa-solid fa-comments text-xs w-4 text-center text-purple-400"></i>
+              <span data-i18n="admin.nav_chat">Chat Ingame</span>
+            </div>
+            <span id="nav-chat-whisper-badge" class="hidden bg-purple-500/20 text-purple-400 border border-purple-500/40 text-[10px] px-1.5 py-0.2 rounded-full font-bold ml-1">0</span>
           </button>
           <button onclick="switchMainTab('etc')" id="main-tab-etc"
-            class="px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5 text-xs whitespace-nowrap">
-            <i class="fa-solid fa-sliders text-[11px]"></i>
-            <span data-i18n="admin.nav_etc">ETC</span>
+            class="w-auto xl:w-full h-9 sm:h-10 px-2.5 sm:px-3 py-1.5 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800/40 transition flex items-center justify-between gap-2 sm:gap-2.5 text-xs font-semibold whitespace-nowrap shrink-0">
+            <div class="flex items-center gap-2 sm:gap-2.5">
+              <i class="fa-solid fa-sliders text-xs w-4 text-center text-cyan-400"></i>
+              <span data-i18n="admin.nav_etc">ETC</span>
+            </div>
           </button>
         </nav>
+      </div>
 
-        <!-- RIGHT: UTILITIES, STAFF PROFILE & CONTROLS -->
-        <div class="w-full lg:w-auto flex flex-wrap lg:flex-nowrap items-center justify-between lg:justify-end gap-1.5 shrink-0">
-          <!-- THEME TOGGLE BUTTON -->
-          <button type="button" id="themeToggleBtn" onclick="toggleTheme()" class="theme-toggle-btn" title="Toggle Theme">
-            <i class="fa-solid fa-sun text-amber-400"></i>
-            <span class="hidden sm:inline ml-1 text-xs">Light</span>
-          </button>
+      <!-- DESKTOP PORTION: STAFF PROFILE, AUTO-RELOAD & CONTROLS -->
+      <div class="hidden xl:block p-3 border-t border-zinc-800/80 space-y-2 bg-[#0c0d10] xl:bg-transparent shrink-0">
+        <!-- STAFF ONLINE PROFILE BADGE -->
+        <div id="staffProfileBadge" class="hidden items-center justify-between gap-2 font-mono p-1.5 bg-[#121215] border border-zinc-800 rounded-xl text-xs"></div>
 
-          <!-- LANGUAGE TOGGLE BUTTON -->
-          <button type="button" id="langToggleBtn" onclick="toggleLanguage()" class="lang-toggle-btn" title="Toggle Language">
-            <span class="lang-toggle-badge bg-emerald-600 text-white">ID</span>
-            <span class="hidden sm:inline ml-1 text-xs text-slate-300">ID</span>
-          </button>
-
-          <!-- AUTO RELOAD INDICATOR BADGE -->
-          <div id="autoReloadBadge" class="hidden xl:flex items-center gap-1.5 bg-[#121215] border border-zinc-800/90 px-2 py-1 rounded-lg text-[10px] font-mono text-zinc-400 select-none shadow-sm" title="Auto Reload Synchronizer (3s)">
-            <i id="autoReloadSpinner" class="fa-solid fa-arrows-rotate text-rose-500 text-[10px]"></i>
-            <span class="text-zinc-400">Live Sync</span>
-            <div class="w-8 h-1 bg-zinc-900 border border-zinc-800 rounded-full overflow-hidden shrink-0">
-              <div id="autoReloadBar" class="h-full bg-gradient-to-r from-rose-500 to-emerald-400 transition-all duration-100 ease-linear" style="width: 0%;"></div>
-            </div>
+        <!-- AUTO RELOAD INDICATOR BADGE -->
+        <div id="autoReloadBadge" class="hidden xl:flex items-center gap-1.5 bg-[#121215] border border-zinc-800/90 px-2 py-1 rounded-xl text-[10px] font-mono text-zinc-400 select-none shadow-sm" title="Auto Reload Synchronizer (3s)">
+          <i id="autoReloadSpinner" class="fa-solid fa-arrows-rotate text-rose-500 text-[10px]"></i>
+          <span class="text-zinc-400">Live Sync</span>
+          <div class="w-10 h-1 bg-zinc-900 border border-zinc-800 rounded-full overflow-hidden shrink-0 ml-auto">
+            <div id="autoReloadBar" class="h-full bg-gradient-to-r from-rose-500 to-emerald-400 transition-all duration-100 ease-linear" style="width: 0%;"></div>
           </div>
+        </div>
 
-          <!-- STAFF ONLINE PROFILE BADGE CONTAINER -->
-          <div id="staffProfileBadge" class="hidden items-center gap-1.5 font-mono"></div>
+        <!-- UTILITIES: THEME & LANG -->
+        <div class="grid grid-cols-2 gap-1.5 font-mono text-xs">
+          <button type="button" id="themeToggleBtn" onclick="toggleTheme()" class="theme-toggle-btn w-full py-1.5 flex items-center justify-center gap-1" title="Toggle Theme">
+            <i class="fa-solid fa-sun text-amber-400"></i>
+            <span class="text-xs">Light</span>
+          </button>
 
-          <a href="./index.html"
-            class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5">
-            <i class="fa-solid fa-house text-[10px]"></i>
-            <span class="hidden sm:inline" data-i18n="nav.home">Home</span>
-          </a>
-          <button onclick="handleLogout()"
-            class="bg-rose-950/60 hover:bg-rose-900/80 border border-rose-600/40 text-rose-300 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono transition flex items-center gap-1.5">
-            <i class="fa-solid fa-right-from-bracket text-[10px]"></i>
-            <span class="hidden sm:inline" data-i18n="nav.logout">Logout</span>
+          <button type="button" id="langToggleBtn" onclick="toggleLanguage()" class="lang-toggle-btn w-full py-1.5 flex items-center justify-center gap-1" title="Toggle Language">
+            <span class="lang-toggle-badge bg-emerald-600 text-white">ID</span>
+            <span class="text-xs text-slate-300">ID</span>
           </button>
         </div>
 
+        <!-- HOME & LOGOUT -->
+        <div class="grid grid-cols-2 gap-1.5 font-mono text-xs">
+          <a href="./index.html"
+            class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 px-2 py-1.5 rounded-xl text-xs font-mono transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-house text-[10px]"></i>
+            <span data-i18n="nav.home">Home</span>
+          </a>
+          <button onclick="handleLogout()"
+            class="bg-rose-950/60 hover:bg-rose-900/80 border border-rose-600/40 text-rose-300 px-2 py-1.5 rounded-xl text-xs font-mono transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-right-from-bracket text-[10px]"></i>
+            <span data-i18n="nav.logout">Logout</span>
+          </button>
+        </div>
       </div>
-    </header>
+    </aside>
 
-    <main class="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6 w-full flex-1">
-      <!-- VIEW SYSTEMS SECTION (CONSOLE TERMINAL, POWER CONTROLS, & SERVER LOGS) -->
-      <section id="view-systems" class="space-y-4 sm:space-y-6">        <!-- SERVER STATUS BAR & POWER CONTROLS -->
+    <!-- RIGHT MAIN CONTENT WRAPPER -->
+    <div class="flex-1 flex flex-col min-w-0 min-h-screen justify-between">
+      <!-- MAIN DASHBOARD PANELS -->
+      <main class="flex-1 min-w-0 px-3 sm:px-6 py-4 sm:py-6 w-full">
+        <!-- VIEW SYSTEMS SECTION (CONSOLE TERMINAL, POWER CONTROLS, & SERVER LOGS) -->
+        <section id="view-systems" class="space-y-4 sm:space-y-6">        <!-- SERVER STATUS BAR & POWER CONTROLS -->
         <div
           class="flex flex-col md:flex-row justify-between items-start md:items-center p-3.5 sm:p-4 bg-[#121215] border border-zinc-800/80 rounded-xl gap-3 shadow-xl">
           <div class="flex items-center gap-3">
@@ -503,6 +541,67 @@
           </div>
         </div>
 
+        <!-- ADMIN IP & USER ACCESS LOGGING -->
+        <div class="bg-[#121215] border border-zinc-800/80 rounded-xl p-4 sm:p-5 shadow-xl space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-3">
+            <div>
+              <h2 class="text-xs sm:text-sm font-bold text-white font-mono uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved text-rose-400"></i> Admin Access Log
+              </h2>
+              <p class="text-[11px] text-zinc-400 font-mono mt-0.5">Catatan IP & identitas staff yang mengakses dashboard admin</p>
+            </div>
+            
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <div class="relative flex-1 sm:w-64">
+                <input type="text" id="accessLogSearchInput" oninput="filterAccessLogs()" placeholder="Cari username, IP, aksi..." class="w-full bg-[#09090b] border border-zinc-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white focus:border-rose-500 focus:outline-none font-mono">
+                <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-zinc-500 text-[11px]"></i>
+              </div>
+              <button onclick="fetchAdminAccessLogs()" title="Refresh Access Logs" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 p-2 rounded-lg text-xs transition shrink-0">
+                <i class="fa-solid fa-rotate-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Stats Badge Row -->
+          <div class="flex flex-wrap gap-2">
+            <div class="bg-[#09090b] border border-zinc-800 rounded-lg px-3 py-1.5 flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-rose-400 text-[11px]"></i>
+              <span class="text-[11px] font-mono text-zinc-400">Total Logs: <span id="accessLogCount" class="text-white font-bold">0</span></span>
+            </div>
+            <div class="bg-[#09090b] border border-zinc-800 rounded-lg px-3 py-1.5 flex items-center gap-2">
+              <i class="fa-solid fa-users text-amber-400 text-[11px]"></i>
+              <span class="text-[11px] font-mono text-zinc-400">Unique Users: <span id="accessLogUniqueUsers" class="text-white font-bold">0</span></span>
+            </div>
+            <div class="bg-[#09090b] border border-zinc-800 rounded-lg px-3 py-1.5 flex items-center gap-2">
+              <i class="fa-solid fa-network-wired text-emerald-400 text-[11px]"></i>
+              <span class="text-[11px] font-mono text-zinc-400">Unique IPs: <span id="accessLogUniqueIps" class="text-white font-bold">0</span></span>
+            </div>
+          </div>
+
+          <!-- Access Logs Table -->
+          <div class="bg-[#09090b] border border-zinc-800 rounded-xl overflow-hidden shadow-inner">
+            <div class="overflow-x-auto custom-scrollbar max-h-[420px]">
+              <table class="w-full text-left text-xs min-w-[800px]">
+                <thead class="bg-[#18181b] text-zinc-400 font-mono text-[10px] uppercase border-b border-zinc-800 sticky top-0 z-10">
+                  <tr>
+                    <th class="p-3 w-40">Waktu</th>
+                    <th class="p-3 w-28">Username</th>
+                    <th class="p-3 w-20">Rank</th>
+                    <th class="p-3 w-32">IP Address</th>
+                    <th class="p-3 w-36">Aksi</th>
+                    <th class="p-3">User-Agent</th>
+                  </tr>
+                </thead>
+                <tbody id="access-log-table-list" class="divide-y divide-zinc-800/60 font-mono text-zinc-300">
+                  <tr>
+                    <td colspan="6" class="text-center p-8 text-zinc-500">Memuat access logs...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       </section>
     </main>
 
@@ -510,6 +609,7 @@
       &copy; 2026 Aetheria: Dragon's Eclipse. &bull; Not affiliated with Mojang AB. &bull; Powered by RaditNex Infrastructure
     </footer>
   </div>
+</div>
 
   <!-- EDIT PLAYER MODAL (COMBINED: LUCKPERMS, ECONOMY, & SIMPLECLANS) -->
   <div id="editPlayerModal"
@@ -885,6 +985,7 @@
 
   <!-- EXTERNAL JS SCRIPTS -->
   <script src="./javascript/i18n.js" defer></script>
+  <script src="./javascript/cookies.js" defer></script>
   <script src="./javascript/admin.js" defer></script>
 </body>
 

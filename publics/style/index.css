@@ -24,11 +24,11 @@ body {
   border: 1px solid rgba(244, 63, 94, 0.3);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.6s ease, box-shadow 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
   overflow: hidden;
 }
 
-/* Diagonal Holo Sheen Sweep Effect on Cards */
 .supreme-card::before {
   content: '';
   position: absolute;
@@ -38,28 +38,32 @@ body {
   height: 200%;
   background: linear-gradient(
     60deg,
-    transparent 40%,
-    rgba(255, 255, 255, 0.04) 45%,
-    rgba(255, 255, 255, 0.14) 50%,
-    rgba(255, 255, 255, 0.04) 55%,
-    transparent 60%
+    transparent 35%,
+    rgba(255, 255, 255, 0.05) 45%,
+    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 255, 255, 0.05) 55%,
+    transparent 65%
   );
-  transform: rotate(-25deg) translateY(-100%);
-  transition: transform 0.75s ease;
+  transform: rotate(-25deg) translateY(-180%);
+  opacity: 0;
+  transition: opacity 0.35s ease, transform 0s 0.35s;
+  will-change: transform, opacity;
   pointer-events: none;
-  z-index: 1;
+  z-index: 2;
 }
 
 /* Efek Hover Pada Perangkat Non-Touchscreen */
 @media (hover: hover) {
   .supreme-card:hover {
     border-color: rgba(244, 63, 94, 0.85);
-    box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.65), 0 0 24px -4px rgba(244, 63, 94, 0.35);
-    transform: translateY(-6px);
+    box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.75), 0 0 32px -4px rgba(244, 63, 94, 0.4);
+    transform: translateY(-12px);
   }
 
   .supreme-card:hover::before {
-    transform: rotate(-25deg) translateY(100%);
+    opacity: 1;
+    transform: rotate(-25deg) translateY(180%);
+    transition: transform 2.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
   }
 }
 
@@ -250,17 +254,26 @@ input[type="file"]::file-selector-button:hover {
   color: #ffffff;
 }
 
-/* Optimasi tambahan khusus layar HP (dibawah 640px) */
-@media (max-width: 639px) {
-  input[type="file"]::file-selector-button {
-    display: block;
-    width: 100%;
-    margin-bottom: 0.5rem;
-    margin-right: 0;
+/* Tablet & iPad Mini Responsive Optimization (640px - 1024px) */
+@media (min-width: 640px) and (max-width: 1024px) {
+  .podium-stage-container {
+    min-height: 380px;
+    gap: 0.75rem !important;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
   }
-  
-  .glow-rose, .glow-gold, .glow-emerald, .glow-violet {
-    box-shadow: 0 0 12px rgba(244, 63, 94, 0.25);
+
+  .podium-block-wrapper {
+    max-width: 175px !important;
+  }
+
+  .supreme-card {
+    padding: 1.15rem !important;
+  }
+
+  header .max-w-6xl {
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }
 
@@ -409,39 +422,6 @@ input[type="file"]::file-selector-button:hover {
    ADVANCED RPG GAME MICRO-ANIMATIONS & INTERACTION SUITE
    ========================================================================= */
 
-/* 1. Mythic / Legendary Border Running Beam */
-@keyframes borderBeamMove {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.border-beam-card {
-  position: relative;
-  z-index: 1;
-}
-
-.border-beam-card::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0 330deg,
-    #f59e0b 345deg,
-    #f43f5e 360deg
-  );
-  animation: borderBeamMove 4s linear infinite;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0.8;
-}
 
 /* 2. Logo 3D Elastic Hover */
 .brand-logo-img {
@@ -473,7 +453,8 @@ input[type="file"]::file-selector-button:hover {
   position: relative;
   overflow: hidden;
   border-radius: 1rem;
-  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
 }
 
 .gallery-card img {
@@ -559,7 +540,8 @@ input[type="file"]::file-selector-button:hover {
 
 /* 7. Animated Checkmark Perks on Store Hover */
 .item-card {
-  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.8s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.6s ease;
+  will-change: transform;
 }
 
 .item-card:hover .fa-check {

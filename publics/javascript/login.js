@@ -1,29 +1,12 @@
 const WORKER_PROXY_URL = "https://aetheria-checkout.raditnur216531.workers.dev/";
 
-// COOKIE HELPER
-function setCookie(name, value, days) {
-  let expires = "";
-  if (days) {
-    const date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-    expires = "; expires=" + date.toUTCString();
-  }
-  document.cookie = name + "=" + (value || "") + expires + "; path=/; SameSite=Strict";
-}
+// Cookie and session helpers are imported from cookies.js
 
-function getCookie(name) {
-  const nameEQ = name + "=";
-  const ca = document.cookie.split(';');
-  for (let i = 0; i < ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
-  }
-  return null;
-}
-
-function eraseCookie(name) {
-  document.cookie = name + '=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+function isAdminLoggedIn() {
+  const token = getAdminToken();
+  const sessionAuth = sessionStorage.getItem('aetheria_admin_auth') === 'true' || localStorage.getItem('aetheria_admin_auth') === 'true';
+  const adminRank = sessionStorage.getItem('aetheria_admin_rank') || localStorage.getItem('aetheria_admin_rank') || '';
+  return Boolean((token || sessionAuth) && isStaffRank(adminRank));
 }
 
 // TOAST NOTIFICATIONS
@@ -63,29 +46,34 @@ function showToast(message, type = 'info') {
 document.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('logout') === 'true' || urlParams.get('reset') === 'true') {
-    eraseCookie('aetheria_admin_token');
-    sessionStorage.removeItem('aetheria_admin_auth');
-    localStorage.removeItem('aetheria_player_user');
+    clearAllSessions();
     return;
   }
 
-  const adminCookie = getCookie('aetheria_admin_token');
-  const sessionAuth = sessionStorage.getItem('aetheria_admin_auth');
-  const playerUser = localStorage.getItem('aetheria_player_user');
-
-  if (adminCookie || sessionAuth === 'true') {
+  if (isAdminLoggedIn()) {
     showToast("Anda sudah login sebagai Staff/Admin. Mengalihkan...", "info");
     setTimeout(() => {
       window.location.href = './admin.html';
     }, 800);
-  } else if (playerUser) {
+    return;
+  }
+
+  const playerUser = localStorage.getItem('aetheria_player_user');
+  if (playerUser) {
     try {
       const data = JSON.parse(playerUser);
+      if (isStaffRank(data.rank)) {
+        // Akun staff terdeteksi namun belum terautentikasi penuh dengan token kriptografi, biarkan di halaman login
+        return;
+      }
+
       showToast(`Selamat datang kembali, ${data.username}! Mengalihkan...`, "info");
       setTimeout(() => {
         window.location.href = './players.html';
       }, 800);
-    } catch (e) {}
+    } catch (e) {
+      localStorage.removeItem('aetheria_player_user');
+    }
   }
 });
 
@@ -99,10 +87,18 @@ async function handleLoginSubmit(e) {
   const errorText = document.getElementById('loginErrorText');
   const btn = document.getElementById('btnLogin');
 
+  if (usernameEl) usernameEl.classList.remove('border-rose-500');
+  if (passwordEl) passwordEl.classList.remove('border-rose-500');
+
   const username = usernameEl ? usernameEl.value.trim() : '';
   const password = passwordEl ? passwordEl.value : '';
 
   if (!username || !password) {
+    if (!username && usernameEl) usernameEl.classList.add('border-rose-500');
+    if (!password && passwordEl) {
+      passwordEl.classList.add('border-rose-500');
+      passwordEl.focus();
+    }
     if (errorBox && errorText) {
       errorText.innerText = "Username dan Password wajib diisi!";
       errorBox.classList.remove('hidden');
@@ -112,9 +108,7 @@ async function handleLoginSubmit(e) {
   }
 
   // Clear previous session states before new login attempt
-  eraseCookie('aetheria_admin_token');
-  sessionStorage.removeItem('aetheria_admin_auth');
-  localStorage.removeItem('aetheria_player_user');
+  clearAllSessions();
 
   if (errorBox) errorBox.classList.add('hidden');
   if (btn) {
@@ -132,9 +126,7 @@ async function handleLoginSubmit(e) {
     const data = await res.json().catch(() => null);
 
     if (res.ok && data && data.result === 'success') {
-      const rankUpper = (data.rank || '').toUpperCase();
-      const staffRanks = ['OWNER', 'ADMIN', 'HELPER'];
-      const isStaff = staffRanks.some(r => rankUpper.includes(r));
+      const isStaff = isStaffRank(data.rank);
 
       if (isStaff) {
         // Staff Authentication - Wajib memiliki token kriptografi resmi dari Worker
@@ -144,46 +136,75 @@ async function handleLoginSubmit(e) {
             errorText.innerText = "Gagal menginisialisasi token sesi staff dari server!";
             errorBox.classList.remove('hidden');
           }
+          if (passwordEl) {
+            passwordEl.value = '';
+            passwordEl.classList.add('border-rose-500');
+          }
           return;
         }
 
         const staffToken = data.token;
         setCookie('aetheria_admin_token', staffToken, 1);
+        sessionStorage.setItem('aetheria_admin_token', staffToken);
         sessionStorage.setItem('aetheria_admin_auth', 'true');
         sessionStorage.setItem('aetheria_admin_username', data.username || username);
         sessionStorage.setItem('aetheria_admin_rank', data.rank || 'Staff');
+
+        localStorage.setItem('aetheria_admin_token', staffToken);
+        localStorage.setItem('aetheria_admin_auth', 'true');
+        localStorage.setItem('aetheria_admin_username', data.username || username);
+        localStorage.setItem('aetheria_admin_rank', data.rank || 'Staff');
+
+        const playerData = {
+          username: data.username || username,
+          rank: data.rank || 'Staff'
+        };
+        localStorage.setItem('aetheria_player_user', JSON.stringify(playerData));
 
         showToast(`Login Staff Berhasil (${data.rank})! Mengalihkan ke Dashboard Staff...`, "success");
         setTimeout(() => {
           window.location.href = './admin.html';
         }, 800);
       } else {
-        // Player Authentication
+        // Player Authentication (Non-Staff) -> Pastikan TIDAK menyimpan session admin!
+        clearAllSessions();
+
         const playerData = {
           username: data.username || username,
           rank: data.rank || 'Member'
         };
         localStorage.setItem('aetheria_player_user', JSON.stringify(playerData));
 
-        showToast(`Selamat datang ${playerData.username}! Mengalihkan ke Dashboard...`, "success");
+        showToast(`Selamat datang ${playerData.username}! Mengalihkan ke Dashboard Player...`, "success");
         setTimeout(() => {
           window.location.href = './players.html';
         }, 800);
       }
 
     } else {
+      // Logic password salah / auth error
+      clearAllSessions();
       const msg = (data && data.message) || "Username atau password in-game (/login) salah!";
       if (errorBox && errorText) {
         errorText.innerText = msg;
         errorBox.classList.remove('hidden');
       }
+      if (passwordEl) {
+        passwordEl.value = '';
+        passwordEl.classList.add('border-rose-500');
+        passwordEl.focus();
+      }
       showToast(msg, "error");
     }
   } catch (err) {
     console.error('Login Error:', err);
+    clearAllSessions();
     if (errorBox && errorText) {
       errorText.innerText = "Gagal terhubung ke server verifikasi AuthMe.";
       errorBox.classList.remove('hidden');
+    }
+    if (passwordEl) {
+      passwordEl.classList.add('border-rose-500');
     }
     showToast("Kesalahan jaringan saat verifikasi akun.", "error");
   } finally {
@@ -194,10 +215,24 @@ async function handleLoginSubmit(e) {
   }
 }
 
+function togglePasswordVisibility() {
+  const passwordInput = document.getElementById('loginPassword');
+  const icon = document.getElementById('togglePasswordIcon');
+  if (!passwordInput || !icon) return;
+
+  if (passwordInput.type === 'password') {
+    passwordInput.type = 'text';
+    icon.classList.remove('fa-eye');
+    icon.classList.add('fa-eye-slash');
+  } else {
+    passwordInput.type = 'password';
+    icon.classList.remove('fa-eye-slash');
+    icon.classList.add('fa-eye');
+  }
+}
+
 function forceResetSession() {
-  eraseCookie('aetheria_admin_token');
-  sessionStorage.removeItem('aetheria_admin_auth');
-  localStorage.removeItem('aetheria_player_user');
+  clearAllSessions();
   showToast("Sesi berhasil direset. Silakan login kembali.", "info");
   setTimeout(() => {
     window.location.href = './login.html?reset=true';

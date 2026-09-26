@@ -83,6 +83,9 @@ function renderHeroRankBadge(rankName) {
   if (rank.includes('DRAGONIAN') || rank.includes('OWNER') || rank.includes('ADMIN')) {
     return `<span class="bg-gradient-to-r from-amber-500/20 to-rose-500/20 text-amber-300 border border-amber-500/40 px-1.5 py-0.5 rounded text-[9px] font-mono-code font-extrabold tracking-wide">DRAGONIAN</span>`;
   }
+  if (rank.includes('MOD')) {
+    return `<span class="bg-purple-500/20 text-purple-300 border border-purple-500/40 px-1.5 py-0.5 rounded text-[9px] font-mono-code font-bold">MOD</span>`;
+  }
   if (rank.includes('MVP')) {
     return `<span class="bg-rose-500/20 text-rose-300 border border-rose-500/40 px-1.5 py-0.5 rounded text-[9px] font-mono-code font-bold">MVP</span>`;
   }
@@ -92,15 +95,7 @@ function renderHeroRankBadge(rankName) {
   return `<span class="bg-slate-800 text-slate-400 border border-slate-700 px-1.5 py-0.5 rounded text-[9px] font-mono-code font-semibold">MEMBER</span>`;
 }
 
-function escapeHTML(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
+// escapeHTML is imported from cookies.js
 
 let isFetchingPlayers = false;
 
@@ -116,8 +111,9 @@ async function fetchOnlinePlayers() {
   try {
     let isOnline = false;
     let onlineCount = 0;
-    let maxCount = 20;
+    let maxCount = 50;
     let playerList = [];
+    let workerSuccess = false;
 
     // Priority 1: Check Pterodactyl power status & online players via Worker Proxy Gateway
     try {
@@ -134,6 +130,7 @@ async function fetchOnlinePlayers() {
       }
 
       if (playersData && playersData.result === "success") {
+        workerSuccess = true;
         if (Array.isArray(playersData.players)) {
           playerList = playersData.players;
         }
@@ -142,10 +139,10 @@ async function fetchOnlinePlayers() {
         } else {
           onlineCount = playerList.length;
         }
-        if (typeof playersData.max === 'number') {
+        if (typeof playersData.max === 'number' && playersData.max > 0) {
           maxCount = playersData.max;
         }
-        if (!isOnline && onlineCount > 0) {
+        if (!isOnline && (onlineCount > 0 || playerList.length > 0)) {
           isOnline = true;
         }
       }
@@ -153,8 +150,8 @@ async function fetchOnlinePlayers() {
       console.warn("Worker fetch status/players failed:", e);
     }
 
-    // Priority 2: Fallback to mcsrvstat API if Worker did not respond with players or status
-    if (!isOnline || playerList.length === 0) {
+    // Priority 2: Fallback to mcsrvstat API ONLY if Worker did not respond with players or status
+    if (!workerSuccess && !isOnline) {
       try {
         const response = await fetch(`https://api.mcsrvstat.us/3/${SERVER_DOMAIN}`);
         const data = await response.json();
@@ -163,7 +160,9 @@ async function fetchOnlinePlayers() {
           isOnline = true;
           if (onlineCount === 0 && data.players) {
             onlineCount = data.players.online || 0;
-            maxCount = data.players.max || 20;
+            if (data.players.max && data.players.max > 20) {
+              maxCount = data.players.max;
+            }
             playerList = (data.players && data.players.list) ? data.players.list : [];
           }
         }
@@ -174,6 +173,15 @@ async function fetchOnlinePlayers() {
 
     if (isOnline) {
       if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
+
+      // Filter out system error strings from player list if any
+      const INVALID_NAMES = ['jar', 'does', 'not', 'contain', 'error', 'exception', 'unknown', 'null', 'undefined', 'file', 'manifest'];
+      playerList = playerList.filter(player => {
+        const name = typeof player === 'object' ? player.name : player;
+        if (!name || typeof name !== 'string') return false;
+        return !INVALID_NAMES.includes(name.toLowerCase().trim());
+      });
+
       if (countText) countText.innerText = `${onlineCount} / ${maxCount} Warriors Online`;
 
       if (container) {
@@ -222,8 +230,8 @@ function switchTab(type) {
   const moneys = document.querySelectorAll('.item-money');
 
   if (type === 'rank') {
-    tabRank.className = "flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg bg-rose-600 text-white shadow-lg shadow-rose-900/40 transition";
-    tabMoney.className = "flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
+    tabRank.className = "flex-1 flex items-center justify-center text-center px-4 sm:px-5 py-2.5 rounded-lg bg-rose-600 text-white shadow-lg shadow-rose-900/40 transition font-semibold";
+    tabMoney.className = "flex-1 flex items-center justify-center text-center px-4 sm:px-5 py-2.5 rounded-lg text-slate-400 hover:text-white transition font-semibold";
     ranks.forEach(el => {
       el.classList.remove('hidden');
       el.classList.add('flex');
@@ -233,8 +241,8 @@ function switchTab(type) {
       el.classList.remove('flex');
     });
   } else {
-    tabMoney.className = "flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg bg-emerald-600 text-white shadow-lg shadow-emerald-900/40 transition";
-    tabRank.className = "flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
+    tabMoney.className = "flex-1 flex items-center justify-center text-center px-4 sm:px-5 py-2.5 rounded-lg bg-emerald-600 text-white shadow-lg shadow-emerald-900/40 transition font-semibold";
+    tabRank.className = "flex-1 flex items-center justify-center text-center px-4 sm:px-5 py-2.5 rounded-lg text-slate-400 hover:text-white transition font-semibold";
     moneys.forEach(el => {
       el.classList.remove('hidden');
       el.classList.add('flex');
@@ -260,24 +268,45 @@ function getCookie(name) {
 function checkAuthNavState() {
   const btn = document.getElementById('navAuthBtn');
   const btnText = document.getElementById('navAuthBtnText');
-  if (!btn || !btnText) return;
+  const btnMobile = document.getElementById('navAuthBtnMobile');
+  const btnMobileText = document.getElementById('navAuthBtnMobileText');
 
-  const adminCookie = getCookie('aetheria_admin_token');
-  const sessionAuth = sessionStorage.getItem('aetheria_admin_auth');
+  const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_token') || localStorage.getItem('aetheria_admin_token');
+  const sessionAuth = sessionStorage.getItem('aetheria_admin_auth') === 'true' || localStorage.getItem('aetheria_admin_auth') === 'true';
+  const adminRank = sessionStorage.getItem('aetheria_admin_rank') || localStorage.getItem('aetheria_admin_rank') || '';
+  
+  const staffRanks = ['OWNER', 'ADMIN', 'MOD', 'MODERATOR', 'STAFF', 'HELPER'];
+  const isStaff = staffRanks.some(r => adminRank.toUpperCase().includes(r));
+  const isStaffAuth = Boolean(((adminToken && adminToken !== 'true') || sessionAuth) && isStaff);
+
   const playerUser = localStorage.getItem('aetheria_player_user');
 
-  if (adminCookie || sessionAuth === 'true') {
-    btn.href = './admin.html';
-    btnText.setAttribute('data-i18n', 'nav.dashboard_staff');
-    btnText.innerText = (typeof window.t === 'function' ? window.t('nav.dashboard_staff') : 'Dashboard Staff');
+  let targetHref = './login.html';
+  let targetI18n = 'nav.login';
+  let defaultText = 'Login';
+
+  if (isStaffAuth) {
+    targetHref = './admin.html';
+    targetI18n = 'nav.dashboard_staff';
+    defaultText = 'Dashboard Staff';
   } else if (playerUser) {
-    btn.href = './players.html';
-    btnText.setAttribute('data-i18n', 'nav.dashboard_player');
-    btnText.innerText = (typeof window.t === 'function' ? window.t('nav.dashboard_player') : 'Dashboard Player');
-  } else {
-    btn.href = './login.html';
-    btnText.setAttribute('data-i18n', 'nav.login');
-    btnText.innerText = (typeof window.t === 'function' ? window.t('nav.login') : 'Login');
+    targetHref = './players.html';
+    targetI18n = 'nav.dashboard_player';
+    defaultText = 'Dashboard Player';
+  }
+
+  const translatedText = (typeof window.t === 'function' ? window.t(targetI18n) : defaultText);
+
+  if (btn && btnText) {
+    btn.href = targetHref;
+    btnText.setAttribute('data-i18n', targetI18n);
+    btnText.innerText = translatedText;
+  }
+
+  if (btnMobile && btnMobileText) {
+    btnMobile.href = targetHref;
+    btnMobileText.setAttribute('data-i18n', targetI18n);
+    btnMobileText.innerText = translatedText;
   }
 }
 
@@ -313,18 +342,53 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function openModal(name, price, category) {
+  // Cek apakah pengguna sudah login (Player atau Staff)
+  const playerUserStr = localStorage.getItem('aetheria_player_user');
+  const adminToken = getCookie('aetheria_admin_token') || sessionStorage.getItem('aetheria_admin_token') || localStorage.getItem('aetheria_admin_token');
+  const sessionAuth = sessionStorage.getItem('aetheria_admin_auth') === 'true' || localStorage.getItem('aetheria_admin_auth') === 'true';
+
+  const isLoggedIn = Boolean(playerUserStr || (adminToken && adminToken !== 'true') || sessionAuth);
+
+  if (!isLoggedIn) {
+    showToast('Silakan login terlebih dahulu untuk membeli Rank & Coins!', 'error');
+    setTimeout(() => {
+      window.location.href = './login.html';
+    }, 1200);
+    return;
+  }
+
   selectedItem = { name, price, category };
   document.getElementById('modal-item-name').innerText = name;
   document.getElementById('modal-item-price').innerText = price;
+
+  // Auto-fill username jika player sudah login
+  if (playerUserStr) {
+    try {
+      const parsed = JSON.parse(playerUserStr);
+      const username = parsed.username || parsed;
+      const userInput = document.getElementById('usernameInput');
+      if (userInput && username && typeof username === 'string') {
+        userInput.value = username;
+      }
+    } catch (e) {
+      const userInput = document.getElementById('usernameInput');
+      if (userInput && playerUserStr && typeof playerUserStr === 'string') {
+        userInput.value = playerUserStr;
+      }
+    }
+  }
+
   document.getElementById('checkoutModal').classList.remove('hidden');
 
   setTimeout(() => {
     const canvas = document.getElementById('signaturePad');
-    const ratio = Math.max(window.devicePixelRatio || 1, 1);
-    canvas.width = canvas.offsetWidth * ratio;
-    canvas.height = canvas.offsetHeight * ratio;
-    canvas.getContext("2d").scale(ratio, ratio);
-    if (signaturePad) signaturePad.clear();
+    if (canvas && canvas.getContext) {
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      canvas.width = canvas.offsetWidth * ratio;
+      canvas.height = canvas.offsetHeight * ratio;
+      canvas.getContext("2d").scale(ratio, ratio);
+      if (signaturePad) signaturePad.clear();
+    }
   }, 50);
 }
 
@@ -401,6 +465,22 @@ async function handleFormSubmit(e) {
     const resData = await response.json().catch(() => ({}));
 
     if (response.ok && resData.result === "success") {
+      try {
+        const orderRecord = {
+          id: resData.id || `AETH-${Date.now().toString().slice(-6)}`,
+          username: username,
+          itemName: selectedItem.name,
+          category: selectedItem.category,
+          price: selectedItem.price,
+          status: 'PENDING',
+          timestamp: new Date().toLocaleString('id-ID')
+        };
+        const cacheKey = `aetheria_player_orders_${username.toLowerCase()}`;
+        const existing = JSON.parse(localStorage.getItem(cacheKey) || '[]');
+        existing.unshift(orderRecord);
+        localStorage.setItem(cacheKey, JSON.stringify(existing));
+      } catch (e) {}
+
       showToast('Bukti pembayaran terkirim ke Discord & tercatat di Admin Sheet!', 'success');
       closeModal();
     } else {
@@ -776,9 +856,9 @@ function switchLeaderboardCategory(cat) {
     const tabBtn = document.getElementById(`lb-tab-${c}`);
     if (tabBtn) {
       if (c === cat) {
-        tabBtn.className = "flex-1 sm:flex-none px-3.5 py-2 rounded-lg bg-rose-600 text-white shadow-lg shadow-rose-900/40 transition flex items-center justify-center gap-2";
+        tabBtn.className = "flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-rose-600 text-white shadow-lg shadow-rose-900/40 transition flex items-center justify-center gap-1.5";
       } else {
-        tabBtn.className = "flex-1 sm:flex-none px-3.5 py-2 rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-2";
+        tabBtn.className = "flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5";
       }
     }
   });

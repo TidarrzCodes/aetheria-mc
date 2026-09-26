@@ -73,12 +73,70 @@ html.light header[class*="bg-[#09090b]"] {
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
 }
 
+html.light header a span.text-white,
+html.light header h1.text-white,
+html.light header span.text-white {
+  color: #0f172a !important;
+}
+
+html.light header nav {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light header nav button.text-zinc-400,
+html.light header nav button.text-slate-400,
+html.light header nav a.text-slate-400 {
+  color: #475569 !important;
+}
+
+html.light header nav button.text-zinc-400:hover,
+html.light header nav button.text-slate-400:hover,
+html.light header nav a.text-slate-400:hover {
+  color: #0f172a !important;
+}
+
+/* Left Sidebar Navbar (Admin Dashboard) */
+aside, #adminSidebar {
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+html.light aside,
+html.light #adminSidebar {
+  background-color: var(--bg-header) !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 1px 0 8px rgba(15, 23, 42, 0.05);
+}
+
+html.light #adminSidebar h1,
+html.light #adminSidebar span.text-white {
+  color: #0f172a !important;
+}
+
+html.light #adminSidebar nav button.text-zinc-400 {
+  color: #475569 !important;
+}
+
+html.light #adminSidebar nav button.bg-zinc-800 {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+html.light #adminSidebar nav button:hover {
+  background-color: #f1f5f9 !important;
+}
+
+html.light #adminSidebar [class*="bg-[#0c0d10]"] {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
 /* Supreme Glass Cards & Panels */
 .supreme-card, .glass-panel {
   background: var(--bg-card) !important;
   border-color: var(--border-card) !important;
   box-shadow: var(--shadow-card) !important;
-  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s ease, border-color 0.6s ease, box-shadow 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 html.light .supreme-card::before {
@@ -306,6 +364,53 @@ html.light .input-box {
   color: #0f172a !important;
 }
 
+html.light select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* Rank Badges in Light Mode */
+html.light .badge-rank-owner {
+  background: #ffe4e6 !important;
+  color: #be123c !important;
+  border-color: #fca5a5 !important;
+}
+html.light .badge-rank-admin {
+  background: #fef3c7 !important;
+  color: #b45309 !important;
+  border-color: #fcd34d !important;
+}
+html.light .badge-rank-mod {
+  background: #f3e8ff !important;
+  color: #7e22ce !important;
+  border-color: #d8b4fe !important;
+}
+html.light .badge-rank-helper {
+  background: #dbeafe !important;
+  color: #1d4ed8 !important;
+  border-color: #93c5fd !important;
+}
+html.light .badge-rank-dragonian {
+  background: #f3e8ff !important;
+  color: #6b21a8 !important;
+  border-color: #c084fc !important;
+}
+html.light .badge-rank-mvp {
+  background: #cff4fc !important;
+  color: #0891b2 !important;
+  border-color: #67e8f9 !important;
+}
+html.light .badge-rank-vip {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+  border-color: #86efac !important;
+}
+html.light .badge-rank-default {
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  border-color: #cbd5e1 !important;
+}
+
 html.light input::placeholder,
 html.light textarea::placeholder {
   color: #94a3b8 !important;
@@ -461,7 +566,7 @@ html.light footer {
   justify-content: center;
   padding: 0.4rem 0.65rem;
   border-radius: 0.75rem;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 700;
   transition: all 0.2s ease;
   cursor: pointer;
@@ -562,4 +667,31 @@ html.light #ingameChatStream .bg-emerald-950\/20:hover {
 html.light #ingameChatStream .text-emerald-100 {
   color: #065f46 !important;
 }
+
+/* =========================================================================
+   14. NAVBAR BRAND LOGO (CIRCULAR EMBLEM)
+   ========================================================================= */
+
+.brand-logo-img {
+  border-radius: 9999px !important;
+  object-fit: cover !important;
+  border: 1px solid rgba(244, 63, 94, 0.45) !important;
+  background-color: var(--input-bg, #070910) !important;
+  padding: 2px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.brand-logo-img:hover {
+  transform: rotate(10deg) scale(1.1) !important;
+  border-color: rgba(244, 63, 94, 0.85) !important;
+  box-shadow: 0 0 16px rgba(244, 63, 94, 0.6) !important;
+}
+
+html.light .brand-logo-img {
+  border-color: rgba(244, 63, 94, 0.5) !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12) !important;
+}
+
 

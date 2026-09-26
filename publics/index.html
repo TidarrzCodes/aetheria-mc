@@ -40,51 +40,57 @@
 
     <!-- TOP NAVBAR -->
     <header class="border-b border-rose-950/80 bg-[#020305]/95 sticky top-0 z-40 backdrop-blur-md">
-      <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
+      <div class="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex flex-col lg:flex-row justify-between items-center gap-2.5 lg:gap-3">
 
-        <!-- LOGO BRAND -->
-        <a href="#" class="flex items-center gap-3 group w-full sm:w-auto justify-between sm:justify-start">
-          <div class="flex items-center gap-3">
-            <div
-              class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center group-hover:scale-105 transition shrink-0">
-              <img src="./library/aetheria.png" alt="Aetheria Logo" class="w-full h-full object-contain brand-logo-img">
+        <!-- LOGO BRAND & MOBILE/TABLET QUICK ACTIONS -->
+        <div class="flex items-center justify-between w-full lg:w-auto gap-3">
+          <a href="#" class="flex items-center gap-2.5 sm:gap-3 group shrink-0">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center shrink-0">
+              <img src="./library/aetheria.png" alt="Aetheria Logo" class="w-full h-full rounded-full object-cover brand-logo-img">
             </div>
             <div>
-              <span
-                class="font-epic font-black text-base sm:text-lg text-white tracking-widest block leading-tight">AETHERIA<span
-                  class="text-rose-500">: ECLIPSE</span></span>
-              <p class="text-[9px] sm:text-[10px] text-slate-400 font-mono-code tracking-tight" data-i18n="nav.network">DRAGON'S ECLIPSE NETWORK
-              </p>
+              <span class="font-epic font-black text-sm sm:text-lg text-white tracking-widest block leading-tight">AETHERIA<span class="text-rose-500">: ECLIPSE</span></span>
+              <p class="text-[9px] sm:text-[10px] text-slate-400 font-mono-code tracking-tight" data-i18n="nav.network">DRAGON'S ECLIPSE NETWORK</p>
             </div>
-          </div>
-        </a>
+          </a>
 
-        <!-- RIGHT WIDGETS (IP COPY, THEME/LANG TOGGLES & PLAYER LOGIN) -->
-        <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto justify-center sm:justify-end">
+          <!-- MOBILE & TABLET UTILITIES (THEME & LANG TOGGLES) -->
+          <div class="flex lg:hidden items-center gap-1.5 font-mono-code text-xs shrink-0">
+            <button type="button" id="themeToggleBtnMobile" onclick="toggleTheme()" class="theme-toggle-btn px-2.5 py-1.5 rounded-lg border border-slate-800 bg-slate-900 text-amber-400" title="Toggle Theme">
+              <i class="fa-solid fa-sun text-xs"></i>
+            </button>
+            <button type="button" id="langToggleBtnMobile" onclick="toggleLanguage()" class="lang-toggle-btn px-2.5 py-1.5 rounded-lg border border-slate-800 bg-slate-900 text-slate-300 font-bold text-xs" title="Toggle Language">
+              ID
+            </button>
+          </div>
+        </div>
+
+        <!-- RIGHT WIDGETS (IP COPY, DESKTOP TOGGLES, & LOGIN/DASHBOARD STAFF BUTTON) -->
+        <div class="flex flex-col lg:flex-row items-center gap-2 w-full lg:w-auto justify-center lg:justify-end">
           <!-- SERVER IP COPY WIDGET -->
           <button onclick="copyIP('aetheria.raditnex.my.id')"
-            class="w-full sm:w-auto bg-slate-900/90 hover:bg-slate-800 border border-rose-500/50 text-xs px-3.5 py-2 rounded-xl transition flex items-center justify-center sm:justify-start gap-2 shadow-lg shadow-rose-950/40 active:scale-95">
+            class="w-full lg:w-auto bg-slate-900/90 hover:bg-slate-800 border border-rose-500/50 text-xs px-3.5 py-2 rounded-xl transition flex items-center justify-center lg:justify-start gap-2 shadow-lg shadow-rose-950/40 active:scale-95">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
             <span class="text-slate-300 truncate text-[11px] sm:text-xs"><span data-i18n="nav.server_ip">SERVER IP:</span> <strong
                 class="text-white font-mono-code">aetheria.raditnex.my.id</strong></span>
             <i class="fa-regular fa-copy text-rose-400 shrink-0 ml-1"></i>
           </button>
 
-          <!-- THEME TOGGLE BUTTON -->
-          <button type="button" id="themeToggleBtn" onclick="toggleTheme()" class="theme-toggle-btn" title="Toggle Theme">
+          <!-- DESKTOP THEME TOGGLE BUTTON -->
+          <button type="button" id="themeToggleBtn" onclick="toggleTheme()" class="theme-toggle-btn hidden lg:flex" title="Toggle Theme">
             <i class="fa-solid fa-sun text-amber-400"></i>
-            <span class="hidden sm:inline ml-1 text-xs">Light</span>
+            <span class="ml-1 text-xs">Light</span>
           </button>
 
-          <!-- LANGUAGE TOGGLE BUTTON -->
-          <button type="button" id="langToggleBtn" onclick="toggleLanguage()" class="lang-toggle-btn" title="Toggle Language">
+          <!-- DESKTOP LANGUAGE TOGGLE BUTTON -->
+          <button type="button" id="langToggleBtn" onclick="toggleLanguage()" class="lang-toggle-btn hidden lg:flex" title="Toggle Language">
             <span class="lang-toggle-badge bg-emerald-600 text-white">ID</span>
-            <span class="hidden sm:inline ml-1 text-xs text-slate-300">ID</span>
+            <span class="ml-1 text-xs text-slate-300">ID</span>
           </button>
 
-          <!-- TOMBOL LOGIN / PLAYER AREA -->
+          <!-- TOMBOL LOGIN / DASHBOARD STAFF -->
           <a href="./login.html" id="navAuthBtn"
-            class="w-full sm:w-auto bg-rose-600 hover:bg-rose-500 text-white text-xs px-3.5 py-2 rounded-xl transition flex items-center justify-center gap-2 font-mono-code font-bold shadow-lg shadow-rose-950/40 shrink-0">
+            class="w-full lg:w-auto flex bg-rose-600 hover:bg-rose-500 text-white text-xs px-3.5 py-2 rounded-xl transition items-center justify-center gap-2 font-mono-code font-bold shadow-lg shadow-rose-950/40 shrink-0">
             <i class="fa-solid fa-user-shield"></i>
             <span id="navAuthBtnText" data-i18n="nav.login">Login</span>
           </a>
@@ -271,7 +277,7 @@
 
     <!-- 3D LEADERBOARD REALM HALL OF FAME -->
     <section id="leaderboard" class="max-w-6xl mx-auto px-4 py-8 sm:py-12 w-full border-t border-slate-800/80">
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-8">
         <div>
           <h3 class="text-2xl sm:text-4xl font-black text-white tracking-tight font-epic flex items-center gap-3">
             <i class="fa-solid fa-crown text-amber-400"></i> <span data-i18n="lb.title">Leaderboard Ksatria</span>
@@ -280,22 +286,22 @@
         </div>
 
         <!-- CATEGORY TABS -->
-        <div class="flex flex-wrap w-full md:w-auto bg-slate-900/90 p-1.5 rounded-xl border border-slate-800 text-xs font-semibold font-mono-code gap-1">
+        <div class="flex flex-wrap sm:flex-nowrap w-full sm:w-auto bg-slate-900/90 p-1 sm:p-1.5 rounded-xl border border-slate-800 text-[11px] sm:text-xs font-semibold font-mono-code gap-1 shrink-0">
           <button onclick="switchLeaderboardCategory('kills')" id="lb-tab-kills"
-            class="flex-1 sm:flex-none px-3.5 py-2 rounded-lg bg-rose-600 text-white shadow-lg shadow-rose-900/40 transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-skull text-rose-300"></i> <span data-i18n="lb.tab_kills">Top Kills</span>
+            class="flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-rose-600 text-white shadow-lg shadow-rose-900/40 transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-skull text-rose-300 text-[10px] sm:text-xs"></i> <span data-i18n="lb.tab_kills">Top Kills</span>
           </button>
           <button onclick="switchLeaderboardCategory('playtime')" id="lb-tab-playtime"
-            class="flex-1 sm:flex-none px-3.5 py-2 rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-clock text-amber-400"></i> <span data-i18n="lb.tab_playtime">Paling Setia</span>
+            class="flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-clock text-amber-400 text-[10px] sm:text-xs"></i> <span data-i18n="lb.tab_playtime">Paling Setia</span>
           </button>
           <button onclick="switchLeaderboardCategory('donators')" id="lb-tab-donators"
-            class="flex-1 sm:flex-none px-3.5 py-2 rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-gem text-cyan-400"></i> <span data-i18n="lb.tab_donators">Top Donatur</span>
+            class="flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-gem text-cyan-400 text-[10px] sm:text-xs"></i> <span data-i18n="lb.tab_donators">Top Donatur</span>
           </button>
           <button onclick="switchLeaderboardCategory('baltop')" id="lb-tab-baltop"
-            class="flex-1 sm:flex-none px-3.5 py-2 rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-coins text-emerald-400"></i> <span data-i18n="lb.tab_baltop">Top Baltop</span>
+            class="flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-coins text-emerald-400 text-[10px] sm:text-xs"></i> <span data-i18n="lb.tab_baltop">Top Baltop</span>
           </button>
         </div>
       </div>
@@ -434,7 +440,7 @@
     <main id="store" class="max-w-6xl mx-auto px-4 py-8 sm:py-12 w-full border-t border-slate-800/80">
 
       <!-- CATEGORY SWITCHER -->
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-8">
         <div>
           <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight font-epic flex items-center gap-2">
             <i class="fa-solid fa-fire text-rose-500"></i> <span data-i18n="store.title">Eclipse Webstore</span>
@@ -443,13 +449,13 @@
         </div>
 
         <div
-          class="flex w-full sm:w-auto bg-slate-900/90 p-1.5 rounded-xl border border-slate-800 text-xs font-semibold">
+          class="flex w-full sm:w-auto min-w-[260px] bg-slate-900/90 p-1.5 rounded-xl border border-slate-800 text-xs font-semibold shrink-0">
           <button onclick="switchTab('rank')" id="tab-rank"
-            class="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg bg-rose-600 text-white shadow-lg shadow-rose-900/40 transition" data-i18n="store.tab_rank">
+            class="flex-1 flex items-center justify-center text-center px-4 sm:px-5 py-2.5 rounded-lg bg-rose-600 text-white shadow-lg shadow-rose-900/40 transition font-semibold" data-i18n="store.tab_rank">
             Rank Membership
           </button>
           <button onclick="switchTab('money')" id="tab-money"
-            class="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg text-slate-400 hover:text-white transition" data-i18n="store.tab_money">
+            class="flex-1 flex items-center justify-center text-center px-4 sm:px-5 py-2.5 rounded-lg text-slate-400 hover:text-white transition font-semibold" data-i18n="store.tab_money">
             Coins / Money
           </button>
         </div>
@@ -525,7 +531,7 @@
 
         <!-- ITEM RANK 3: DRAGONIAN -->
         <div
-          class="item-card item-rank supreme-card border-beam-card p-5 sm:p-6 rounded-2xl flex flex-col justify-between border-amber-500/80 glow-gold relative overflow-hidden">
+          class="item-card item-rank supreme-card p-5 sm:p-6 rounded-2xl flex flex-col justify-between border-amber-500/80 glow-gold relative overflow-hidden">
           <div class="absolute -right-10 -top-10 w-28 h-28 bg-amber-500/10 rounded-full blur-2xl pointer-events-none">
           </div>
           <div>
@@ -792,81 +798,83 @@
     <div id="checkoutModal"
       class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
       <div
-        class="supreme-card w-full max-w-md p-5 sm:p-6 rounded-2xl relative shadow-2xl border-rose-500/60 max-h-[90vh] overflow-y-auto">
+        class="supreme-card w-full max-w-md rounded-2xl relative shadow-2xl border-rose-500/60 max-h-[90vh] flex flex-col overflow-hidden">
         <button onclick="closeModal()"
-          class="absolute top-4 right-4 text-slate-400 hover:text-white text-sm w-8 h-8 flex items-center justify-center rounded-lg bg-slate-900 border border-slate-800">
+          class="absolute top-4 right-4 text-slate-400 hover:text-white text-sm w-8 h-8 flex items-center justify-center rounded-lg bg-slate-900 border border-slate-800 z-10">
           <i class="fa-solid fa-xmark"></i>
         </button>
 
-        <h3
-          class="text-base sm:text-lg font-bold text-white mb-4 border-b border-slate-800/80 pb-3 font-epic flex items-center gap-2">
-          <i class="fa-solid fa-shield-halved text-rose-500"></i> <span data-i18n="checkout.title">Konfirmasi Pembayaran GoPay</span>
-        </h3>
+        <div class="p-5 sm:p-6 overflow-y-auto custom-scrollbar">
+          <h3
+            class="text-base sm:text-lg font-bold text-white mb-4 border-b border-slate-800/80 pb-3 font-epic flex items-center gap-2 pr-8">
+            <i class="fa-solid fa-shield-halved text-rose-500"></i> <span data-i18n="checkout.title">Konfirmasi Pembayaran GoPay</span>
+          </h3>
 
-        <div
-          class="bg-slate-950/80 p-3 sm:p-3.5 rounded-xl border border-slate-800/80 mb-4 text-xs flex justify-between items-center">
-          <div>
-            <p class="text-slate-400 text-[10px] sm:text-[11px]" data-i18n="checkout.item_label">Item Dipilih:</p>
-            <p id="modal-item-name" class="font-bold text-white mt-0.5 font-epic"></p>
-          </div>
-          <div class="text-right">
-            <p class="text-slate-400 text-[10px] sm:text-[11px]" data-i18n="checkout.price_label">Harga:</p>
-            <p id="modal-item-price" class="font-bold text-emerald-400 mt-0.5 font-mono-code"></p>
-          </div>
-        </div>
-
-        <div
-          class="bg-blue-950/30 border border-blue-500/30 p-3 sm:p-3.5 rounded-xl mb-4 text-xs flex justify-between items-center gap-3">
-          <div class="flex items-center gap-3">
-            <div class="h-10 sm:h-12 w-auto flex items-center justify-center shrink-0">
-              <img
-                src="https://static.vecteezy.com/system/resources/previews/067/065/676/non_2x/gopay-logo-square-rounded-gopay-logo-free-download-gopay-logo-free-png.png"
-                alt="GoPay Logo" class="h-full w-auto object-contain">
-            </div>
+          <div
+            class="bg-slate-950/80 p-3 sm:p-3.5 rounded-xl border border-slate-800/80 mb-4 text-xs flex justify-between items-center">
             <div>
-              <p class="text-slate-400 text-[9px] sm:text-[10px] tracking-wider font-semibold flex items-center gap-1">
-                <span data-i18n="checkout.transfer_to">TRANSFER KE</span> <b class="text-blue-400">GOPAY</b>:</p>
-              <p class="font-mono-code font-bold text-white text-xs sm:text-sm mt-0.5">0858-8022-6237</p>
-              <p class="text-[9px] sm:text-[10px] text-slate-400" data-i18n="checkout.an_operator">a.n. Operator Server</p>
+              <p class="text-slate-400 text-[10px] sm:text-[11px]" data-i18n="checkout.item_label">Item Dipilih:</p>
+              <p id="modal-item-name" class="font-bold text-white mt-0.5 font-epic"></p>
+            </div>
+            <div class="text-right">
+              <p class="text-slate-400 text-[10px] sm:text-[11px]" data-i18n="checkout.price_label">Harga:</p>
+              <p id="modal-item-price" class="font-bold text-emerald-400 mt-0.5 font-mono-code"></p>
             </div>
           </div>
-          <button onclick="copyGopay('085880226237')"
-            class="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs px-3 py-1.5 rounded-lg transition shadow-md shadow-blue-950 shrink-0" data-i18n="checkout.copy_btn">
-            Copy
-          </button>
+
+          <div
+            class="bg-blue-950/30 border border-blue-500/30 p-3 sm:p-3.5 rounded-xl mb-4 text-xs flex justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+              <div class="h-10 sm:h-12 w-auto flex items-center justify-center shrink-0">
+                <img
+                  src="https://static.vecteezy.com/system/resources/previews/067/065/676/non_2x/gopay-logo-square-rounded-gopay-logo-free-download-gopay-logo-free-png.png"
+                  alt="GoPay Logo" class="h-full w-auto object-contain">
+              </div>
+              <div>
+                <p class="text-slate-400 text-[9px] sm:text-[10px] tracking-wider font-semibold flex items-center gap-1">
+                  <span data-i18n="checkout.transfer_to">TRANSFER KE</span> <b class="text-blue-400">GOPAY</b>:</p>
+                <p class="font-mono-code font-bold text-white text-xs sm:text-sm mt-0.5">0858-8022-6237</p>
+                <p class="text-[9px] sm:text-[10px] text-slate-400" data-i18n="checkout.an_operator">a.n. Operator Server</p>
+              </div>
+            </div>
+            <button onclick="copyGopay('085880226237')"
+              class="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs px-3 py-1.5 rounded-lg transition shadow-md shadow-blue-950 shrink-0" data-i18n="checkout.copy_btn">
+              Copy
+            </button>
+          </div>
+
+          <form id="orderForm" onsubmit="handleFormSubmit(event)" class="space-y-4 text-xs">
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1.5" data-i18n="checkout.user_label">Username Minecraft *</label>
+              <input type="text" id="usernameInput" required placeholder="Contoh: Steve" data-i18n-placeholder="checkout.user_ph"
+                class="w-full input-box px-3.5 py-2.5 rounded-xl text-white font-mono-code">
+            </div>
+
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1.5" data-i18n="checkout.proof_label">Upload Bukti Transfer *</label>
+              <input type="file" id="proofInput" accept="image/*" required
+                class="w-full input-box p-1.5 rounded-xl text-slate-400 font-mono-code text-xs">
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center mb-1.5">
+                <label class="text-slate-300 font-semibold" data-i18n="checkout.sig_label">Tanda Tangan Pemesan *</label>
+                <button type="button" onclick="clearSignature()"
+                  class="text-[11px] text-rose-400 hover:text-rose-300 hover:underline flex items-center gap-1">
+                  <i class="fa-solid fa-rotate-left"></i> <span data-i18n="checkout.btn_clear">Hapus TTD</span>
+                </button>
+              </div>
+              <div class="input-box rounded-xl overflow-hidden border border-slate-800">
+                <canvas id="signaturePad" class="w-full h-28 cursor-crosshair block"></canvas>
+              </div>
+            </div>
+
+            <button type="submit" id="submitBtn"
+              class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3.5 rounded-xl transition text-xs mt-3 shadow-lg shadow-rose-950/60 font-epic tracking-wider uppercase" data-i18n="checkout.btn_submit">
+              Kirim Bukti Pembayaran
+            </button>
+          </form>
         </div>
-
-        <form id="orderForm" onsubmit="handleFormSubmit(event)" class="space-y-4 text-xs">
-          <div>
-            <label class="block text-slate-300 font-semibold mb-1.5" data-i18n="checkout.user_label">Username Minecraft *</label>
-            <input type="text" id="usernameInput" required placeholder="Contoh: Steve" data-i18n-placeholder="checkout.user_ph"
-              class="w-full input-box px-3.5 py-2.5 rounded-xl text-white font-mono-code">
-          </div>
-
-          <div>
-            <label class="block text-slate-300 font-semibold mb-1.5" data-i18n="checkout.proof_label">Upload Bukti Transfer *</label>
-            <input type="file" id="proofInput" accept="image/*" required
-              class="w-full input-box p-1.5 rounded-xl text-slate-400 font-mono-code text-xs">
-          </div>
-
-          <div>
-            <div class="flex justify-between items-center mb-1.5">
-              <label class="text-slate-300 font-semibold" data-i18n="checkout.sig_label">Tanda Tangan Pemesan *</label>
-              <button type="button" onclick="clearSignature()"
-                class="text-[11px] text-rose-400 hover:text-rose-300 hover:underline flex items-center gap-1">
-                <i class="fa-solid fa-rotate-left"></i> <span data-i18n="checkout.btn_clear">Hapus TTD</span>
-              </button>
-            </div>
-            <div class="input-box rounded-xl overflow-hidden border border-slate-800">
-              <canvas id="signaturePad" class="w-full h-28 cursor-crosshair block"></canvas>
-            </div>
-          </div>
-
-          <button type="submit" id="submitBtn"
-            class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3.5 rounded-xl transition text-xs mt-3 shadow-lg shadow-rose-950/60 font-epic tracking-wider uppercase" data-i18n="checkout.btn_submit">
-            Kirim Bukti Pembayaran
-          </button>
-        </form>
       </div>
     </div>
 
@@ -946,6 +954,7 @@
 
   <!-- EXTERNAL JS SCRIPTS -->
   <script src="./javascript/i18n.js" defer></script>
+  <script src="./javascript/cookies.js" defer></script>
   <script src="./javascript/index.js" defer></script>
 </body>
 

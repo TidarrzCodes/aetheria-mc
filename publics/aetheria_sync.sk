@@ -1,0 +1,80 @@
+# =========================================================================
+# AETHERIA: DRAGON'S ECLIPSE - AUTOMATIC SPREADSHEET SYNC SKRIPT
+# File: plugins/Skript/scripts/aetheria_sync.sk
+# Target Minecraft Server: 1.20.1 Forge / Spigot / Paper
+# =========================================================================
+
+options:
+    # URL Cloudflare Worker Proxy Anda
+    WORKER_URL: "https://aetheria-checkout.raditnur216531.workers.dev/?action=update_player_db"
+    
+    # Prefix Pesan In-Game
+    PREFIX: "&8[&eAetheria&8] &f"
+
+# -------------------------------------------------------------------------
+# 1. OTOMATIS SYNC SAAT PLAYER KELUAR / QUIT DARI SERVER
+# -------------------------------------------------------------------------
+on quit:
+    set {_p} to player
+    set {_name} to name of {_p}
+    set {_ip} to ip of {_p}
+    
+    # Ambil Saldo Uang Player (Vault / Essentials / Economy)
+    if {_p}'s balance is set:
+        set {_money} to "%{_p}'s balance%"
+    else:
+        set {_money} to "$0"
+        
+    # Ambil Rank Player (LuckPerms / GroupManager)
+    set {_group} to group of {_p}
+    if {_group} is not set:
+        set {_group} to "Member"
+
+    # Kirim HTTP POST Request ke Cloudflare Worker
+    send a post request to "{@WORKER_URL}" with headers "Content-Type: application/json" and body "{""username"": ""%{_name}%"", ""ipAddress"": ""%{_ip}%"", ""rank"": ""%{_group}%"", ""money"": ""%{_money}%""}"
+
+# -------------------------------------------------------------------------
+# 2. PERINTAH MANUAL IN-GAME (/syncme ATAU /syncdata)
+# -------------------------------------------------------------------------
+command /syncme:
+    aliases: /syncdata, /syncprofile
+    trigger:
+        set {_p} to player
+        set {_name} to name of {_p}
+        set {_ip} to ip of {_p}
+        
+        send "{@PREFIX}&7Menghubungkan ke Cloudflare Worker & Google Sheets..." to {_p}
+        
+        if {_p}'s balance is set:
+            set {_money} to "%{_p}'s balance%"
+        else:
+            set {_money} to "$0"
+            
+        set {_group} to group of {_p}
+        if {_group} is not set:
+            set {_group} to "Member"
+
+        # Kirim Request HTTP Sync
+        send a post request to "{@WORKER_URL}" with headers "Content-Type: application/json" and body "{""username"": ""%{_name}%"", ""ipAddress"": ""%{_ip}%"", ""rank"": ""%{_group}%"", ""money"": ""%{_money}%""}"
+        
+        send "{@PREFIX}&aData profil, uang, & inventori berhasil disinkronkan ke Spreadsheet!" to {_p}
+
+# -------------------------------------------------------------------------
+# 3. AUTO SYNC PERIODIK SETIAP 15 MENIT (SEMUA PLAYER ONLINE)
+# -------------------------------------------------------------------------
+every 15 minutes:
+    loop all players:
+        set {_p} to loop-player
+        set {_name} to name of {_p}
+        set {_ip} to ip of {_p}
+        
+        if {_p}'s balance is set:
+            set {_money} to "%{_p}'s balance%"
+        else:
+            set {_money} to "$0"
+            
+        set {_group} to group of {_p}
+        if {_group} is not set:
+            set {_group} to "Member"
+
+        send a post request to "{@WORKER_URL}" with headers "Content-Type: application/json" and body "{""username"": ""%{_name}%"", ""ipAddress"": ""%{_ip}%"", ""rank"": ""%{_group}%"", ""money"": ""%{_money}%""}"

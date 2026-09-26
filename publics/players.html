@@ -24,100 +24,144 @@
 
 <body class="min-h-screen bg-[#020305] text-slate-200 antialiased flex flex-col justify-between selection:bg-rose-600 selection:text-white relative">
 
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container" class="fixed top-20 right-5 z-[60] flex flex-col gap-3 pointer-events-none"></div>
+
   <div class="relative z-10 flex flex-col min-h-screen">
 
     <!-- NAVBAR -->
     <header class="border-b border-rose-950/80 bg-[#020305]/95 sticky top-0 z-40 backdrop-blur-md">
-      <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-        <a href="./index.html" class="flex items-center gap-3">
-          <img src="./library/aetheria.png" alt="Aetheria Logo" class="w-9 h-9 object-contain">
-          <div>
-            <span class="font-black text-base text-white tracking-widest block leading-tight font-epic">AETHERIA<span class="text-rose-500">: PLAYER HUD</span></span>
-            <p class="text-[9px] text-slate-400 font-mono-code tracking-tight" data-i18n="player.hud_title">PLAYER PROFILE & REALM HUB</p>
+      <div class="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex flex-row justify-between items-center gap-2 w-full">
+        <a href="./index.html" class="flex items-center gap-2.5 sm:gap-3 shrink">
+          <img src="./library/aetheria.png" alt="Aetheria Logo" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover brand-logo-img shrink-0">
+          <div class="min-w-0">
+            <span class="font-black text-sm sm:text-base text-white tracking-wider block leading-tight font-epic truncate">AETHERIA<span class="text-rose-500">: HUD</span></span>
+            <p class="text-[9px] text-slate-400 font-mono-code tracking-tight hidden sm:block" data-i18n="player.hud_title">PLAYER PROFILE & REALM HUB</p>
           </div>
         </a>
 
-        <div class="flex items-center gap-2 font-mono-code">
+        <div class="flex items-center gap-1.5 sm:gap-2 font-mono-code shrink-0">
           <!-- THEME TOGGLE BUTTON -->
-          <button type="button" id="themeToggleBtn" onclick="toggleTheme()" class="theme-toggle-btn" title="Toggle Theme">
-            <i class="fa-solid fa-sun text-amber-400"></i>
-            <span class="hidden sm:inline ml-1 text-xs">Light</span>
+          <button type="button" id="themeToggleBtn" onclick="toggleTheme()" class="theme-toggle-btn h-9 px-2.5 sm:px-3 flex items-center justify-center" title="Toggle Theme">
+            <i class="fa-solid fa-sun text-amber-400 text-base leading-none"></i>
+            <span class="hidden sm:inline ml-1.5 text-xs">Light</span>
           </button>
 
           <!-- LANGUAGE TOGGLE BUTTON -->
-          <button type="button" id="langToggleBtn" onclick="toggleLanguage()" class="lang-toggle-btn" title="Toggle Language">
-            <span class="lang-toggle-badge bg-emerald-600 text-white">ID</span>
-            <span class="hidden sm:inline ml-1 text-xs text-slate-300">ID</span>
+          <button type="button" id="langToggleBtn" onclick="toggleLanguage()" class="lang-toggle-btn h-9 px-2.5 sm:px-3 flex items-center justify-center" title="Toggle Language">
+            <span class="lang-toggle-badge bg-emerald-600 text-white text-xs font-bold px-1.5 py-0.5 rounded">ID</span>
+            <span class="hidden sm:inline ml-1.5 text-xs text-slate-300">ID</span>
           </button>
 
-          <a href="./index.html#store" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
-            <i class="fa-solid fa-cart-shopping"></i> <span data-i18n="nav.store">Webstore</span>
+          <a href="./index.html#store" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs h-9 px-2.5 sm:px-3.5 rounded-xl transition flex items-center justify-center gap-1.5" title="Webstore">
+            <i class="fa-solid fa-cart-shopping text-base leading-none"></i> <span data-i18n="nav.store" class="hidden sm:inline">Webstore</span>
           </a>
-          <button onclick="handlePlayerLogout()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-bold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
-            <i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="nav.logout">Logout</span>
+          <button onclick="handlePlayerLogout()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-bold text-xs h-9 px-2.5 sm:px-3.5 rounded-xl transition flex items-center justify-center gap-1.5" title="Logout">
+            <i class="fa-solid fa-right-from-bracket text-base leading-none text-rose-400"></i> <span data-i18n="nav.logout" class="hidden sm:inline">Logout</span>
           </button>
         </div>
       </div>
     </header>
 
     <!-- MAIN DASHBOARD HUB -->
-    <main class="max-w-6xl mx-auto px-4 py-8 w-full flex-1 space-y-8">
+    <main class="max-w-6xl mx-auto px-3 sm:px-4 py-6 sm:py-8 w-full flex-1 space-y-6 sm:space-y-8">
 
-      <!-- PLAYER PROFILE CARD -->
-      <section id="playerProfileCard" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- PLAYER PROFILE & HISTORY CARD -->
+      <section id="playerProfileCard" class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 items-stretch w-full">
         
-        <!-- AVATAR & BASIC INFO -->
-        <div class="supreme-card p-6 rounded-2xl flex flex-col items-center text-center justify-between border-rose-500/50 shadow-xl">
-          <div class="space-y-3 w-full">
-            <div class="relative w-28 h-28 mx-auto">
-              <img id="playerSkinHead" src="https://mc-heads.net/avatar/Steve/100" alt="Avatar" class="w-full h-full rounded-2xl border-2 border-rose-500/60 shadow-xl bg-slate-900 object-contain p-1">
+        <!-- AVATAR & PROFIL STATS -->
+        <div class="supreme-card p-4 sm:p-6 rounded-2xl flex flex-col items-center text-center justify-between border-rose-500/50 shadow-xl w-full">
+          <div class="space-y-3 w-full flex flex-col items-center">
+            <div class="relative w-24 h-24 sm:w-28 sm:h-28 mx-auto">
+              <img id="playerSkinHead" src="https://mc-heads.net/avatar/Steve/100" alt="Avatar" class="w-full h-full rounded-2xl border-2 border-rose-500/60 shadow-xl bg-slate-900 object-contain p-1 transition-transform hover:scale-105">
             </div>
-            <div>
-              <h3 id="playerDisplayUsername" class="text-xl font-bold text-white font-mono-code">Steve</h3>
-              <div id="playerDisplayRank" class="mt-1">
-                <span class="bg-zinc-800 text-zinc-400 border border-zinc-700 px-2.5 py-0.5 rounded text-[11px] font-mono-code font-semibold">MEMBER</span>
+            <div class="w-full">
+              <h3 id="playerDisplayUsername" class="text-lg sm:text-xl font-bold text-white font-mono-code">Steve</h3>
+              <div id="playerDisplayRank" class="mt-1.5 flex justify-center">
+                <span class="bg-zinc-800 text-zinc-400 border border-zinc-700 px-2.5 py-0.5 rounded text-[11px] font-mono-code font-semibold">[MEMBER]</span>
               </div>
             </div>
           </div>
 
-          <div class="w-full pt-4 border-t border-slate-800/80 text-xs font-mono-code text-slate-400 space-y-2 mt-4">
-            <div class="flex justify-between"><span data-i18n="player.status_ingame">Status In-Game:</span> <strong id="playerOnlineState" class="text-slate-500">Offline</strong></div>
-            <div class="flex justify-between"><span data-i18n="player.realm_server">Realm Server:</span> <strong class="text-rose-400">1.20.1 Forge</strong></div>
+          <div class="w-full space-y-3 mt-4">
+            <div class="bg-slate-950/70 p-3 sm:p-3.5 rounded-xl border border-slate-800/80 text-xs font-mono-code text-slate-400 space-y-2 text-left w-full">
+              <div class="flex justify-between items-center"><span data-i18n="player.status_ingame">Status In-Game:</span> <strong id="playerOnlineState" class="text-slate-500">Offline</strong></div>
+              <div class="flex justify-between items-center"><span data-i18n="player.money">Uang In-Game:</span> <strong id="playerBalance" class="text-emerald-400 font-bold">$0</strong></div>
+              <div class="flex justify-between items-center"><span data-i18n="player.rank">Rank Player:</span> <span id="playerProfileRankBadge"><strong class="text-slate-300">Member</strong></span></div>
+              <div class="flex justify-between items-center"><span data-i18n="player.clan">Clan / Guild:</span> <strong id="playerClan" class="text-cyan-400">-</strong></div>
+              <div class="flex justify-between items-center"><span data-i18n="player.playtime">Waktu Bermain:</span> <strong id="playerPlaytime" class="text-amber-400">0 Jam 0 Mnt</strong></div>
+              <div class="flex justify-between items-center border-t border-slate-800/60 pt-2 mt-1"><span data-i18n="player.realm_server">Realm Server:</span> <strong class="text-rose-400">1.20.1 Forge</strong></div>
+            </div>
             
             <div id="staffAccessContainer" class="hidden">
-              <a href="./admin.html" class="w-full mt-2 bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 py-2 rounded-xl transition text-xs font-mono-code flex items-center justify-center gap-1.5 font-bold">
-                <i class="fa-solid fa-user-shield"></i> <span data-i18n="player.to_staff">Ke Dashboard Staff</span>
+              <a href="./admin.html" class="w-full bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 py-2.5 rounded-xl transition text-xs font-mono-code flex items-center justify-center gap-2 font-bold shadow-lg">
+                <i class="fa-solid fa-user-shield text-xs"></i> <span data-i18n="player.to_staff">Ke Dashboard Staff</span>
               </a>
             </div>
 
-            <button onclick="handlePlayerLogout()" class="w-full mt-2 bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/30 text-rose-300 py-2 rounded-xl transition text-xs font-mono-code">
-              <i class="fa-solid fa-right-from-bracket mr-1"></i> <span data-i18n="player.logout_btn">Logout Akun</span>
+            <button onclick="handlePlayerLogout()" class="w-full bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/30 text-rose-300 py-2.5 rounded-xl transition text-xs font-mono-code flex items-center justify-center gap-2 font-semibold">
+              <i class="fa-solid fa-right-from-bracket text-xs"></i> <span data-i18n="player.logout_btn">Logout Akun</span>
             </button>
           </div>
         </div>
 
-        <!-- RANK BENEFITS & STATS -->
-        <div class="md:col-span-2 supreme-card p-6 rounded-2xl space-y-4 shadow-xl">
-          <h4 class="text-sm font-bold text-white font-mono-code uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-3">
-            <i class="fa-solid fa-shield-halved text-rose-500"></i> <span data-i18n="player.perks_title">Benefit & Keuntungan Rank Kamu</span>
-          </h4>
+        <!-- PLAYER HISTORY CARD (RIWAYAT PEMBELIAN & LOGIN SERVER) -->
+        <div class="md:col-span-2 supreme-card p-4 sm:p-6 rounded-2xl flex flex-col justify-between space-y-4 shadow-xl w-full">
+          <div class="space-y-4">
+            <!-- HEADER & TABS -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+              <h4 class="text-sm font-bold text-white font-mono-code uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-clock-rotate-left text-rose-500"></i> <span data-i18n="player.history_title">RIWAYAT PLAYER</span>
+              </h4>
+              <div class="flex items-center gap-2 text-xs font-mono-code">
+                <button type="button" onclick="switchPlayerHistoryTab('purchases')" id="tabHistPurchases" class="hist-tab-btn active bg-rose-600 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-md">
+                  <i class="fa-solid fa-receipt mr-1"></i> <span data-i18n="player.tab_purchases">Riwayat Pembelian</span>
+                </button>
+                <button type="button" onclick="switchPlayerHistoryTab('logins')" id="tabHistLogins" class="hist-tab-btn bg-slate-900 hover:bg-slate-800 text-slate-400 px-3 py-1.5 rounded-lg transition border border-slate-800">
+                  <i class="fa-solid fa-right-to-bracket mr-1"></i> <span data-i18n="player.tab_logins">Riwayat Login & IP</span>
+                </button>
+              </div>
+            </div>
 
-          <div id="rankBenefitList" class="space-y-3 text-xs font-mono-code">
-            <p class="text-slate-400 italic">Memuat keuntungan rank...</p>
+            <!-- TAB 1: RIWAYAT PEMBELIAN WEBSTORE -->
+            <div id="histPurchasesContainer" class="space-y-3">
+              <div class="flex justify-between items-center text-xs font-mono-code text-slate-400">
+                <span>Daftar transaksi & pembelian item Webstore:</span>
+                <button onclick="fetchPlayerPurchaseHistory()" class="text-rose-400 hover:text-rose-300 text-[11px] font-semibold flex items-center gap-1 transition">
+                  <i class="fa-solid fa-rotate"></i> Refresh
+                </button>
+              </div>
+              <div id="playerPurchaseList" class="space-y-2.5 text-xs font-mono-code max-h-[340px] overflow-y-auto custom-scrollbar pr-1">
+                <p class="text-slate-400 italic py-4 text-center">Memuat riwayat pembelian...</p>
+              </div>
+            </div>
+
+            <!-- TAB 2: RIWAYAT LOGIN SERVER & IP -->
+            <div id="histLoginsContainer" class="hidden space-y-3">
+              <div class="flex justify-between items-center text-xs font-mono-code text-slate-400">
+                <span>Log aktivitas login server & IP address yang digunakan:</span>
+                <button onclick="fetchPlayerLoginHistory()" class="text-rose-400 hover:text-rose-300 text-[11px] font-semibold flex items-center gap-1 transition">
+                  <i class="fa-solid fa-rotate"></i> Refresh
+                </button>
+              </div>
+              <div id="playerLoginList" class="space-y-2.5 text-xs font-mono-code max-h-[340px] overflow-y-auto custom-scrollbar pr-1">
+                <p class="text-slate-400 italic py-4 text-center">Memuat riwayat login...</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       <!-- PLAYER LIVE INVENTORY & HUD SECTION -->
-      <section class="supreme-card p-6 rounded-2xl border-slate-800 space-y-4 shadow-xl">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-slate-800">
+      <section class="supreme-card p-4 sm:p-6 rounded-2xl border-slate-800 space-y-4 shadow-xl w-full">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-800">
           <div>
-            <h3 class="text-lg font-bold text-white font-mono-code flex items-center gap-2">
+            <h3 class="text-base sm:text-lg font-bold text-white font-mono-code flex items-center gap-2">
               <i class="fa-solid fa-box-open text-rose-500"></i> <span data-i18n="player.inv_title">INVENTORI IN-GAME KAMU</span>
             </h3>
             <p id="player-inv-status" class="text-xs text-slate-400 font-mono-code mt-0.5">Memuat data item dari server...</p>
           </div>
-          <button onclick="fetchPlayerInventoryHUD()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs px-3.5 py-1.5 rounded-xl font-mono-code text-slate-300 transition flex items-center gap-1.5">
+          <button onclick="fetchPlayerInventoryHUD()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs px-3.5 py-2 rounded-xl font-mono-code text-slate-300 transition flex items-center gap-1.5 shrink-0">
             <i class="fa-solid fa-rotate text-[11px]"></i> <span data-i18n="player.inv_refresh">Refresh Inventori</span>
           </button>
         </div>
@@ -137,11 +181,11 @@
         <!-- INVENTORY CONTENT CONTAINER -->
         <div id="playerInvContent" class="hidden space-y-4">
           <!-- ARMOR & OFFHAND SECTION -->
-          <div class="bg-[#06080d] border border-slate-800/80 p-3.5 rounded-xl">
-            <p class="text-[10px] font-mono-code text-slate-400 uppercase mb-2.5 font-semibold tracking-wider flex items-center gap-1.5">
+          <div class="bg-[#06080d] border border-slate-800/80 p-3.5 sm:p-4 rounded-xl">
+            <p class="text-[10px] font-mono-code text-slate-400 uppercase mb-3 font-semibold tracking-wider flex items-center gap-1.5">
               <i class="fa-solid fa-shield-halved text-amber-500"></i> <span data-i18n="player.armor_title">Armor & Offhand</span>
             </p>
-            <div class="flex flex-wrap items-center justify-between sm:justify-start gap-2.5">
+            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3 sm:gap-4">
               <!-- Helmet (103) -->
               <div class="flex flex-col items-center gap-1">
                 <span class="text-[9px] font-mono-code text-slate-500 uppercase">Helm</span>
@@ -175,24 +219,127 @@
           </div>
 
           <!-- MAIN INVENTORY GRID (3 x 9) -->
-          <div class="bg-[#06080d] border border-slate-800/80 p-3.5 rounded-xl overflow-x-auto custom-scrollbar">
-            <p class="text-[10px] font-mono-code text-slate-400 uppercase mb-2.5 font-semibold tracking-wider flex items-center gap-1.5">
+          <div class="bg-[#06080d] border border-slate-800/80 p-3.5 sm:p-4 rounded-xl overflow-x-auto custom-scrollbar flex flex-col items-center sm:items-start w-full">
+            <p class="text-[10px] font-mono-code text-slate-400 uppercase mb-3 font-semibold tracking-wider flex items-center gap-1.5 w-full">
               <i class="fa-solid fa-boxes-stacked text-rose-500"></i> <span data-i18n="player.main_inv_title">Main Inventory (Slot 9 - 35)</span>
             </p>
-            <div id="hudMainGrid" class="grid grid-cols-9 gap-1.5 min-w-[340px] justify-items-center">
+            <div id="hudMainGrid" class="grid grid-cols-9 gap-1.5 sm:gap-2 min-w-[270px] sm:min-w-0 justify-items-center mx-auto sm:mx-0">
               <!-- 27 slots generated dynamically -->
             </div>
           </div>
 
           <!-- HOTBAR GRID (1 x 9) -->
-          <div class="bg-[#06080d] border border-slate-800/80 p-3.5 rounded-xl overflow-x-auto custom-scrollbar">
-            <p class="text-[10px] font-mono-code text-slate-400 uppercase mb-2.5 font-semibold tracking-wider flex items-center gap-1.5">
+          <div class="bg-[#06080d] border border-slate-800/80 p-3.5 sm:p-4 rounded-xl overflow-x-auto custom-scrollbar flex flex-col items-center sm:items-start w-full">
+            <p class="text-[10px] font-mono-code text-slate-400 uppercase mb-3 font-semibold tracking-wider flex items-center gap-1.5 w-full">
               <i class="fa-solid fa-hand text-emerald-500"></i> <span data-i18n="player.hotbar_title">Hotbar (Slot 0 - 8)</span>
             </p>
-            <div id="hudHotbarGrid" class="grid grid-cols-9 gap-1.5 min-w-[340px] justify-items-center">
+            <div id="hudHotbarGrid" class="grid grid-cols-9 gap-1.5 sm:gap-2 min-w-[270px] sm:min-w-0 justify-items-center mx-auto sm:mx-0">
               <!-- 9 slots generated dynamically -->
             </div>
           </div>
+        </div>
+      </section>
+
+      <!-- PLAYER ACHIEVEMENTS & ADVANCEMENTS SECTION -->
+      <section class="supreme-card p-4 sm:p-6 rounded-2xl border-slate-800 space-y-5 shadow-xl w-full">
+        <!-- HEADER & PROGRESS STATS -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-800">
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-white font-mono-code flex items-center gap-2">
+              <i class="fa-solid fa-trophy text-amber-400"></i> <span data-i18n="player.achievements_title">PENCAPAIAN & KEMAJUAN (ACHIEVEMENTS)</span>
+            </h3>
+            <p id="player-achievements-status" class="text-xs text-slate-400 font-mono-code mt-0.5" data-i18n="player.achievements_sub">
+              Daftar pencapaian & kemajuan yang telah berhasil didapatkan di server in-game.
+            </p>
+          </div>
+          <button onclick="fetchPlayerAchievementsHUD()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs px-3.5 py-2 rounded-xl font-mono-code text-slate-300 transition flex items-center gap-1.5 shrink-0">
+            <i class="fa-solid fa-rotate text-[11px]"></i> <span data-i18n="player.achievements_refresh">Refresh Achievement</span>
+          </button>
+        </div>
+
+        <!-- PROGRESS BAR CARD -->
+        <div class="bg-[#06080d] border border-slate-800/80 p-4 rounded-xl flex flex-col sm:flex-row items-center gap-4 justify-between">
+          <div class="w-full sm:w-2/3 space-y-2">
+            <div class="flex justify-between items-center text-xs font-mono-code">
+              <span class="text-slate-300 font-semibold flex items-center gap-1.5">
+                <i class="fa-solid fa-chart-line text-rose-500"></i> <span data-i18n="player.ach_progress_label">Kemajuan Player:</span>
+              </span>
+              <span id="achProgressText" class="text-amber-400 font-bold">0 / 0 (0%)</span>
+            </div>
+            <div class="w-full bg-slate-900 h-3 rounded-full overflow-hidden border border-slate-800 p-0.5">
+              <div id="achProgressBar" class="bg-gradient-to-r from-rose-500 via-amber-500 to-emerald-400 h-full rounded-full transition-all duration-700 w-0"></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 w-full sm:w-auto justify-end text-xs font-mono-code">
+            <div class="bg-emerald-950/40 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-center">
+              <span class="text-[10px] text-emerald-400 block uppercase font-bold" data-i18n="player.ach_stat_unlocked">Terbuka</span>
+              <strong id="achStatUnlocked" class="text-emerald-300 text-sm font-bold">0</strong>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg text-center">
+              <span class="text-[10px] text-slate-400 block uppercase font-bold" data-i18n="player.ach_stat_locked">Terkunci</span>
+              <strong id="achStatLocked" class="text-slate-400 text-sm font-bold">0</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- CATEGORY TABS & STATUS FILTERS -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+          <!-- Category Tabs -->
+          <div class="flex flex-wrap items-center gap-1.5 font-mono-code text-xs" id="achCategoryTabs">
+            <button onclick="filterAchievementsCategory('all')" data-cat="all" class="ach-tab-btn active bg-rose-600 text-white font-bold px-3 py-1.5 rounded-lg transition">
+              <i class="fa-solid fa-border-all mr-1"></i> <span data-i18n="player.cat_all">Semua</span>
+            </button>
+            <button onclick="filterAchievementsCategory('story')" data-cat="story" class="ach-tab-btn bg-slate-900 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg transition border border-slate-800">
+              <i class="fa-solid fa-compass mr-1 text-amber-400"></i> Story
+            </button>
+            <button onclick="filterAchievementsCategory('nether')" data-cat="nether" class="ach-tab-btn bg-slate-900 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg transition border border-slate-800">
+              <i class="fa-solid fa-fire mr-1 text-rose-400"></i> Nether
+            </button>
+            <button onclick="filterAchievementsCategory('end')" data-cat="end" class="ach-tab-btn bg-slate-900 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg transition border border-slate-800">
+              <i class="fa-solid fa-dragon mr-1 text-purple-400"></i> The End
+            </button>
+            <button onclick="filterAchievementsCategory('adventure')" data-cat="adventure" class="ach-tab-btn bg-slate-900 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg transition border border-slate-800">
+              <i class="fa-solid fa-crosshairs mr-1 text-emerald-400"></i> Adventure
+            </button>
+            <button onclick="filterAchievementsCategory('husbandry')" data-cat="husbandry" class="ach-tab-btn bg-slate-900 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg transition border border-slate-800">
+              <i class="fa-solid fa-wheat-awn mr-1 text-amber-300"></i> Husbandry
+            </button>
+            <button onclick="filterAchievementsCategory('epicfight')" data-cat="epicfight" class="ach-tab-btn bg-slate-900 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg transition border border-slate-800">
+              <i class="fa-solid fa-khanda mr-1 text-rose-500"></i> Epic Fight
+            </button>
+            <button onclick="filterAchievementsCategory('aether')" data-cat="aether" class="ach-tab-btn bg-slate-900 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg transition border border-slate-800">
+              <i class="fa-solid fa-cloud-sun mr-1 text-cyan-400"></i> The Aether
+            </button>
+            <button onclick="filterAchievementsCategory('saintsdragon')" data-cat="saintsdragon" class="ach-tab-btn bg-slate-900 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg transition border border-slate-800">
+              <i class="fa-solid fa-dragon mr-1 text-amber-500"></i> Saints Dragon
+            </button>
+          </div>
+
+          <!-- Status Dropdown / Filter -->
+          <div class="flex items-center gap-2 font-mono-code text-xs">
+            <select id="achStatusFilter" onchange="applyAchievementsFilter()" class="bg-slate-900 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-lg focus:outline-none focus:border-rose-500">
+              <option value="all" data-i18n="player.filter_all_status">Semua Status</option>
+              <option value="unlocked" data-i18n="player.filter_unlocked">Terbuka (Unlocked)</option>
+              <option value="locked" data-i18n="player.filter_locked">Terkunci (Locked)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- LOADING STATE -->
+        <div id="achLoading" class="py-10 text-center text-xs font-mono-code text-slate-400 flex flex-col items-center justify-center gap-2">
+          <i class="fa-solid fa-spinner fa-spin text-amber-400 text-2xl"></i>
+          <span>Memeriksa data pencapaian dari server...</span>
+        </div>
+
+        <!-- ERROR STATE -->
+        <div id="achError" class="hidden py-8 text-center text-xs font-mono-code text-rose-400 bg-rose-950/20 border border-rose-900/50 rounded-xl p-4">
+          <i class="fa-solid fa-circle-exclamation text-xl mb-1.5 block"></i>
+          <span id="achErrorMessage">Gagal memuat pencapaian player.</span>
+        </div>
+
+        <!-- ACHIEVEMENTS CARDS CONTAINER -->
+        <div id="achievementsGrid" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-2">
+          <!-- Cards generated dynamically via JavaScript -->
         </div>
       </section>
 
@@ -206,6 +353,7 @@
   </div>
 
   <script src="./javascript/i18n.js" defer></script>
+  <script src="./javascript/cookies.js" defer></script>
   <script src="./javascript/players.js" defer></script>
 </body>
 

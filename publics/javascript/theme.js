@@ -29,10 +29,10 @@
     const btns = document.querySelectorAll('.theme-toggle-btn, #themeToggleBtn');
     btns.forEach(btn => {
       if (theme === 'light') {
-        btn.innerHTML = `<i class="fa-solid fa-moon text-amber-500"></i> <span class="hidden sm:inline ml-1 text-xs">Dark</span>`;
+        btn.innerHTML = `<i class="fa-solid fa-moon text-amber-500 text-base leading-none"></i> <span class="hidden sm:inline ml-1.5 text-xs">Dark</span>`;
         btn.setAttribute('title', 'Switch to Dark Mode');
       } else {
-        btn.innerHTML = `<i class="fa-solid fa-sun text-amber-400"></i> <span class="hidden sm:inline ml-1 text-xs">Light</span>`;
+        btn.innerHTML = `<i class="fa-solid fa-sun text-amber-400 text-base leading-none"></i> <span class="hidden sm:inline ml-1.5 text-xs">Light</span>`;
         btn.setAttribute('title', 'Switch to Light Mode');
       }
     });

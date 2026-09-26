@@ -5,38 +5,24 @@ let ordersData = [];
 let currentFilter = 'ALL';
 let currentMainTab = 'systems';
 
-// ==========================================
-// UTILS: COOKIE HELPER
-// ==========================================
-function setCookie(name, value, days) {
-  let expires = "";
-  if (days) {
-    const date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-    expires = "; expires=" + date.toUTCString();
+// Cookie and session helpers are imported from cookies.js
+
+function isAdminLoggedIn() {
+  const token = getAdminToken();
+  const sessionAuth = sessionStorage.getItem('aetheria_admin_auth') === 'true' || localStorage.getItem('aetheria_admin_auth') === 'true';
+  const adminRank = sessionStorage.getItem('aetheria_admin_rank') || localStorage.getItem('aetheria_admin_rank') || '';
+  
+  const playerUserStr = localStorage.getItem('aetheria_player_user');
+  let playerRank = '';
+  if (playerUserStr) {
+    try {
+      const parsed = JSON.parse(playerUserStr);
+      playerRank = parsed.rank || '';
+    } catch(e) {}
   }
-  document.cookie = name + "=" + (value || "") + expires + "; path=/; SameSite=Strict";
-}
 
-function getCookie(name) {
-  const nameEQ = name + "=";
-  const ca = document.cookie.split(';');
-  for (let i = 0; i < ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
-  }
-  return null;
-}
-
-function eraseCookie(name) {
-  document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-}
-
-function getAdminToken() {
-  const cookie = getCookie('aetheria_admin_token');
-  if (cookie && cookie !== 'true') return cookie;
-  return '';
+  const effectiveRank = adminRank || playerRank;
+  return Boolean((token || sessionAuth) && isStaffRank(effectiveRank));
 }
 
 // ==========================================
@@ -78,26 +64,16 @@ function showToast(message, type = 'success') {
   }, 4000);
 }
 
-function escapeHTML(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
+// escapeHTML is imported from cookies.js
 
 // ==========================================
 // INITIALIZATION & TIMERS
 // ==========================================
 window.addEventListener('DOMContentLoaded', () => {
-  const adminCookie = getCookie('aetheria_admin_token');
-  const sessionAuth = sessionStorage.getItem('aetheria_admin_auth');
-
-  if (adminCookie || sessionAuth === 'true') {
+  if (isAdminLoggedIn()) {
     unlockDashboard();
   } else {
+    clearAllSessions();
     window.location.href = './login.html';
   }
 });
@@ -159,6 +135,7 @@ function unlockDashboard() {
   renderStaffProfileBadge();
   syncCurrentTab();
   startAutoReloadAnimation();
+  logDashboardAccess('DASHBOARD_LOGIN');
 }
 
 async function renderStaffProfileBadge() {
@@ -221,10 +198,8 @@ function renderActiveStaffList(staffList) {
 }
 
 function handleLogout() {
-  eraseCookie('aetheria_admin_token');
-  sessionStorage.removeItem('aetheria_admin_auth');
-  localStorage.removeItem('aetheria_player_user');
-  window.location.href = './login.html';
+  clearAllSessions();
+  window.location.href = './login.html?logout=true';
 }
 
 function switchMainTab(tabName) {
@@ -251,8 +226,8 @@ function switchMainTab(tabName) {
   if (viewEtc) viewEtc.classList.add('hidden');
   if (viewChat) viewChat.classList.add('hidden');
 
-  const inactiveBtnClass = "flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5 text-xs";
-  const activeBtnClass = "flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg bg-zinc-800 text-white font-medium transition flex items-center justify-center gap-1.5 text-xs";
+  const inactiveBtnClass = "w-auto xl:w-full h-10 px-3 py-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800/40 transition flex items-center justify-between gap-2.5 text-xs font-semibold whitespace-nowrap shrink-0";
+  const activeBtnClass = "w-auto xl:w-full h-10 px-3 py-2 rounded-xl bg-zinc-800 text-white font-semibold transition flex items-center justify-between gap-2.5 text-xs whitespace-nowrap shrink-0 shadow-sm border border-zinc-700/50";
 
   if (btnOrders) btnOrders.className = inactiveBtnClass;
   if (btnPlayers) btnPlayers.className = inactiveBtnClass;
@@ -281,6 +256,7 @@ function switchMainTab(tabName) {
     if (viewEtc) viewEtc.classList.remove('hidden');
     if (btnEtc) btnEtc.className = activeBtnClass;
     fetchWebChatLogs();
+    fetchAdminAccessLogs();
   }
 }
 
@@ -855,6 +831,9 @@ function renderRankBadge(rankName) {
   if (rank.includes('ADMIN')) {
     return `<span class="bg-rose-500/10 text-rose-300 border border-rose-500/30 px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wide">ADMIN</span>`;
   }
+  if (rank.includes('MOD')) {
+    return `<span class="bg-purple-500/10 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wide">MOD</span>`;
+  }
   if (rank.includes('HELPER')) {
     return `<span class="bg-blue-500/10 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wide">HELPER</span>`;
   }
@@ -910,8 +889,15 @@ async function fetchOnlinePlayers() {
       if (headerDot) headerDot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
 
       let onlineList = (rconData && rconData.players) ? rconData.players : [];
+      const INVALID_NAMES = ['jar', 'does', 'not', 'contain', 'error', 'exception', 'unknown', 'null', 'undefined', 'file', 'manifest'];
+      onlineList = onlineList.filter(p => {
+        const name = typeof p === 'object' ? p.name : p;
+        if (!name || typeof name !== 'string') return false;
+        return !INVALID_NAMES.includes(name.toLowerCase().trim());
+      });
+
       let onlineCount = (rconData && typeof rconData.online === 'number') ? rconData.online : onlineList.length;
-      let maxCount = (rconData && rconData.max) ? rconData.max : 20;
+      let maxCount = (rconData && rconData.max) ? rconData.max : 50;
 
       if (countText) countText.innerText = `${onlineCount} / ${maxCount} Player Online (ONLINE)`;
       if (badgeCount) badgeCount.innerText = onlineCount;
@@ -1990,3 +1976,131 @@ window.submitAdminInGameChat = submitAdminInGameChat;
 window.addEventListener('languageChanged', () => {
   try { syncCurrentTab(); } catch (e) { }
 });
+
+
+// ==========================================
+// ADMIN ACCESS LOG (IP & USER LOGGING)
+// ==========================================
+let cachedAccessLogs = [];
+
+async function logDashboardAccess(actionType = 'DASHBOARD_ACCESS') {
+  try {
+    const adminToken = getAdminToken();
+    if (!adminToken) return;
+
+    await fetch(`${WORKER_PROXY_URL}?action=log_admin_access`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Token': adminToken
+      },
+      body: JSON.stringify({ action_type: actionType })
+    });
+  } catch (e) { }
+}
+
+async function fetchAdminAccessLogs() {
+  try {
+    const adminToken = getAdminToken();
+    if (!adminToken) return;
+
+    const res = await fetch(`${WORKER_PROXY_URL}?action=get_admin_access_logs`, {
+      method: 'GET',
+      headers: {
+        'X-Admin-Token': adminToken
+      }
+    });
+
+    const json = await res.json().catch(() => null);
+    if (json && json.result === 'success' && Array.isArray(json.logs)) {
+      cachedAccessLogs = json.logs;
+      renderAccessLogs(cachedAccessLogs);
+    } else {
+      renderAccessLogs([]);
+    }
+  } catch (e) {
+    renderAccessLogs([]);
+  }
+}
+
+function renderAccessLogs(logs) {
+  const tbody = document.getElementById('access-log-table-list');
+  const countEl = document.getElementById('accessLogCount');
+  const uniqueUsersEl = document.getElementById('accessLogUniqueUsers');
+  const uniqueIpsEl = document.getElementById('accessLogUniqueIps');
+  if (!tbody) return;
+
+  // Stats
+  const uniqueUsers = new Set(logs.map(l => l.username)).size;
+  const uniqueIps = new Set(logs.map(l => l.ip)).size;
+  if (countEl) countEl.textContent = logs.length;
+  if (uniqueUsersEl) uniqueUsersEl.textContent = uniqueUsers;
+  if (uniqueIpsEl) uniqueIpsEl.textContent = uniqueIps;
+
+  if (logs.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-zinc-500 font-mono text-xs">Belum ada access log tercatat.</td></tr>`;
+    return;
+  }
+
+  const actionBadge = (action) => {
+    const map = {
+      'DASHBOARD_LOGIN': { color: 'emerald', icon: 'fa-right-to-bracket', label: 'Login' },
+      'DASHBOARD_ACCESS': { color: 'blue', icon: 'fa-eye', label: 'Access' },
+      'TAB_SWITCH': { color: 'purple', icon: 'fa-arrows-rotate', label: 'Tab Switch' },
+      'COMMAND_EXEC': { color: 'amber', icon: 'fa-terminal', label: 'Command' },
+      'PLAYER_EDIT': { color: 'rose', icon: 'fa-user-pen', label: 'Edit Player' }
+    };
+    const cfg = map[action] || { color: 'zinc', icon: 'fa-circle', label: action };
+    return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-${cfg.color}-500/15 text-${cfg.color}-400 border border-${cfg.color}-500/30 text-[10px]"><i class="fa-solid ${cfg.icon} text-[9px]"></i>${escapeHTML(cfg.label)}</span>`;
+  };
+
+  const rankBadge = (rank) => {
+    const r = (rank || '').toUpperCase();
+    if (r.includes('OWNER')) return `<span class="text-amber-400 font-bold text-[10px]">OWNER</span>`;
+    if (r.includes('ADMIN')) return `<span class="text-rose-400 font-bold text-[10px]">ADMIN</span>`;
+    if (r.includes('MOD')) return `<span class="text-purple-400 font-bold text-[10px]">MOD</span>`;
+    return `<span class="text-zinc-400 text-[10px]">${escapeHTML(rank)}</span>`;
+  };
+
+  tbody.innerHTML = logs.map(log => `
+    <tr class="hover:bg-zinc-800/30 transition">
+      <td class="p-3 text-[11px] text-zinc-400 whitespace-nowrap">
+        <i class="fa-regular fa-clock text-zinc-600 mr-1"></i>${escapeHTML(log.timestamp)}
+      </td>
+      <td class="p-3">
+        <div class="flex items-center gap-2">
+          <img src="https://mc-heads.net/avatar/${encodeURIComponent(log.username)}/20" alt="" class="w-5 h-5 rounded border border-zinc-700" onerror="this.src='https://mc-heads.net/avatar/steve/20'">
+          <span class="text-white font-semibold text-[11px]">${escapeHTML(log.username)}</span>
+        </div>
+      </td>
+      <td class="p-3">${rankBadge(log.rank)}</td>
+      <td class="p-3">
+        <span class="bg-zinc-900 border border-zinc-700 text-emerald-400 px-2 py-0.5 rounded text-[10px] font-mono">${escapeHTML(log.ip)}</span>
+      </td>
+      <td class="p-3">${actionBadge(log.action)}</td>
+      <td class="p-3 text-[10px] text-zinc-500 max-w-[200px] truncate" title="${escapeHTML(log.userAgent)}">${escapeHTML(log.userAgent)}</td>
+    </tr>
+  `).join('');
+}
+
+function filterAccessLogs() {
+  const searchInput = document.getElementById('accessLogSearchInput');
+  if (!searchInput) return;
+  const query = searchInput.value.trim().toLowerCase();
+
+  if (!query) {
+    renderAccessLogs(cachedAccessLogs);
+    return;
+  }
+
+  const filtered = cachedAccessLogs.filter(log =>
+    (log.username || '').toLowerCase().includes(query) ||
+    (log.ip || '').toLowerCase().includes(query) ||
+    (log.action || '').toLowerCase().includes(query) ||
+    (log.rank || '').toLowerCase().includes(query) ||
+    (log.userAgent || '').toLowerCase().includes(query) ||
+    (log.timestamp || '').toLowerCase().includes(query)
+  );
+
+  renderAccessLogs(filtered);
+}

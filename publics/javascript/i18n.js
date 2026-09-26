@@ -128,20 +128,43 @@ const AETHERIA_TRANSLATIONS = {
     "player.hud_title": "PLAYER PROFILE & REALM HUB",
     "player.status_ingame": "Status In-Game:",
     "player.realm_server": "Realm Server:",
+    "player.money": "Uang In-Game:",
+    "player.rank": "Rank Player:",
+    "player.clan": "Clan / Guild:",
+    "player.playtime": "Waktu Bermain:",
     "player.to_staff": "Ke Dashboard Staff",
     "player.logout_btn": "Logout Akun",
+    "player.history_title": "RIWAYAT PLAYER",
+    "player.tab_purchases": "Riwayat Pembelian",
+    "player.tab_logins": "Riwayat Login & IP",
+    "player.btn_download_proof": "Download Bukti",
     "player.perks_title": "Benefit & Keuntungan Rank Kamu",
     "player.inv_title": "INVENTORI IN-GAME KAMU",
     "player.inv_refresh": "Refresh Inventori",
     "player.armor_title": "Armor & Offhand",
     "player.main_inv_title": "Main Inventory (Slot 9 - 35)",
     "player.hotbar_title": "Hotbar (Slot 0 - 8)",
+    "player.achievements_title": "PENCAPAIAN & KEMAJUAN (ACHIEVEMENTS)",
+    "player.achievements_sub": "Daftar pencapaian & kemajuan yang telah berhasil didapatkan di server in-game.",
+    "player.achievements_refresh": "Refresh Achievement",
+    "player.ach_progress_label": "Kemajuan Player:",
+    "player.ach_stat_unlocked": "Terbuka",
+    "player.ach_stat_locked": "Terkunci",
+    "player.cat_all": "Semua",
+    "player.filter_all_status": "Semua Status",
+    "player.filter_unlocked": "Terbuka (Unlocked)",
+    "player.filter_locked": "Terkunci (Locked)",
+    "player.ach_unlocked_badge": "Terbuka",
+    "player.ach_locked_badge": "Terkunci",
+    "player.ach_empty": "Tidak ada pencapaian yang cocok dengan filter.",
 
     // Login Page
     "login.title": "LOGIN AETHERIA",
     "login.desc": "Gunakan Username & Password yang sama dengan di dalam Server Minecraft (/login)",
     "login.pass_label": "Password In-Game (/login)",
     "login.submit": "Masuk Sekarang",
+    "login.back_home": "Kembali ke Beranda",
+    "login.help_discord": "Bantuan Discord",
 
     // Admin Dashboard
     "admin.nav_systems": "Systems",
@@ -320,20 +343,43 @@ const AETHERIA_TRANSLATIONS = {
     "player.hud_title": "PLAYER PROFILE & REALM HUB",
     "player.status_ingame": "In-Game Status:",
     "player.realm_server": "Realm Server:",
+    "player.money": "In-Game Money:",
+    "player.rank": "Player Rank:",
+    "player.clan": "Clan / Guild:",
+    "player.playtime": "Playtime:",
     "player.to_staff": "To Staff Dashboard",
     "player.logout_btn": "Logout Account",
+    "player.history_title": "PLAYER HISTORY",
+    "player.tab_purchases": "Purchase History",
+    "player.tab_logins": "Login & IP History",
+    "player.btn_download_proof": "Download Proof",
     "player.perks_title": "Your Rank Benefits & Perks",
     "player.inv_title": "YOUR IN-GAME INVENTORY",
     "player.inv_refresh": "Refresh Inventory",
     "player.armor_title": "Armor & Offhand",
     "player.main_inv_title": "Main Inventory (Slot 9 - 35)",
     "player.hotbar_title": "Hotbar (Slot 0 - 8)",
+    "player.achievements_title": "ACHIEVEMENTS & ADVANCEMENTS",
+    "player.achievements_sub": "List of achievements & advancements unlocked in the in-game server.",
+    "player.achievements_refresh": "Refresh Achievements",
+    "player.ach_progress_label": "Player Progress:",
+    "player.ach_stat_unlocked": "Unlocked",
+    "player.ach_stat_locked": "Locked",
+    "player.cat_all": "All",
+    "player.filter_all_status": "All Status",
+    "player.filter_unlocked": "Unlocked Only",
+    "player.filter_locked": "Locked Only",
+    "player.ach_unlocked_badge": "Unlocked",
+    "player.ach_locked_badge": "Locked",
+    "player.ach_empty": "No achievements match the selected filter.",
 
     // Login Page
     "login.title": "AETHERIA LOGIN",
     "login.desc": "Use the exact same Username & Password as in the Minecraft Server (/login)",
     "login.pass_label": "In-Game Password (/login)",
     "login.submit": "Sign In Now",
+    "login.back_home": "Back to Home",
+    "login.help_discord": "Discord Help",
 
     // Admin Dashboard
     "admin.nav_systems": "Systems",
@@ -444,20 +490,24 @@ const AETHERIA_TRANSLATIONS = {
     window.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang, t } }));
   }
 
+  const ID_FLAG_SVG = `<svg class="w-[22px] h-[16px] rounded-[2px] shadow-sm shrink-0 border border-slate-700/60 inline-block object-cover align-middle" viewBox="0 0 3 2"><rect width="3" height="1" fill="#dc2626"/><rect y="1" width="3" height="1" fill="#ffffff"/></svg>`;
+  const EN_FLAG_SVG = `<svg class="w-[22px] h-[16px] rounded-[2px] shadow-sm shrink-0 border border-slate-700/60 inline-block object-cover align-middle" viewBox="0 0 60 30"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="2"/><path d="M30,0 V30 M0,15 H60" stroke="#fff" stroke-width="10"/><path d="M30,0 V30 M0,15 H60" stroke="#C8102E" stroke-width="6"/></svg>`;
+
   function updateLanguageButtons(lang) {
-    const btns = document.querySelectorAll('.lang-toggle-btn, #langToggleBtn');
+    const btns = document.querySelectorAll('.lang-toggle-btn, #langToggleBtn, #langToggleBtnMobile');
     btns.forEach(btn => {
       if (lang === 'en') {
-        btn.innerHTML = `<span class="lang-toggle-badge bg-rose-600 text-white">EN</span> <span class="hidden sm:inline ml-1 text-xs text-slate-300">English</span>`;
+        btn.innerHTML = `${EN_FLAG_SVG} <span class="hidden sm:inline ml-1.5 text-xs text-slate-300 font-bold">EN</span>`;
         btn.setAttribute('title', 'Ganti ke Bahasa Indonesia');
       } else {
-        btn.innerHTML = `<span class="lang-toggle-badge bg-emerald-600 text-white">ID</span> <span class="hidden sm:inline ml-1 text-xs text-slate-300">Indonesia</span>`;
+        btn.innerHTML = `${ID_FLAG_SVG} <span class="hidden sm:inline ml-1.5 text-xs text-slate-300 font-bold">ID</span>`;
         btn.setAttribute('title', 'Switch to English');
       }
     });
   }
 
   window.setLanguage = applyLanguage;
+  window.getCurrentLanguage = () => currentLang;
 
   window.toggleLanguage = function () {
     const next = currentLang === 'id' ? 'en' : 'id';
